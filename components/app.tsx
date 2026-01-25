@@ -32,6 +32,6 @@ async function migrate(db: SQLite.SQLiteDatabase) {
     current INTEGER NOT NULL
   );
 
-  INSERT INTO goals (name, year, target, current) VALUES ('Meditate', '2026', 6000, 0);
+  INSERT INTO goals (name, year, target, current) VALUES ('Meditate', '2026', 50, 0);
   `);
 }
