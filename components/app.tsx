@@ -1,4 +1,4 @@
-import { AppState, AppStateContext, defaultState } from "@/hooks";
+import { AppState, AppStateContext, defaultState } from "@/hooks/state";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import * as SQLite from "expo-sqlite";
 import { useImmer } from "use-immer";
@@ -6,25 +6,15 @@ import { useImmer } from "use-immer";
 export const queryClient = new QueryClient();
 
 export const App = ({ children }: React.PropsWithChildren) => {
-  // const existingState = window.localStorage.getItem(appStateKey);
-  const [state, setState] = useImmer<AppState>(
-    // existingState ? JSON.parse(existingState) : defaultState
-    defaultState,
-  );
-
-  // useEffect(() => {
-  //   if (state) {
-  //     window.localStorage.setItem(appStateKey, JSON.stringify(state));
-  //   }
-  // }, [state]);
+  const [state, setState] = useImmer<AppState>(defaultState);
   return (
-    <QueryClientProvider client={queryClient}>
-      <SQLite.SQLiteProvider databaseName="bucket" onInit={migrate}>
-        <AppStateContext.Provider value={[state, setState]}>
+    <AppStateContext.Provider value={[state, setState]}>
+      <QueryClientProvider client={queryClient}>
+        <SQLite.SQLiteProvider databaseName="bucket" onInit={migrate}>
           {children}
-        </AppStateContext.Provider>
-      </SQLite.SQLiteProvider>
-    </QueryClientProvider>
+        </SQLite.SQLiteProvider>
+      </QueryClientProvider>
+    </AppStateContext.Provider>
   );
 };
 
