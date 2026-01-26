@@ -94,7 +94,6 @@ export default function Home() {
                 borderWidth: 1,
               }}
             >
-              {" "}
               <View
                 style={{
                   position: "absolute",
@@ -116,7 +115,6 @@ export default function Home() {
                 borderWidth: 1,
               }}
             >
-              {" "}
               <View
                 style={{
                   position: "absolute",
