@@ -157,4 +157,4 @@ RUN chmod +x /usr/local/bin/init-firewall.sh && \
 USER node
 
 # Set crlf option to avoid newline diffs when base OS is windows
-RUN git config --local core.autocrlf input
+# RUN git config --local core.autocrlf input
