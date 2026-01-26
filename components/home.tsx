@@ -4,6 +4,46 @@ import { useCallback, useEffect } from "react";
 import { Button, Text, View } from "react-native";
 import { useGoals, useSelectedGoal, useUpdateGoal } from "../hooks/goals";
 
+const BAR_HEIGHT = 500;
+
+interface ProgressSegmentProps {
+  ratio: number;
+  backgroundColor: string;
+  borderColor: string;
+  label: string;
+}
+
+function ProgressSegment({
+  ratio,
+  backgroundColor,
+  borderColor,
+  label,
+}: ProgressSegmentProps) {
+  if (ratio <= 0) return null;
+
+  return (
+    <View
+      style={{
+        height: BAR_HEIGHT * ratio,
+        backgroundColor,
+        borderRadius: 5,
+        borderColor,
+        borderWidth: 1,
+      }}
+    >
+      <View
+        style={{
+          position: "absolute",
+          left: 80,
+          width: 200,
+        }}
+      >
+        <Text>{label}</Text>
+      </View>
+    </View>
+  );
+}
+
 export default function Home() {
   const { data: goals } = useGoals();
   const updateGoal = useUpdateGoal();
@@ -50,82 +90,32 @@ export default function Home() {
         <View
           style={{
             width: 75,
-            height: 500,
+            height: BAR_HEIGHT,
             display: "flex",
             flexDirection: "column",
             justifyContent: "flex-end",
           }}
         >
-          {/* Missing */}
-          <View
-            style={{
-              borderRadius: 5,
-              flexGrow: 1,
-            }}
-          ></View>
-          {excessRatio > 0 ? (
-            <View
-              style={{
-                height: 500 * excessRatio,
-                backgroundColor: "#d9f99d", // lime-200
-                borderRadius: 5,
-                borderColor: "#bef264", // lime-300
-                borderWidth: 1,
-              }}
-            >
-              <View
-                style={{
-                  position: "absolute",
-                  left: 80,
-                  width: 200,
-                }}
-              >
-                <Text>{(100 * excessRatio).toFixed(1)}% excess!!</Text>
-              </View>
-            </View>
-          ) : null}
-          {deficitRatio > 0 ? (
-            <View
-              style={{
-                height: 500 * deficitRatio,
-                backgroundColor: "#fde68a", // amber-200
-                borderRadius: 5,
-                borderColor: "#fcd34d", // amber-300
-                borderWidth: 1,
-              }}
-            >
-              <View
-                style={{
-                  position: "absolute",
-                  left: 80,
-                  width: 200,
-                }}
-              >
-                <Text>{(100 * deficitRatio).toFixed(1)}% deficit</Text>
-              </View>
-            </View>
-          ) : null}
-          {ratio - excessRatio > 0 ? (
-            <View
-              style={{
-                height: 500 * (ratio - excessRatio),
-                backgroundColor: "#a7f3d0", // emerald-200
-                borderRadius: 5,
-                borderColor: "#6ee7b7", // emerald-300
-                borderWidth: 1,
-              }}
-            >
-              <View
-                style={{
-                  position: "absolute",
-                  left: 80,
-                  width: 200,
-                }}
-              >
-                <Text>{(100 * (ratio - excessRatio)).toFixed(1)}% done!</Text>
-              </View>
-            </View>
-          ) : null}
+          {/* Remaining space */}
+          <View style={{ borderRadius: 5, flexGrow: 1 }} />
+          <ProgressSegment
+            ratio={excessRatio}
+            backgroundColor="#d9f99d"
+            borderColor="#bef264"
+            label={`${(100 * excessRatio).toFixed(1)}% excess!!`}
+          />
+          <ProgressSegment
+            ratio={deficitRatio}
+            backgroundColor="#fde68a"
+            borderColor="#fcd34d"
+            label={`${(100 * deficitRatio).toFixed(1)}% deficit`}
+          />
+          <ProgressSegment
+            ratio={ratio - excessRatio}
+            backgroundColor="#a7f3d0"
+            borderColor="#6ee7b7"
+            label={`${(100 * (ratio - excessRatio)).toFixed(1)}% done!`}
+          />
         </View>
       </View>
 
