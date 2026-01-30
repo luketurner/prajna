@@ -23,6 +23,7 @@ async function migrate(db: SQLite.SQLiteDatabase) {
   PRAGMA journal_mode = WAL;
   PRAGMA foreign_keys = ON;
   DROP TABLE goals;
+  DROP TABLE sessions;
 
   CREATE TABLE IF NOT EXISTS goals (
     id INTEGER PRIMARY KEY NOT NULL,
@@ -30,6 +31,13 @@ async function migrate(db: SQLite.SQLiteDatabase) {
     year TEXT NOT NULL,
     target INTEGER NOT NULL,
     current INTEGER NOT NULL
+  );
+
+  CREATE TABLE IF NOT EXISTS sessions (
+    id INTEGER PRIMARY KEY NOT NULL,
+    startedAt DATETIME NOT NULL,
+    duration INTEGER NOT NULL,
+    status TEXT NOT NULL
   );
 
   INSERT INTO goals (name, year, target, current) VALUES ('Meditate', '2026', 50, 0);
