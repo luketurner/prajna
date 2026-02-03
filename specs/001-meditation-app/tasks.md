@@ -19,10 +19,10 @@
 
 **Purpose**: Project initialization, install dependencies, create directory structure
 
-- [ ] T001 Install expo-keep-awake dependency via `npx expo install expo-keep-awake`
-- [ ] T002 Create directory structure: `data/repositories/`, `hooks/`, `components/ui/`, `constants/`, `app/(tabs)/history/`, `app/(tabs)/goals/`
-- [ ] T003 [P] Create theme colors in `constants/Colors.ts`
-- [ ] T004 [P] Create TypeScript path alias `@/*` in `tsconfig.json` if not already configured
+- [x] T001 Install expo-keep-awake dependency via `npx expo install expo-keep-awake`
+- [x] T002 Create directory structure: `data/repositories/`, `hooks/`, `components/ui/`, `constants/`, `app/(tabs)/history/`, `app/(tabs)/goals/`
+- [x] T003 [P] Create theme colors in `constants/Colors.ts`
+- [x] T004 [P] Create TypeScript path alias `@/*` in `tsconfig.json` if not already configured
 
 ---
 
@@ -32,18 +32,18 @@
 
 **⚠️ CRITICAL**: No user story work can begin until this phase is complete
 
-- [ ] T005 Implement database migration logic (PRAGMA user_version, WAL mode, all 4 tables, indexes) in `data/migrations.ts`
-- [ ] T006 Implement SessionRepository class (CRUD, stats, tag breakdown queries) in `data/repositories/session-repository.ts` per contracts/repository-interfaces.ts
-- [ ] T007 [P] Implement TagRepository class (CRUD) in `data/repositories/tag-repository.ts` per contracts/repository-interfaces.ts
-- [ ] T008 [P] Implement GoalRepository class (CRUD with progress calculation) in `data/repositories/goal-repository.ts` per contracts/repository-interfaces.ts
-- [ ] T009 Create RepositoryProvider context (instantiates repositories from SQLiteDatabase, provides via React context) in `data/database-provider.tsx`
-- [ ] T010 Create TanStack Query key factory in `data/query-keys.ts` per contracts/repository-interfaces.ts
-- [ ] T011 Set up root layout with QueryClientProvider, SQLiteProvider (bucket.db + migrations), RepositoryProvider, and Stack navigator with modal routes in `app/_layout.tsx`
-- [ ] T012 Set up tab navigator layout with 4 tabs (Timer, History, Goals, Stats), custom tab bar with FAB, and gear icon for settings in `app/(tabs)/_layout.tsx`
-- [ ] T013 [P] Create EmptyState component in `components/EmptyState.tsx`
-- [ ] T014 [P] Create TagPicker multi-select component in `components/TagPicker.tsx`
-- [ ] T015 [P] Create SessionForm shared form component (date, duration, tags) in `components/SessionForm.tsx`
-- [ ] T016 [P] Create GoalForm shared form component (target hours, period type, date range) in `components/GoalForm.tsx`
+- [x] T005 Implement database migration logic (PRAGMA user_version, WAL mode, all 4 tables, indexes) in `data/migrations.ts`
+- [x] T006 Implement SessionRepository class (CRUD, stats, tag breakdown queries) in `data/repositories/session-repository.ts` per contracts/repository-interfaces.ts
+- [x] T007 [P] Implement TagRepository class (CRUD) in `data/repositories/tag-repository.ts` per contracts/repository-interfaces.ts
+- [x] T008 [P] Implement GoalRepository class (CRUD with progress calculation) in `data/repositories/goal-repository.ts` per contracts/repository-interfaces.ts
+- [x] T009 Create RepositoryProvider context (instantiates repositories from SQLiteDatabase, provides via React context) in `data/database-provider.tsx`
+- [x] T010 Create TanStack Query key factory in `data/query-keys.ts` per contracts/repository-interfaces.ts
+- [x] T011 Set up root layout with QueryClientProvider, SQLiteProvider (bucket.db + migrations), RepositoryProvider, and Stack navigator with modal routes in `app/_layout.tsx`
+- [x] T012 Set up tab navigator layout with 4 tabs (Timer, History, Goals, Stats), custom tab bar with FAB, and gear icon for settings in `app/(tabs)/_layout.tsx`
+- [x] T013 [P] Create EmptyState component in `components/EmptyState.tsx`
+- [x] T014 [P] Create TagPicker multi-select component in `components/TagPicker.tsx`
+- [x] T015 [P] Create SessionForm shared form component (date, duration, tags) in `components/SessionForm.tsx`
+- [x] T016 [P] Create GoalForm shared form component (target hours, period type, date range) in `components/GoalForm.tsx`
 
 **Checkpoint**: Foundation ready — database, providers, navigation, and shared components in place. User story implementation can now begin.
 
@@ -57,12 +57,12 @@
 
 ### Implementation for User Story 1
 
-- [ ] T017 [US1] Implement useTimer hook (Date.now() pattern, setInterval 1s, AppState listener, kv-store persistence, crash recovery check on mount) in `hooks/useTimer.ts`
-- [ ] T018 [P] [US1] Create TimerDisplay component (HH:MM:SS formatted text) in `components/TimerDisplay.tsx`
-- [ ] T019 [US1] Implement useSessions hook (useQuery for getAll, useMutation for create/update/delete with cache invalidation) in `hooks/useSessions.ts`
-- [ ] T020 [P] [US1] Implement useTags hook (useQuery for getAll, useMutation for create/update/delete) in `hooks/useTags.ts`
-- [ ] T021 [US1] Build Timer screen with start/stop/discard controls, TimerDisplay, crash recovery dialog, and expo-keep-awake in `app/(tabs)/index.tsx`
-- [ ] T022 [US1] Build save-session modal screen (shows duration, TagPicker, save/discard buttons, navigates back on save) in `app/save-session.tsx`
+- [x] T017 [US1] Implement useTimer hook (Date.now() pattern, setInterval 1s, AppState listener, kv-store persistence, crash recovery check on mount) in `hooks/useTimer.ts`
+- [x] T018 [P] [US1] Create TimerDisplay component (HH:MM:SS formatted text) in `components/TimerDisplay.tsx`
+- [x] T019 [US1] Implement useSessions hook (useQuery for getAll, useMutation for create/update/delete with cache invalidation) in `hooks/useSessions.ts`
+- [x] T020 [P] [US1] Implement useTags hook (useQuery for getAll, useMutation for create/update/delete) in `hooks/useTags.ts`
+- [x] T021 [US1] Build Timer screen with start/stop/discard controls, TimerDisplay, crash recovery dialog, and expo-keep-awake in `app/(tabs)/index.tsx`
+- [x] T022 [US1] Build save-session modal screen (shows duration, TagPicker, save/discard buttons, navigates back on save) in `app/save-session.tsx`
 
 **Checkpoint**: User Story 1 complete — users can time a meditation, optionally tag it, and save it. Timer works across background/foreground transitions and survives crashes.
 
@@ -76,7 +76,7 @@
 
 ### Implementation for User Story 2
 
-- [ ] T023 [US2] Build manual-entry modal screen (SessionForm with date picker, duration in minutes, TagPicker, validation: no future dates, duration > 0, >4h confirmation prompt) in `app/manual-entry.tsx`
+- [x] T023 [US2] Build manual-entry modal screen (SessionForm with date picker, duration in minutes, TagPicker, validation: no future dates, duration > 0, >4h confirmation prompt) in `app/manual-entry.tsx`
 
 **Checkpoint**: User Stories 1 & 2 complete — users can both time sessions and manually log past sessions. Both entry methods save to the same database.
 
@@ -90,11 +90,11 @@
 
 ### Implementation for User Story 3
 
-- [ ] T024 [P] [US3] Create SessionCard component (date, duration formatted, tag chips) in `components/SessionCard.tsx`
-- [ ] T025 [US3] Create History nested stack layout in `app/(tabs)/history/_layout.tsx`
-- [ ] T026 [US3] Build History list screen (FlatList of SessionCard, reverse chronological, empty state) in `app/(tabs)/history/index.tsx`
-- [ ] T027 [US3] Build Session detail screen (full session info, edit/delete actions) in `app/(tabs)/history/[sessionId].tsx`
-- [ ] T028 [US3] Build edit-session modal screen (SessionForm pre-filled with existing data, update mutation) in `app/edit-session.tsx`
+- [x] T024 [P] [US3] Create SessionCard component (date, duration formatted, tag chips) in `components/SessionCard.tsx`
+- [x] T025 [US3] Create History nested stack layout in `app/(tabs)/history/_layout.tsx`
+- [x] T026 [US3] Build History list screen (FlatList of SessionCard, reverse chronological, empty state) in `app/(tabs)/history/index.tsx`
+- [x] T027 [US3] Build Session detail screen (full session info, edit/delete actions) in `app/(tabs)/history/[sessionId].tsx`
+- [x] T028 [US3] Build edit-session modal screen (SessionForm pre-filled with existing data, update mutation) in `app/edit-session.tsx`
 
 **Checkpoint**: User Stories 1–3 complete — users can time sessions, log past sessions, and browse/edit/delete their full history.
 
@@ -108,12 +108,12 @@
 
 ### Implementation for User Story 4
 
-- [ ] T029 [US4] Implement useGoals hook (useQuery for getAll/getById, useMutation for create/update/delete with cache invalidation including sessions) in `hooks/useGoals.ts`
-- [ ] T030 [P] [US4] Create GoalCard component (progress bar, percentage, hours completed/remaining, completed/expired visual states) in `components/GoalCard.tsx`
-- [ ] T031 [US4] Create Goals nested stack layout in `app/(tabs)/goals/_layout.tsx`
-- [ ] T032 [US4] Build Goals list screen (FlatList of GoalCard, "Add Goal" action, empty state) in `app/(tabs)/goals/index.tsx`
-- [ ] T033 [US4] Build Goal detail/edit screen (GoalCard expanded, edit/delete actions) in `app/(tabs)/goals/[goalId].tsx`
-- [ ] T034 [US4] Build create-goal modal screen (GoalForm with period type picker, date range selection, target hours input) in `app/create-goal.tsx`
+- [x] T029 [US4] Implement useGoals hook (useQuery for getAll/getById, useMutation for create/update/delete with cache invalidation including sessions) in `hooks/useGoals.ts`
+- [x] T030 [P] [US4] Create GoalCard component (progress bar, percentage, hours completed/remaining, completed/expired visual states) in `components/GoalCard.tsx`
+- [x] T031 [US4] Create Goals nested stack layout in `app/(tabs)/goals/_layout.tsx`
+- [x] T032 [US4] Build Goals list screen (FlatList of GoalCard, "Add Goal" action, empty state) in `app/(tabs)/goals/index.tsx`
+- [x] T033 [US4] Build Goal detail/edit screen (GoalCard expanded, edit/delete actions) in `app/(tabs)/goals/[goalId].tsx`
+- [x] T034 [US4] Build create-goal modal screen (GoalForm with period type picker, date range selection, target hours input) in `app/create-goal.tsx`
 
 **Checkpoint**: User Stories 1–4 complete — users can time sessions, log past sessions, browse history, and track goals with automatic progress calculation.
 
@@ -127,7 +127,7 @@
 
 ### Implementation for User Story 5
 
-- [ ] T035 [US5] Build Settings modal screen with tag management list (create, edit inline, delete with confirmation, duplicate name prevention) in `app/settings.tsx`
+- [x] T035 [US5] Build Settings modal screen with tag management list (create, edit inline, delete with confirmation, duplicate name prevention) in `app/settings.tsx`
 
 **Checkpoint**: User Stories 1–5 complete — users have full tag management with cascading updates.
 
@@ -141,8 +141,8 @@
 
 ### Implementation for User Story 6
 
-- [ ] T036 [US6] Implement useSessionStats hook (useQuery for getStats and getTagBreakdown) in `hooks/useSessionStats.ts`
-- [ ] T037 [US6] Build Statistics screen (time totals, average, streaks, tag breakdown list, empty state) in `app/(tabs)/stats.tsx`
+- [x] T036 [US6] Implement useSessionStats hook (useQuery for getStats and getTagBreakdown) in `hooks/useSessionStats.ts`
+- [x] T037 [US6] Build Statistics screen (time totals, average, streaks, tag breakdown list, empty state) in `app/(tabs)/stats.tsx`
 
 **Checkpoint**: All 6 user stories complete — full-featured meditation timer and logger.
 
@@ -152,10 +152,10 @@
 
 **Purpose**: Final refinements that affect multiple user stories
 
-- [ ] T038 [P] Ensure goal progress invalidation when sessions are created/edited/deleted (verify useSessions mutations invalidate goals query keys)
-- [ ] T039 [P] Verify session edit/delete from history properly invalidates stats and goals caches
-- [ ] T040 Run `npx tsc --noEmit` to verify zero type errors across all files
-- [ ] T041 Run `npx expo lint` to verify zero lint errors
+- [x] T038 [P] Ensure goal progress invalidation when sessions are created/edited/deleted (verify useSessions mutations invalidate goals query keys)
+- [x] T039 [P] Verify session edit/delete from history properly invalidates stats and goals caches
+- [x] T040 Run `npx tsc --noEmit` to verify zero type errors across all files
+- [x] T041 Run `npx expo lint` to verify zero lint errors
 - [ ] T042 Run `npx expo start` and perform manual smoke test per quickstart.md verification steps
 
 ---
