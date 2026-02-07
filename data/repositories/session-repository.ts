@@ -55,40 +55,46 @@ export class SessionRepository implements ISessionRepository {
   }
 
   async create(input: CreateSessionInput): Promise<number> {
-    const result = await this.db.runAsync(
-      `INSERT INTO sessions (date, duration_seconds, source) VALUES (?, ?, ?)`,
-      [input.date, input.durationSeconds, input.source]
-    );
+    let sessionId = 0;
 
-    const sessionId = result.lastInsertRowId;
-
-    // Insert tag associations
-    for (const tagId of input.tagIds) {
-      await this.db.runAsync(
-        `INSERT INTO session_tags (session_id, tag_id) VALUES (?, ?)`,
-        [sessionId, tagId]
+    await this.db.withTransactionAsync(async () => {
+      const result = await this.db.runAsync(
+        `INSERT INTO sessions (date, duration_seconds, source) VALUES (?, ?, ?)`,
+        [input.date, input.durationSeconds, input.source]
       );
-    }
+
+      sessionId = result.lastInsertRowId;
+
+      // Insert tag associations
+      for (const tagId of input.tagIds) {
+        await this.db.runAsync(
+          `INSERT INTO session_tags (session_id, tag_id) VALUES (?, ?)`,
+          [sessionId, tagId]
+        );
+      }
+    });
 
     return sessionId;
   }
 
   async update(input: UpdateSessionInput): Promise<void> {
-    await this.db.runAsync(
-      `UPDATE sessions SET date = ?, duration_seconds = ?, updated_at = datetime('now') WHERE id = ?`,
-      [input.date, input.durationSeconds, input.id]
-    );
-
-    // Replace tag associations
-    await this.db.runAsync(`DELETE FROM session_tags WHERE session_id = ?`, [
-      input.id,
-    ]);
-    for (const tagId of input.tagIds) {
+    await this.db.withTransactionAsync(async () => {
       await this.db.runAsync(
-        `INSERT INTO session_tags (session_id, tag_id) VALUES (?, ?)`,
-        [input.id, tagId]
+        `UPDATE sessions SET date = ?, duration_seconds = ?, updated_at = datetime('now') WHERE id = ?`,
+        [input.date, input.durationSeconds, input.id]
       );
-    }
+
+      // Replace tag associations
+      await this.db.runAsync(`DELETE FROM session_tags WHERE session_id = ?`, [
+        input.id,
+      ]);
+      for (const tagId of input.tagIds) {
+        await this.db.runAsync(
+          `INSERT INTO session_tags (session_id, tag_id) VALUES (?, ?)`,
+          [input.id, tagId]
+        );
+      }
+    });
   }
 
   async delete(id: number): Promise<void> {

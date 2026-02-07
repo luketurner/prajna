@@ -13,6 +13,8 @@ interface TagRow {
   updated_at: string;
 }
 
+const MAX_TAG_NAME_LENGTH = 50;
+
 export class TagRepository implements ITagRepository {
   constructor(private db: SQLiteDatabase) {}
 
@@ -35,7 +37,10 @@ export class TagRepository implements ITagRepository {
   }
 
   async create(input: CreateTagInput): Promise<number> {
-    const trimmedName = input.name.trim();
+    const trimmedName = input.name.trim().slice(0, MAX_TAG_NAME_LENGTH);
+    if (trimmedName.length === 0) {
+      throw new Error("Tag name cannot be empty");
+    }
     const result = await this.db.runAsync(
       `INSERT INTO tags (name) VALUES (?)`,
       [trimmedName]
@@ -44,7 +49,10 @@ export class TagRepository implements ITagRepository {
   }
 
   async update(input: UpdateTagInput): Promise<void> {
-    const trimmedName = input.name.trim();
+    const trimmedName = input.name.trim().slice(0, MAX_TAG_NAME_LENGTH);
+    if (trimmedName.length === 0) {
+      throw new Error("Tag name cannot be empty");
+    }
     await this.db.runAsync(
       `UPDATE tags SET name = ?, updated_at = datetime('now') WHERE id = ?`,
       [trimmedName, input.id]

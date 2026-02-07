@@ -5,6 +5,9 @@ import type { PersistedTimerState } from "@/specs/001-meditation-app/contracts/r
 
 const TIMER_STATE_KEY = "timer_state";
 
+// Maximum reasonable timer duration: 24 hours
+const MAX_REASONABLE_MS = 24 * 60 * 60 * 1000;
+
 interface UseTimerResult {
   elapsedMs: number;
   isRunning: boolean;
@@ -90,8 +93,11 @@ export function useTimer(): UseTimerResult {
         if (state.isRunning) {
           // Calculate how long the timer was running
           const elapsed = state.accumulatedMs + (Date.now() - state.startTime);
-          setRecoveredElapsedMs(elapsed);
-          setHasRecoveryData(true);
+          // Validate recovered value is within reasonable bounds
+          if (elapsed > 0 && elapsed <= MAX_REASONABLE_MS) {
+            setRecoveredElapsedMs(elapsed);
+            setHasRecoveryData(true);
+          }
           // Clear the stored state - user must choose to accept or discard
           clearPersistedState();
         }
