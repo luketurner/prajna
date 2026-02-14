@@ -127,7 +127,7 @@ RUN echo "{ git: { paging: { externalDiffCommand: \"difft --color=always\" } } }
 RUN npm install -g typescript typescript-language-server
 
 # Install Claude
-RUN npm install -g @anthropic-ai/claude-code
+RUN curl -fsSL https://claude.ai/install.sh | bash
 
 # Install Bun
 RUN npm install -g bun
