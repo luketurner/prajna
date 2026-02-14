@@ -2,12 +2,14 @@ import { Tabs, useRouter } from "expo-router";
 import { Pressable, View, StyleSheet, useColorScheme } from "react-native";
 import { MaterialIcons } from "@expo/vector-icons";
 import type { BottomTabBarProps } from "@react-navigation/bottom-tabs";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { Colors } from "@/constants/Colors";
 
 function CustomTabBar({ state, descriptors, navigation }: BottomTabBarProps) {
   const colorScheme = useColorScheme() ?? "light";
   const colors = Colors[colorScheme];
   const router = useRouter();
+  const insets = useSafeAreaInsets();
 
   // Insert FAB between History (index 1) and Goals (index 2)
   const renderItems = () => {
@@ -73,7 +75,7 @@ function CustomTabBar({ state, descriptors, navigation }: BottomTabBarProps) {
   };
 
   return (
-    <View style={[styles.tabBar, { backgroundColor: colors.background, borderTopColor: colors.border }]}>
+    <View style={[styles.tabBar, { backgroundColor: colors.background, borderTopColor: colors.border, paddingBottom: Math.max(insets.bottom, 8) }]}>
       {renderItems()}
     </View>
   );
@@ -135,7 +137,7 @@ const styles = StyleSheet.create({
   tabBar: {
     flexDirection: "row",
     borderTopWidth: 1,
-    paddingBottom: 20,
+    paddingBottom: 8,
     paddingTop: 8,
     alignItems: "center",
     justifyContent: "space-around",
