@@ -158,3 +158,6 @@ USER node
 
 # Set crlf option to avoid newline diffs when base OS is windows
 # RUN git config --local core.autocrlf input
+
+# Expo stuff
+RUN npm install -g eas-cli 
