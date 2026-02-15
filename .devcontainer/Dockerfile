@@ -107,6 +107,7 @@ RUN sh -c "$(wget -O- https://github.com/deluan/zsh-in-docker/releases/download/
   -a "export PROMPT_COMMAND='history -a' && export HISTFILE=/commandhistory/.bash_history" \
   -a "alias bc=\"backlog task create\"" \
   -a "alias bv=\"backlog board view\"" \
+  -a "alias claudes=\"claude --dangerously-skip-permissions\"" \
   -x
 
 # tmux settings
