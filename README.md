@@ -1,6 +1,12 @@
-# Prajna app
+<div style="margin: auto; max-width: 256px;">
 
-> [!CAUTION]
+![Splash icon](./assets/images/splash-icon.png)
+
+# Prajna
+
+</div>
+
+> [!WARNING]
 > This app was basically 100% written by AI using spec-driven development. In other words, it was vibe-coded.
 >
 > I'm using it myself, but YMMV.
