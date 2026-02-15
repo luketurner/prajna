@@ -1,21 +1,21 @@
-<p style="margin: auto; max-width: 256px;" align="left" width="100%">
+<p style="margin: auto; max-width: 256px;" align="center" width="100%">
 
 <img width="256" height="256" src="assets/images/splash-icon.png">
 
-# Prajna
-
 </p>
 
-> [!WARNING]
-> This app was basically 100% written by AI using spec-driven development. In other words, it was vibe-coded.
->
-> I'm using it myself, but YMMV.
+<h1 align="center">Prajna</h1>
 
 A simple mobile app for meditation tracking.
 
 1. Record meditation sessions.
 2. Tag sessions with user-defined tags (e.g. based on meditation type, how you felt, or whatever you want.)
 3. Compare aggregate meditation time to goals (e.g. yearly resolutions).
+
+> [!WARNING]
+> This app was basically 100% written by AI using spec-driven development. In other words, it was vibe-coded.
+>
+> I'm using it myself, but YMMV.
 
 Written using [React Native](https://reactnative.dev/) and [Expo](https://expo.dev).
 
