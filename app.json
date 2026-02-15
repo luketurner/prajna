@@ -51,12 +51,12 @@
     "extra": {
       "router": {},
       "eas": {
-        "projectId": "db1dfded-0dda-43e4-8079-6cbf515d3e79"
+        "projectId": "d16fb5ff-28fc-46b7-af30-54554ea3181a"
       }
     },
     "owner": "luketurner0",
     "updates": {
-      "url": "https://u.expo.dev/db1dfded-0dda-43e4-8079-6cbf515d3e79"
+      "url": "https://u.expo.dev/d16fb5ff-28fc-46b7-af30-54554ea3181a"
     },
     "runtimeVersion": {
       "policy": "appVersion"
