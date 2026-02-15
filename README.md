@@ -13,9 +13,7 @@ A simple mobile app for meditation tracking.
 3. Compare aggregate meditation time to goals (e.g. yearly resolutions).
 
 > [!WARNING]
-> This app was basically 100% written by AI using spec-driven development. In other words, it was vibe-coded.
->
-> I'm using it myself, but YMMV.
+> This app was basically 100% written by AI using spec-driven development. In other words, it was vibe-coded, and comes with all the jank that implies. YMMV.
 
 Written using [React Native](https://reactnative.dev/) and [Expo](https://expo.dev).
 
