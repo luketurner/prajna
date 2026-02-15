@@ -20,7 +20,7 @@ Templates requiring updates:
 Follow-up TODOs: None
 -->
 
-# Bucket Constitution
+# Prajna Constitution
 
 ## Core Principles
 
@@ -55,7 +55,7 @@ cross-platform compatibility on iOS and Android via Expo/React Native.
   and clearly marked.
 - All features MUST be tested on both iOS and Android before merging.
 
-**Rationale**: Bucket is a mobile-first product. Decisions that
+**Rationale**: Prajna is a mobile-first product. Decisions that
 compromise mobile UX or performance undermine the core value
 proposition.
 
@@ -153,7 +153,7 @@ All PRs MUST verify compliance with Core Principles before approval.
 ## Governance
 
 This constitution is the authoritative source of project standards
-for the Bucket app. In case of conflict between this document and
+for the Prajna app. In case of conflict between this document and
 other project documentation, this constitution takes precedence.
 
 - **Amendment Process**: Any change to this constitution MUST be

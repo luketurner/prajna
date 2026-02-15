@@ -16,7 +16,7 @@
 
 ### Key Patterns
 
-- **Initialization**: `<SQLiteProvider databaseName="bucket.db" onInit={migrateDbIfNeeded}>` wrapped in `<Suspense>`.
+- **Initialization**: `<SQLiteProvider databaseName="prajna.db" onInit={migrateDbIfNeeded}>` wrapped in `<Suspense>`.
 - **Migrations**: `PRAGMA user_version` incremented per migration step in `onInit` callback.
 - **WAL mode**: `PRAGMA journal_mode = WAL` enabled on init for concurrent read/write performance.
 - **Transactions**: `withExclusiveTransactionAsync(txn)` for write operations; use `txn` not `db` inside.

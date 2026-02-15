@@ -38,7 +38,7 @@
 - [x] T008 [P] Implement GoalRepository class (CRUD with progress calculation) in `data/repositories/goal-repository.ts` per contracts/repository-interfaces.ts
 - [x] T009 Create RepositoryProvider context (instantiates repositories from SQLiteDatabase, provides via React context) in `data/database-provider.tsx`
 - [x] T010 Create TanStack Query key factory in `data/query-keys.ts` per contracts/repository-interfaces.ts
-- [x] T011 Set up root layout with QueryClientProvider, SQLiteProvider (bucket.db + migrations), RepositoryProvider, and Stack navigator with modal routes in `app/_layout.tsx`
+- [x] T011 Set up root layout with QueryClientProvider, SQLiteProvider (prajna.db + migrations), RepositoryProvider, and Stack navigator with modal routes in `app/_layout.tsx`
 - [x] T012 Set up tab navigator layout with 4 tabs (Timer, History, Goals, Stats), custom tab bar with FAB, and gear icon for settings in `app/(tabs)/_layout.tsx`
 - [x] T013 [P] Create EmptyState component in `components/EmptyState.tsx`
 - [x] T014 [P] Create TagPicker multi-select component in `components/TagPicker.tsx`

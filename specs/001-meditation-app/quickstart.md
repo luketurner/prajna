@@ -81,7 +81,7 @@ constants/
 │  ┌─────────────────────────────────────────────┐│
 │  │  QueryClientProvider                         ││
 │  │  ┌─────────────────────────────────────────┐││
-│  │  │  SQLiteProvider (bucket.db, migrations)  │││
+│  │  │  SQLiteProvider (prajna.db, migrations)  │││
 │  │  │  ┌─────────────────────────────────────┐│││
 │  │  │  │  RepositoryProvider                  ││││
 │  │  │  │  ┌─────────────────────────────────┐││││

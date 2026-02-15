@@ -1,5 +1,5 @@
 {
-  "name": "bucket-dev",
+  "name": "prajna-dev",
   "build": {
     "dockerfile": "Dockerfile",
     "args": {

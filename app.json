@@ -1,16 +1,16 @@
 {
   "expo": {
-    "name": "bucket",
-    "slug": "bucket",
+    "name": "Prajna",
+    "slug": "prajna",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/images/icon.png",
-    "scheme": "bucket",
+    "scheme": "prajna",
     "userInterfaceStyle": "automatic",
     "newArchEnabled": true,
     "ios": {
       "supportsTablet": true,
-      "bundleIdentifier": "com.luketurner0.bucket"
+      "bundleIdentifier": "com.luketurner0.prajna"
     },
     "android": {
       "adaptiveIcon": {
@@ -21,7 +21,7 @@
       },
       "edgeToEdgeEnabled": true,
       "predictiveBackGestureEnabled": false,
-      "package": "com.luketurner0.bucket"
+      "package": "com.luketurner0.prajna"
     },
     "web": {
       "output": "static",

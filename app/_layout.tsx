@@ -42,7 +42,7 @@ export default function RootLayout() {
   return (
     <QueryClientProvider client={queryClient}>
       <Suspense fallback={<LoadingFallback />}>
-        <SQLiteProvider databaseName="bucket.db" onInit={migrateDbIfNeeded}>
+        <SQLiteProvider databaseName="prajna.db" onInit={migrateDbIfNeeded}>
           <RepositoryProvider>
             <StatusBar style={colorScheme === "dark" ? "light" : "dark"} />
             <Stack

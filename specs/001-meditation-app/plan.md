@@ -11,7 +11,7 @@ Build a mobile meditation timing and logging app using Expo SDK 54 and React Nat
 
 **Language/Version**: TypeScript 5.9 (strict mode)
 **Primary Dependencies**: Expo SDK 54, React Native 0.81.4, React 19.1, expo-router ~6.0.8, @tanstack/react-query ^5.90.20, date-fns ^4.1.0, @expo/vector-icons ^15.0.2
-**Storage**: expo-sqlite ~16.0.10 (local SQLite database: `bucket.db`); expo-sqlite/kv-store for timer crash recovery
+**Storage**: expo-sqlite ~16.0.10 (local SQLite database: `prajna.db`); expo-sqlite/kv-store for timer crash recovery
 **Testing**: Manual testing via Expo Go / development builds; `testID` props for automation; `npx expo lint` for linting; `npx tsc --noEmit` for type checking
 **Target Platform**: iOS and Android (cross-platform via Expo managed workflow)
 **Project Type**: Mobile (single Expo project with file-based routing)

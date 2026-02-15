@@ -1,4 +1,4 @@
-# Bucket app
+# Prajna app
 
 > [!CAUTION]
 > This app was basically 100% written by AI using spec-driven development. In other words, it was vibe-coded.

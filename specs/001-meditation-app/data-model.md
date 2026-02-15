@@ -2,7 +2,7 @@
 
 **Feature Branch**: `001-meditation-app`
 **Date**: 2026-02-02
-**Storage**: expo-sqlite v16 (local SQLite database: `bucket.db`)
+**Storage**: expo-sqlite v16 (local SQLite database: `prajna.db`)
 
 ## Entity Relationship Diagram
 
