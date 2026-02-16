@@ -201,7 +201,7 @@ export function SessionForm({
           style={[styles.button, styles.submitButton, { backgroundColor: colors.tint }]}
           disabled={isSubmitting}
         >
-          <Text style={[styles.buttonText, { color: "#fff" }]}>
+          <Text style={[styles.buttonText, { color: colors.background }]}>
             {isSubmitting ? "Saving..." : submitLabel}
           </Text>
         </Pressable>

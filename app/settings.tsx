@@ -203,7 +203,7 @@ export default function SettingsScreen() {
           style={[styles.addButton, { backgroundColor: colors.tint }]}
           disabled={createTag.isPending}
         >
-          <MaterialIcons name="add" size={24} color="#fff" />
+          <MaterialIcons name="add" size={24} color={colors.background} />
         </Pressable>
       </View>
 

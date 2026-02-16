@@ -71,14 +71,14 @@ export function TagPicker({
                 <MaterialIcons
                   name="check"
                   size={14}
-                  color="#fff"
+                  color={colors.background}
                   style={styles.checkIcon}
                 />
               )}
               <Text
                 style={[
                   styles.tagText,
-                  { color: isSelected ? "#fff" : colors.text },
+                  { color: isSelected ? colors.background : colors.text },
                 ]}
               >
                 {tag.name}

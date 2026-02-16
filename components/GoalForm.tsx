@@ -166,7 +166,7 @@ export function GoalForm({
               <Text
                 style={[
                   styles.periodOptionText,
-                  { color: periodType === type ? "#fff" : colors.text },
+                  { color: periodType === type ? colors.background : colors.text },
                 ]}
               >
                 {type.charAt(0).toUpperCase() + type.slice(1)}
@@ -249,7 +249,7 @@ export function GoalForm({
           style={[styles.button, styles.submitButton, { backgroundColor: colors.tint }]}
           disabled={isSubmitting}
         >
-          <Text style={[styles.buttonText, { color: "#fff" }]}>
+          <Text style={[styles.buttonText, { color: colors.background }]}>
             {isSubmitting ? "Saving..." : submitLabel}
           </Text>
         </Pressable>

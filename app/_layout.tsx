@@ -44,7 +44,7 @@ export default function RootLayout() {
       <Suspense fallback={<LoadingFallback />}>
         <SQLiteProvider databaseName="prajna.db" onInit={migrateDbIfNeeded}>
           <RepositoryProvider>
-            <StatusBar style={colorScheme === "dark" ? "light" : "dark"} />
+            <StatusBar style="light" />
             <Stack
               screenOptions={{
                 headerStyle: { backgroundColor: colors.background },

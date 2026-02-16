@@ -107,7 +107,7 @@ export function GoalCard({ goal, onPress }: GoalCardProps) {
               styles.expectedMarker,
               {
                 left: `${Math.min(100, goal.expectedPercent)}%`,
-                backgroundColor: colorScheme === "dark" ? "rgba(255,255,255,0.5)" : "rgba(0,0,0,0.4)",
+                backgroundColor: "rgba(195,188,155,0.5)",
               },
             ]}
           />

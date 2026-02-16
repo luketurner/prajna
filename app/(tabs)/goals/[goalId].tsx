@@ -193,7 +193,7 @@ export default function GoalDetailScreen() {
                   styles.expectedMarker,
                   {
                     left: `${Math.min(100, goal.expectedPercent)}%`,
-                    backgroundColor: colorScheme === "dark" ? "rgba(255,255,255,0.5)" : "rgba(0,0,0,0.4)",
+                    backgroundColor: "rgba(195,188,155,0.5)",
                   },
                 ]}
               />
@@ -256,8 +256,8 @@ export default function GoalDetailScreen() {
             onPress={() => setIsEditing(true)}
             style={[styles.actionButton, { backgroundColor: colors.tint }]}
           >
-            <MaterialIcons name="edit" size={20} color="#fff" />
-            <Text style={styles.actionButtonText}>Edit</Text>
+            <MaterialIcons name="edit" size={20} color={colors.background} />
+            <Text style={[styles.actionButtonText, { color: colors.background }]}>Edit</Text>
           </Pressable>
 
           <Pressable
@@ -369,6 +369,5 @@ const styles = StyleSheet.create({
   actionButtonText: {
     fontSize: 16,
     fontWeight: "600",
-    color: "#fff",
   },
 });

@@ -98,7 +98,7 @@ export default function TimerScreen() {
             accessibilityLabel="Start meditation timer"
             accessibilityRole="button"
           >
-            <MaterialIcons name="play-arrow" size={48} color="#fff" />
+            <MaterialIcons name="play-arrow" size={48} color={colors.background} />
           </Pressable>
         ) : (
           <View style={styles.runningControls}>
@@ -117,7 +117,7 @@ export default function TimerScreen() {
               accessibilityLabel="Stop and save session"
               accessibilityRole="button"
             >
-              <MaterialIcons name="stop" size={48} color="#fff" />
+              <MaterialIcons name="stop" size={48} color={colors.background} />
             </Pressable>
           </View>
         )}

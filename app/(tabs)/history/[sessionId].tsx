@@ -143,8 +143,8 @@ export default function SessionDetailScreen() {
             onPress={handleEdit}
             style={[styles.actionButton, { backgroundColor: colors.tint }]}
           >
-            <MaterialIcons name="edit" size={20} color="#fff" />
-            <Text style={styles.actionButtonText}>Edit</Text>
+            <MaterialIcons name="edit" size={20} color={colors.background} />
+            <Text style={[styles.actionButtonText, { color: colors.background }]}>Edit</Text>
           </Pressable>
 
           <Pressable
@@ -228,6 +228,5 @@ const styles = StyleSheet.create({
   actionButtonText: {
     fontSize: 16,
     fontWeight: "600",
-    color: "#fff",
   },
 });

@@ -121,7 +121,7 @@ export default function SaveSessionScreen() {
           style={[styles.button, styles.saveButton, { backgroundColor: colors.tint }]}
           disabled={createSession.isPending}
         >
-          <Text style={[styles.buttonText, { color: "#fff" }]}>
+          <Text style={[styles.buttonText, { color: colors.background }]}>
             {createSession.isPending ? "Saving..." : "Save Session"}
           </Text>
         </Pressable>
