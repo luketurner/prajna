@@ -31,10 +31,30 @@ function CustomTabBar({ state, descriptors, navigation }: BottomTabBarProps) {
         }
       };
 
+      // Timer tab renders as the center FAB instead of a regular tab
+      if (route.name === "index") {
+        // Put "Log session" button in the first tab position
+        items.push(
+          <Pressable
+            key="log-session"
+            onPress={() => router.push("/manual-entry" as never)}
+            style={styles.tabItem}
+            accessibilityRole="button"
+            accessibilityLabel="Log a session manually"
+          >
+            <MaterialIcons
+              name="add"
+              size={24}
+              color={colors.tabIconDefault}
+            />
+          </Pressable>
+        );
+        return;
+      }
+
       // Get icon name based on route
       let iconName: keyof typeof MaterialIcons.glyphMap = "timer";
-      if (route.name === "index") iconName = "timer";
-      else if (route.name === "history") iconName = "history";
+      if (route.name === "history") iconName = "history";
       else if (route.name === "goals") iconName = "flag";
       else if (route.name === "stats") iconName = "bar-chart";
 
@@ -55,17 +75,17 @@ function CustomTabBar({ state, descriptors, navigation }: BottomTabBarProps) {
         </Pressable>
       );
 
-      // Insert FAB after History tab (index 1)
+      // Insert Timer FAB after History tab (index 1)
       if (index === 1) {
         items.push(
           <Pressable
             key="fab"
-            onPress={() => router.push("/manual-entry" as never)}
+            onPress={() => navigation.navigate("index")}
             style={[styles.fab, { backgroundColor: colors.fab }]}
             accessibilityRole="button"
-            accessibilityLabel="Log a session manually"
+            accessibilityLabel="Timer"
           >
-            <MaterialIcons name="add" size={28} color={colors.fabIcon} />
+            <MaterialIcons name="timer" size={28} color={colors.fabIcon} />
           </Pressable>
         );
       }
