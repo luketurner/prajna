@@ -1,0 +1,57 @@
+# Source - https://stackoverflow.com/a/78099823
+# Posted by Mohmadhaidar devjiyani
+# Retrieved 2026-02-16, License - CC BY-SA 4.0
+on:
+  push:
+    branches: ["main"]
+jobs:
+  build_android:
+    name: Setup and Build
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      # - name: 🏗 Setup Workflow
+      #   uses: ./.github/actions/setup
+      - name: 🏗 Setup Node
+        uses: actions/setup-node@v3
+        with:
+          node-version: "18.x"
+          cache: pnpm
+      - name: 📦 Install dependencies
+        run: pnpm install
+
+      - name: 🏗 Setup EAS
+        uses: expo/expo-github-action@v8
+        with:
+          eas-version: latest
+          token: ${{ secrets.EXPO_TOKEN }}
+      - name: Publish update
+        id: generating_apk
+        run: eas build --profile preview --platform android --non-interactive --local --output=./app-release.apk
+      - name: Create Release
+        id: create_release
+        uses: actions/create-release@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          tag_name: ${{ github.run_number }}
+          release_name: Release ${{ github.run_number }}
+          prerelease: true
+      - name: Upload Release Asset
+        id: upload-release-asset
+        uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          upload_url: ${{ steps.create_release.outputs.upload_url }}
+          asset_path: ./app-release.apk
+          asset_name: app-release.apk
+          asset_content_type: application/vnd.android.package-archive
+      - name: Generating QR code
+        id: generating_qr_code
+        uses: kentaro-m/qr-code-commenter-action@v0.1.2
+        with:
+          repo-token: "${{ secrets.GITHUB_TOKEN }}"
+          content: https://github.com/luketurner/prajna/releases/download/${{ github.run_number }}/app-release.apk
+          comment: |
+            :lock: This is a QR code for access to the preview website.{qrcode}
