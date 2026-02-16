@@ -15,11 +15,9 @@ jobs:
       - name: 🏗 Setup Node
         uses: actions/setup-node@v3
         with:
-          node-version: "18.x"
-          cache: pnpm
+          node-version: "24.x"
       - name: 📦 Install dependencies
-        run: pnpm install
-
+        run: npm install
       - name: 🏗 Setup EAS
         uses: expo/expo-github-action@v8
         with:
