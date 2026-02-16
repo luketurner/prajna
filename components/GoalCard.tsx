@@ -51,12 +51,24 @@ export function GoalCard({ goal, onPress }: GoalCardProps) {
     statusText = "Expired";
   }
 
+  // Expected progress status
+  const threshold = goal.targetHours * 0.05;
+  let deltaColor: string = colors.tint;
+  let deltaLabel = "on track";
+  if (goal.deltaHours > threshold) {
+    deltaColor = colors.success;
+    deltaLabel = "ahead";
+  } else if (goal.deltaHours < -threshold) {
+    deltaColor = colors.warning;
+    deltaLabel = "behind";
+  }
+
   return (
     <Pressable
       onPress={onPress}
       style={[styles.card, { backgroundColor: colors.card, borderColor: colors.border }]}
       accessibilityRole="button"
-      accessibilityLabel={`Goal: ${goal.targetHours} hours, ${Math.round(progressPercent)}% complete`}
+      accessibilityLabel={`Goal: ${goal.targetHours} hours, ${Math.round(progressPercent)}% complete${!goal.isCompleted && goal.expectedPercent > 0 ? `, ${formatHours(Math.abs(goal.deltaHours))} ${deltaLabel}` : ""}`}
     >
       {/* Header */}
       <View style={styles.header}>
@@ -77,16 +89,29 @@ export function GoalCard({ goal, onPress }: GoalCardProps) {
       </View>
 
       {/* Progress Bar */}
-      <View style={[styles.progressBarBg, { backgroundColor: colors.progressBarBackground }]}>
-        <View
-          style={[
-            styles.progressBarFill,
-            {
-              backgroundColor: statusColor,
-              width: `${progressPercent}%`,
-            },
-          ]}
-        />
+      <View style={styles.progressBarWrapper}>
+        <View style={[styles.progressBarBg, { backgroundColor: colors.progressBarBackground }]}>
+          <View
+            style={[
+              styles.progressBarFill,
+              {
+                backgroundColor: statusColor,
+                width: `${progressPercent}%`,
+              },
+            ]}
+          />
+        </View>
+        {!goal.isCompleted && (
+          <View
+            style={[
+              styles.expectedMarker,
+              {
+                left: `${Math.min(100, goal.expectedPercent)}%`,
+                backgroundColor: colorScheme === "dark" ? "rgba(255,255,255,0.5)" : "rgba(0,0,0,0.4)",
+              },
+            ]}
+          />
+        )}
       </View>
 
       {/* Stats Row */}
@@ -107,14 +132,34 @@ export function GoalCard({ goal, onPress }: GoalCardProps) {
             progress
           </Text>
         </View>
-        <View style={styles.stat}>
-          <Text style={[styles.statValue, { color: colors.text }]}>
-            {formatHours(goal.remainingHours)}
-          </Text>
-          <Text style={[styles.statLabel, { color: colors.textSecondary }]}>
-            remaining
-          </Text>
-        </View>
+        {goal.isCompleted ? (
+          <View style={styles.stat}>
+            <Text style={[styles.statValue, { color: colors.text }]}>
+              {formatHours(goal.remainingHours)}
+            </Text>
+            <Text style={[styles.statLabel, { color: colors.textSecondary }]}>
+              remaining
+            </Text>
+          </View>
+        ) : goal.expectedPercent === 0 && !goal.isExpired ? (
+          <View style={styles.stat}>
+            <Text style={[styles.statValue, { color: colors.textSecondary }]}>
+              —
+            </Text>
+            <Text style={[styles.statLabel, { color: colors.textSecondary }]}>
+              not started
+            </Text>
+          </View>
+        ) : (
+          <View style={styles.stat}>
+            <Text style={[styles.statValue, { color: deltaColor }]}>
+              {goal.deltaHours >= 0 ? "+" : "−"}{formatHours(Math.abs(goal.deltaHours))}
+            </Text>
+            <Text style={[styles.statLabel, { color: deltaColor }]}>
+              {deltaLabel}
+            </Text>
+          </View>
+        )}
       </View>
     </Pressable>
   );
@@ -154,11 +199,22 @@ const styles = StyleSheet.create({
     fontSize: 12,
     fontWeight: "600",
   },
+  progressBarWrapper: {
+    position: "relative",
+    marginBottom: 16,
+  },
   progressBarBg: {
     height: 8,
     borderRadius: 4,
     overflow: "hidden",
-    marginBottom: 16,
+  },
+  expectedMarker: {
+    position: "absolute",
+    top: -2,
+    width: 2,
+    height: 12,
+    borderRadius: 1,
+    marginLeft: -1,
   },
   progressBarFill: {
     height: "100%",

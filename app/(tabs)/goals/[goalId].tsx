@@ -126,6 +126,18 @@ export default function GoalDetailScreen() {
     statusText = "Expired";
   }
 
+  // Expected progress status
+  const threshold = goal.targetHours * 0.05;
+  let deltaColor: string = colors.tint;
+  let deltaLabel = "on track";
+  if (goal.deltaHours > threshold) {
+    deltaColor = colors.success;
+    deltaLabel = "ahead";
+  } else if (goal.deltaHours < -threshold) {
+    deltaColor = colors.warning;
+    deltaLabel = "behind";
+  }
+
   return (
     <ScrollView style={[styles.container, { backgroundColor: colors.background }]}>
       <View style={styles.content}>
@@ -163,22 +175,68 @@ export default function GoalDetailScreen() {
           <Text style={[styles.label, { color: colors.textSecondary }]}>
             Progress
           </Text>
-          <View style={[styles.progressBarBg, { backgroundColor: colors.progressBarBackground }]}>
-            <View
-              style={[
-                styles.progressBarFill,
-                {
-                  backgroundColor: statusColor,
-                  width: `${progressPercent}%`,
-                },
-              ]}
-            />
+          <View style={styles.progressBarWrapper}>
+            <View style={[styles.progressBarBg, { backgroundColor: colors.progressBarBackground }]}>
+              <View
+                style={[
+                  styles.progressBarFill,
+                  {
+                    backgroundColor: statusColor,
+                    width: `${progressPercent}%`,
+                  },
+                ]}
+              />
+            </View>
+            {!goal.isCompleted && (
+              <View
+                style={[
+                  styles.expectedMarker,
+                  {
+                    left: `${Math.min(100, goal.expectedPercent)}%`,
+                    backgroundColor: colorScheme === "dark" ? "rgba(255,255,255,0.5)" : "rgba(0,0,0,0.4)",
+                  },
+                ]}
+              />
+            )}
           </View>
           <Text style={[styles.progressText, { color: colors.text }]}>
             {formatHours(progressHours)} of {goal.targetHours} hours (
             {Math.round(progressPercent)}%)
           </Text>
         </View>
+
+        {/* Expected Progress */}
+        {!goal.isCompleted && goal.expectedPercent > 0 && (
+          <View style={styles.section}>
+            <Text style={[styles.label, { color: colors.textSecondary }]}>
+              Expected
+            </Text>
+            <Text style={[styles.value, { color: colors.text }]}>
+              {formatHours(goal.expectedHours)}
+            </Text>
+            <Text
+              style={[
+                styles.deltaText,
+                { color: deltaColor },
+              ]}
+            >
+              {goal.deltaHours >= 0 ? "+" : "−"}
+              {formatHours(Math.abs(goal.deltaHours))} {deltaLabel}
+            </Text>
+          </View>
+        )}
+
+        {/* Not Started */}
+        {!goal.isCompleted && goal.expectedPercent === 0 && !goal.isExpired && (
+          <View style={styles.section}>
+            <Text style={[styles.label, { color: colors.textSecondary }]}>
+              Expected
+            </Text>
+            <Text style={[styles.value, { color: colors.textSecondary }]}>
+              Not started yet
+            </Text>
+          </View>
+        )}
 
         {/* Remaining */}
         {!goal.isCompleted && (
@@ -261,11 +319,22 @@ const styles = StyleSheet.create({
     fontSize: 18,
     fontWeight: "500",
   },
+  progressBarWrapper: {
+    position: "relative",
+    marginBottom: 8,
+  },
   progressBarBg: {
     height: 12,
     borderRadius: 6,
     overflow: "hidden",
-    marginBottom: 8,
+  },
+  expectedMarker: {
+    position: "absolute",
+    top: -2,
+    width: 2,
+    height: 16,
+    borderRadius: 1,
+    marginLeft: -1,
   },
   progressBarFill: {
     height: "100%",
@@ -273,6 +342,11 @@ const styles = StyleSheet.create({
   },
   progressText: {
     fontSize: 14,
+  },
+  deltaText: {
+    fontSize: 14,
+    fontWeight: "500",
+    marginTop: 4,
   },
   actions: {
     flexDirection: "row",

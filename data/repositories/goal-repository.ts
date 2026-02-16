@@ -1,5 +1,11 @@
 import type { SQLiteDatabase } from "expo-sqlite";
-import { format, parseISO, isBefore, startOfDay } from "date-fns";
+import {
+  format,
+  parseISO,
+  isBefore,
+  startOfDay,
+  differenceInCalendarDays,
+} from "date-fns";
 import type {
   GoalWithProgress,
   CreateGoalInput,
@@ -93,6 +99,17 @@ export class GoalRepository implements IGoalRepository {
     const today = format(startOfDay(new Date()), "yyyy-MM-dd");
     const isExpired = isBefore(parseISO(row.end_date), parseISO(today));
 
+    const todayDate = parseISO(today);
+    const start = parseISO(row.start_date);
+    const end = parseISO(row.end_date);
+    const totalDays = differenceInCalendarDays(end, start) + 1;
+    const elapsedDays = Math.max(0, differenceInCalendarDays(todayDate, start) + 1);
+    const fraction = Math.min(1, Math.max(0, elapsedDays / totalDays));
+
+    const expectedHours = row.target_hours * fraction;
+    const expectedPercent = fraction * 100;
+    const deltaHours = row.progress_seconds / 3600 - expectedHours;
+
     return {
       id: row.id,
       targetHours: row.target_hours,
@@ -106,6 +123,9 @@ export class GoalRepository implements IGoalRepository {
       remainingHours,
       isCompleted,
       isExpired,
+      expectedHours,
+      expectedPercent,
+      deltaHours,
     };
   }
 }

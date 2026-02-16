@@ -44,6 +44,9 @@ export interface GoalWithProgress extends Goal {
   remainingHours: number;
   isCompleted: boolean;
   isExpired: boolean;
+  expectedHours: number;
+  expectedPercent: number;
+  deltaHours: number;
 }
 
 // ─── Input Types (for create/update operations) ─────────────────────
