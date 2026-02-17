@@ -1,19 +1,31 @@
-import { useState, useRef, useEffect, useCallback } from "react";
+import { useState, useRef, useEffect, useCallback, useMemo } from "react";
 import { AppState, type AppStateStatus } from "react-native";
 import Storage from "expo-sqlite/kv-store";
-import type { PersistedTimerState } from "@/specs/001-meditation-app/contracts/repository-interfaces";
 
 const TIMER_STATE_KEY = "timer_state";
 
 // Maximum reasonable timer duration: 24 hours
 const MAX_REASONABLE_MS = 24 * 60 * 60 * 1000;
 
+export type TimerMode = "open-ended" | "countdown" | "overtime";
+
+interface PersistedTimerState {
+  startTime: number;
+  accumulatedMs: number;
+  isRunning: boolean;
+  durationMs: number | null;
+  mode: TimerMode;
+}
+
 interface UseTimerResult {
   elapsedMs: number;
+  displayMs: number;
   isRunning: boolean;
+  mode: TimerMode | null;
+  durationMs: number | null;
   hasRecoveryData: boolean;
   recoveredElapsedMs: number;
-  start: () => void;
+  start: (durationMs?: number | null) => void;
   stop: () => void;
   discard: () => void;
   acceptRecovery: () => void;
@@ -33,11 +45,15 @@ function formatElapsedMs(ms: number): string {
 export function useTimer(): UseTimerResult {
   const [elapsedMs, setElapsedMs] = useState(0);
   const [isRunning, setIsRunning] = useState(false);
+  const [mode, setMode] = useState<TimerMode | null>(null);
+  const [durationMs, setDurationMs] = useState<number | null>(null);
   const [hasRecoveryData, setHasRecoveryData] = useState(false);
   const [recoveredElapsedMs, setRecoveredElapsedMs] = useState(0);
 
   const startTimeRef = useRef<number | null>(null);
   const accumulatedMsRef = useRef(0);
+  const durationMsRef = useRef<number | null>(null);
+  const modeRef = useRef<TimerMode | null>(null);
   const intervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
   const appStateRef = useRef<AppStateStatus>(AppState.currentState);
 
@@ -47,6 +63,8 @@ export function useTimer(): UseTimerResult {
       startTime: startTimeRef.current ?? 0,
       accumulatedMs: accumulatedMsRef.current,
       isRunning: running,
+      durationMs: durationMsRef.current,
+      mode: modeRef.current ?? "open-ended",
     };
     Storage.setItemSync(TIMER_STATE_KEY, JSON.stringify(state));
   }, []);
@@ -69,11 +87,33 @@ export function useTimer(): UseTimerResult {
     if (intervalRef.current) return;
 
     intervalRef.current = setInterval(() => {
-      setElapsedMs(calculateElapsed());
+      const elapsed = calculateElapsed();
+      setElapsedMs(elapsed);
+
+      // Check for countdown → overtime transition
+      if (
+        modeRef.current === "countdown" &&
+        durationMsRef.current !== null &&
+        elapsed >= durationMsRef.current
+      ) {
+        modeRef.current = "overtime";
+        setMode("overtime");
+      }
     }, 1000);
 
     // Immediate update
-    setElapsedMs(calculateElapsed());
+    const elapsed = calculateElapsed();
+    setElapsedMs(elapsed);
+
+    // Check transition on immediate update too
+    if (
+      modeRef.current === "countdown" &&
+      durationMsRef.current !== null &&
+      elapsed >= durationMsRef.current
+    ) {
+      modeRef.current = "overtime";
+      setMode("overtime");
+    }
   }, [calculateElapsed]);
 
   // Stop the display interval
@@ -89,7 +129,7 @@ export function useTimer(): UseTimerResult {
     try {
       const storedState = Storage.getItemSync(TIMER_STATE_KEY);
       if (storedState) {
-        const state: PersistedTimerState = JSON.parse(storedState);
+        const state = JSON.parse(storedState) as PersistedTimerState;
         if (state.isRunning) {
           // Calculate how long the timer was running
           const elapsed = state.accumulatedMs + (Date.now() - state.startTime);
@@ -147,14 +187,26 @@ export function useTimer(): UseTimerResult {
     };
   }, [stopInterval]);
 
-  const start = useCallback(() => {
-    startTimeRef.current = Date.now();
-    accumulatedMsRef.current = 0;
-    setIsRunning(true);
-    setElapsedMs(0);
-    persistState(true);
-    startInterval();
-  }, [persistState, startInterval]);
+  const start = useCallback(
+    (targetDurationMs?: number | null) => {
+      startTimeRef.current = Date.now();
+      accumulatedMsRef.current = 0;
+
+      const newMode: TimerMode =
+        targetDurationMs != null ? "countdown" : "open-ended";
+      modeRef.current = newMode;
+      durationMsRef.current = targetDurationMs ?? null;
+
+      setIsRunning(true);
+      setElapsedMs(0);
+      setMode(newMode);
+      setDurationMs(targetDurationMs ?? null);
+
+      persistState(true);
+      startInterval();
+    },
+    [persistState, startInterval]
+  );
 
   const stop = useCallback(() => {
     // Finalize accumulated time
@@ -170,8 +222,12 @@ export function useTimer(): UseTimerResult {
   const discard = useCallback(() => {
     startTimeRef.current = null;
     accumulatedMsRef.current = 0;
+    durationMsRef.current = null;
+    modeRef.current = null;
     setIsRunning(false);
     setElapsedMs(0);
+    setMode(null);
+    setDurationMs(null);
     stopInterval();
     clearPersistedState();
   }, [stopInterval, clearPersistedState]);
@@ -191,9 +247,24 @@ export function useTimer(): UseTimerResult {
     setRecoveredElapsedMs(0);
   }, []);
 
+  // Compute display value based on mode
+  const displayMs = useMemo(() => {
+    if (mode === "countdown" && durationMs !== null) {
+      return Math.max(0, durationMs - elapsedMs);
+    }
+    if (mode === "overtime" && durationMs !== null) {
+      return elapsedMs - durationMs;
+    }
+    // open-ended or null mode
+    return elapsedMs;
+  }, [mode, durationMs, elapsedMs]);
+
   return {
     elapsedMs,
+    displayMs,
     isRunning,
+    mode,
+    durationMs,
     hasRecoveryData,
     recoveredElapsedMs,
     start,

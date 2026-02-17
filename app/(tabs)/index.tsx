@@ -1,4 +1,4 @@
-import { useEffect } from "react";
+import { useEffect, useRef, useState } from "react";
 import {
   View,
   Text,
@@ -11,8 +11,12 @@ import { useRouter } from "expo-router";
 import { useKeepAwake } from "expo-keep-awake";
 import { MaterialIcons } from "@expo/vector-icons";
 import { TimerDisplay } from "@/components/TimerDisplay";
+import { DurationInput } from "@/components/DurationInput";
 import { useTimer, formatElapsedMs } from "@/hooks/useTimer";
+import { useAlarm } from "@/hooks/useAlarm";
+import { useTimerNotification } from "@/hooks/useTimerNotification";
 import { Colors } from "@/constants/Colors";
+import type { TimerMode } from "@/hooks/useTimer";
 
 export default function TimerScreen() {
   const colorScheme = useColorScheme() ?? "light";
@@ -20,7 +24,9 @@ export default function TimerScreen() {
   const router = useRouter();
   const {
     elapsedMs,
+    displayMs,
     isRunning,
+    mode,
     hasRecoveryData,
     recoveredElapsedMs,
     start,
@@ -29,9 +35,45 @@ export default function TimerScreen() {
     acceptRecovery,
     discardRecovery,
   } = useTimer();
+  const { playAlarm, stopAlarm } = useAlarm();
+  const {
+    requestPermissions,
+    updateTimerNotification,
+    dismissTimerNotification,
+    scheduleAlarmNotification,
+    cancelAlarmNotification,
+  } = useTimerNotification();
+
+  const [durationMinutes, setDurationMinutes] = useState<number | null>(null);
+  const prevModeRef = useRef<TimerMode | null>(null);
+  const notificationPermittedRef = useRef(false);
 
   // Keep screen awake while timer is running
   useKeepAwake();
+
+  // Detect countdown → overtime transition and trigger alarm
+  useEffect(() => {
+    if (prevModeRef.current === "countdown" && mode === "overtime") {
+      playAlarm();
+    }
+    prevModeRef.current = mode;
+  }, [mode, playAlarm]);
+
+  // Update notification on each display tick
+  useEffect(() => {
+    if (!isRunning || !notificationPermittedRef.current) return;
+
+    const formattedTime = formatElapsedMs(displayMs);
+    const subtitle =
+      mode === "countdown"
+        ? "Countdown"
+        : mode === "overtime"
+          ? "Overtime"
+          : "Meditating";
+
+    // Fire-and-forget — don't block the UI
+    updateTimerNotification(formattedTime, subtitle);
+  }, [displayMs, isRunning, mode, updateTimerNotification]);
 
   // Show recovery dialog when app detects a crashed session
   useEffect(() => {
@@ -61,7 +103,27 @@ export default function TimerScreen() {
     }
   }, [hasRecoveryData, recoveredElapsedMs, acceptRecovery, discardRecovery, router]);
 
+  const handleStart = async () => {
+    const targetMs =
+      durationMinutes != null ? durationMinutes * 60 * 1000 : null;
+
+    // Request notification permissions (first-use prompt)
+    const permitted = await requestPermissions();
+    notificationPermittedRef.current = permitted;
+
+    start(targetMs);
+
+    // Schedule background alarm notification for countdown mode
+    if (permitted && targetMs != null) {
+      const seconds = Math.round(targetMs / 1000);
+      scheduleAlarmNotification(seconds);
+    }
+  };
+
   const handleStop = () => {
+    stopAlarm();
+    dismissTimerNotification();
+    cancelAlarmNotification();
     stop();
     router.push({
       pathname: "/save-session" as never,
@@ -78,7 +140,12 @@ export default function TimerScreen() {
         {
           text: "Discard",
           style: "destructive",
-          onPress: discard,
+          onPress: () => {
+            stopAlarm();
+            dismissTimerNotification();
+            cancelAlarmNotification();
+            discard();
+          },
         },
       ]
     );
@@ -86,14 +153,32 @@ export default function TimerScreen() {
 
   return (
     <View style={[styles.container, { backgroundColor: colors.background }]}>
+      {!isRunning && (
+        <DurationInput
+          value={durationMinutes}
+          onChange={setDurationMinutes}
+          disabled={isRunning}
+        />
+      )}
+
       <View style={styles.timerContainer}>
-        <TimerDisplay elapsedMs={elapsedMs} />
+        {mode === "overtime" && (
+          <Text style={[styles.modeLabel, { color: colors.textSecondary }]}>
+            Overtime
+          </Text>
+        )}
+        <TimerDisplay elapsedMs={displayMs} />
+        {mode === "countdown" && (
+          <Text style={[styles.modeLabel, { color: colors.textSecondary }]}>
+            Remaining
+          </Text>
+        )}
       </View>
 
       <View style={styles.controls}>
         {!isRunning ? (
           <Pressable
-            onPress={start}
+            onPress={handleStart}
             style={[styles.primaryButton, { backgroundColor: colors.tint }]}
             accessibilityLabel="Start meditation timer"
             accessibilityRole="button"
@@ -147,6 +232,12 @@ const styles = StyleSheet.create({
   },
   timerContainer: {
     marginBottom: 48,
+    alignItems: "center",
+  },
+  modeLabel: {
+    fontSize: 14,
+    marginBottom: 4,
+    marginTop: 4,
   },
   controls: {
     alignItems: "center",

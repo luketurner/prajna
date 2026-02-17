@@ -3,10 +3,33 @@ import { Stack } from "expo-router";
 import { StatusBar } from "expo-status-bar";
 import { SQLiteProvider } from "expo-sqlite";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { ActivityIndicator, View, useColorScheme } from "react-native";
+import { ActivityIndicator, Platform, View, useColorScheme } from "react-native";
+import * as Notifications from "expo-notifications";
 import { migrateDbIfNeeded } from "@/data/migrations";
 import { RepositoryProvider } from "@/data/database-provider";
 import { Colors } from "@/constants/Colors";
+
+// Configure foreground notification handler — suppress in-app pop-ups for timer ticks
+Notifications.setNotificationHandler({
+  handleNotification: async () => ({
+    shouldShowAlert: false,
+    shouldShowBanner: false,
+    shouldShowList: true,
+    shouldPlaySound: false,
+    shouldSetBadge: false,
+  }),
+});
+
+// Create Android notification channel for timer updates
+if (Platform.OS === "android") {
+  Notifications.setNotificationChannelAsync("meditation-timer", {
+    name: "Meditation Timer",
+    importance: Notifications.AndroidImportance.LOW,
+    vibrationPattern: [0],
+    lockscreenVisibility: Notifications.AndroidNotificationVisibility.PUBLIC,
+    showBadge: false,
+  });
+}
 
 const queryClient = new QueryClient({
   defaultOptions: {
