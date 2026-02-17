@@ -6,7 +6,17 @@
 
 <h1 align="center">Prajna</h1>
 
-A simple Android app for meditation tracking:
+A simple Android app for meditation tracking.
+
+<p style="margin: auto;" align="center" width="100%">
+
+<img width="33%" src="docs/goals.png">
+
+<img width="33%" src="docs/timer.png">
+
+<img width="33%" src="docs/stats.png">
+
+</p>
 
 1. Record meditation sessions.
 2. Tag sessions with user-defined tags (e.g. based on meditation type, how you felt, or whatever you want.)
