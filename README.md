@@ -17,7 +17,7 @@ A simple Android app for meditation tracking:
 
 ## Installation
 
-Prajna is not distributed on the Google Play Store. To install it, you need to manually download and install the `.apk` file from the latest release on Github.
+Prajna is not distributed on the Google Play Store. To install it, you need to manually download and install the `.apk` file from the [latest release](https://github.com/luketurner/prajna/releases/latest).
 
 ## Development
 
