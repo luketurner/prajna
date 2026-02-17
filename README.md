@@ -10,11 +10,11 @@ A simple Android app for meditation tracking.
 
 <p style="margin: auto;" align="center" width="100%">
 
-<img width="33%" src="docs/goals.png">
+<img width="30%" src="docs/goals.png">
 
-<img width="33%" src="docs/timer.png">
+<img width="30%" src="docs/timer.png">
 
-<img width="33%" src="docs/stats.png">
+<img width="30%" src="docs/stats.png">
 
 </p>
 
