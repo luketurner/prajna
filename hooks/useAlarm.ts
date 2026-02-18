@@ -5,7 +5,7 @@ import {
 } from "expo-audio";
 import { useCallback, useEffect, useRef } from "react";
 
-const ALARM_AUTO_STOP_MS = 4000;
+const ALARM_AUTO_STOP_MS = 9000;
 
 const bellSound = require("@/assets/audio/bell.mp3");
 
