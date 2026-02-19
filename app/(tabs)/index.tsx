@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import {
   View,
   Text,
@@ -8,8 +8,10 @@ import {
   Alert,
 } from "react-native";
 import { useRouter } from "expo-router";
+import { useFocusEffect } from "@react-navigation/native";
 import { useKeepAwake } from "expo-keep-awake";
 import { MaterialIcons } from "@expo/vector-icons";
+import Storage from "expo-sqlite/kv-store";
 import { TimerDisplay } from "@/components/TimerDisplay";
 import { DurationInput } from "@/components/DurationInput";
 import { useTimer, formatElapsedMs } from "@/hooks/useTimer";
@@ -17,6 +19,8 @@ import { useAlarm } from "@/hooks/useAlarm";
 import { useTimerNotification } from "@/hooks/useTimerNotification";
 import { Colors } from "@/constants/Colors";
 import type { TimerMode } from "@/hooks/useTimer";
+
+const DURATION_MINUTES_KEY = "duration_minutes";
 
 export default function TimerScreen() {
   const colorScheme = useColorScheme() ?? "light";
@@ -32,6 +36,7 @@ export default function TimerScreen() {
     start,
     stop,
     discard,
+    reset,
     acceptRecovery,
     discardRecovery,
   } = useTimer();
@@ -44,9 +49,36 @@ export default function TimerScreen() {
     cancelAlarmNotification,
   } = useTimerNotification();
 
-  const [durationMinutes, setDurationMinutes] = useState<number | null>(null);
+  const [durationMinutes, setDurationMinutes] = useState<number | null>(() => {
+    try {
+      const stored = Storage.getItemSync(DURATION_MINUTES_KEY);
+      if (stored != null) return parseInt(stored, 10);
+    } catch {}
+    return null;
+  });
   const prevModeRef = useRef<TimerMode | null>(null);
   const notificationPermittedRef = useRef(false);
+  const navigatedToSaveRef = useRef(false);
+
+  // Persist duration whenever it changes
+  const handleDurationChange = useCallback((value: number | null) => {
+    setDurationMinutes(value);
+    if (value != null) {
+      Storage.setItemSync(DURATION_MINUTES_KEY, value.toString());
+    } else {
+      Storage.removeItemSync(DURATION_MINUTES_KEY);
+    }
+  }, []);
+
+  // Reset timer when returning from save-session screen
+  useFocusEffect(
+    useCallback(() => {
+      if (navigatedToSaveRef.current) {
+        navigatedToSaveRef.current = false;
+        reset();
+      }
+    }, [reset])
+  );
 
   // Keep screen awake while timer is running
   useKeepAwake();
@@ -92,6 +124,7 @@ export default function TimerScreen() {
             text: "Save",
             onPress: () => {
               acceptRecovery();
+              navigatedToSaveRef.current = true;
               router.push({
                 pathname: "/save-session" as never,
                 params: { durationMs: recoveredElapsedMs.toString() },
@@ -125,6 +158,7 @@ export default function TimerScreen() {
     dismissTimerNotification();
     cancelAlarmNotification();
     stop();
+    navigatedToSaveRef.current = true;
     router.push({
       pathname: "/save-session" as never,
       params: { durationMs: elapsedMs.toString() },
@@ -156,7 +190,7 @@ export default function TimerScreen() {
       {!isRunning && (
         <DurationInput
           value={durationMinutes}
-          onChange={setDurationMinutes}
+          onChange={handleDurationChange}
           disabled={isRunning}
         />
       )}

@@ -28,6 +28,7 @@ interface UseTimerResult {
   start: (durationMs?: number | null) => void;
   stop: () => void;
   discard: () => void;
+  reset: () => void;
   acceptRecovery: () => void;
   discardRecovery: () => void;
 }
@@ -247,6 +248,18 @@ export function useTimer(): UseTimerResult {
     setRecoveredElapsedMs(0);
   }, []);
 
+  // Reset timer display after a session is saved (or discarded from save screen)
+  const reset = useCallback(() => {
+    startTimeRef.current = null;
+    accumulatedMsRef.current = 0;
+    modeRef.current = null;
+    setElapsedMs(0);
+    setMode(null);
+    setDurationMs(null);
+    stopInterval();
+    clearPersistedState();
+  }, [stopInterval, clearPersistedState]);
+
   // Compute display value based on mode
   const displayMs = useMemo(() => {
     if (mode === "countdown" && durationMs !== null) {
@@ -270,6 +283,7 @@ export function useTimer(): UseTimerResult {
     start,
     stop,
     discard,
+    reset,
     acceptRecovery,
     discardRecovery,
   };
