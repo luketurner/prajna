@@ -32,7 +32,8 @@ export function useTimerNotification() {
             subtitle,
             sticky: true,
             autoDismiss: false,
-            priority: Notifications.AndroidNotificationPriority.LOW,
+            priority: Notifications.AndroidNotificationPriority.DEFAULT,
+            interruptionLevel: "active",
             sound: false,
             data: { type: "meditation-timer" },
           },
@@ -61,13 +62,16 @@ export function useTimerNotification() {
           content: {
             title: "Meditation Complete",
             body: "Your meditation session is complete.",
-            sound: true,
+            sound: "bell.mp3",
             priority: Notifications.AndroidNotificationPriority.HIGH,
+            interruptionLevel: "timeSensitive",
+            data: { type: "meditation-alarm" },
           },
           trigger: {
             type: Notifications.SchedulableTriggerInputTypes.TIME_INTERVAL,
             seconds,
             repeats: false,
+            channelId: "meditation-alarm",
           },
         });
       } catch {

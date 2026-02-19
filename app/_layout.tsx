@@ -9,23 +9,38 @@ import { migrateDbIfNeeded } from "@/data/migrations";
 import { RepositoryProvider } from "@/data/database-provider";
 import { Colors } from "@/constants/Colors";
 
-// Configure foreground notification handler — suppress in-app pop-ups for timer ticks
+// Configure foreground notification handler — suppress pop-ups for timer ticks,
+// but allow sound for alarm notifications
 Notifications.setNotificationHandler({
-  handleNotification: async () => ({
-    shouldShowAlert: false,
-    shouldShowBanner: false,
-    shouldShowList: true,
-    shouldPlaySound: false,
-    shouldSetBadge: false,
-  }),
+  handleNotification: async (notification) => {
+    const isAlarm =
+      notification.request.content.data?.type === "meditation-alarm";
+    return {
+      shouldShowAlert: isAlarm,
+      shouldShowBanner: isAlarm,
+      shouldShowList: true,
+      shouldPlaySound: isAlarm,
+      shouldSetBadge: false,
+    };
+  },
 });
 
-// Create Android notification channel for timer updates
+// Create Android notification channels
 if (Platform.OS === "android") {
   Notifications.setNotificationChannelAsync("meditation-timer", {
     name: "Meditation Timer",
-    importance: Notifications.AndroidImportance.LOW,
+    importance: Notifications.AndroidImportance.DEFAULT,
     vibrationPattern: [0],
+    sound: null,
+    lockscreenVisibility: Notifications.AndroidNotificationVisibility.PUBLIC,
+    showBadge: false,
+  });
+
+  Notifications.setNotificationChannelAsync("meditation-alarm", {
+    name: "Meditation Alarm",
+    importance: Notifications.AndroidImportance.HIGH,
+    sound: "bell.mp3",
+    vibrationPattern: [0, 250, 250, 250],
     lockscreenVisibility: Notifications.AndroidNotificationVisibility.PUBLIC,
     showBadge: false,
   });
