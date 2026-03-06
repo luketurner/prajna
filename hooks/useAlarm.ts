@@ -17,7 +17,7 @@ export function useAlarm() {
   // Configure audio mode on mount
   useEffect(() => {
     setAudioModeAsync({
-      playsInSilentMode: false,
+      playsInSilentMode: true,
       interruptionMode: "mixWithOthers",
     });
   }, []);

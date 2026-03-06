@@ -11,6 +11,7 @@ import { useRouter } from "expo-router";
 import { useFocusEffect } from "@react-navigation/native";
 import { useKeepAwake } from "expo-keep-awake";
 import { MaterialIcons } from "@expo/vector-icons";
+import * as Notifications from "expo-notifications";
 import Storage from "expo-sqlite/kv-store";
 import { TimerDisplay } from "@/components/TimerDisplay";
 import { DurationInput } from "@/components/DurationInput";
@@ -59,6 +60,7 @@ export default function TimerScreen() {
   const prevModeRef = useRef<TimerMode | null>(null);
   const notificationPermittedRef = useRef(false);
   const navigatedToSaveRef = useRef(false);
+  const alarmFiredRef = useRef(false);
 
   // Persist duration whenever it changes
   const handleDurationChange = useCallback((value: number | null) => {
@@ -85,11 +87,27 @@ export default function TimerScreen() {
 
   // Detect countdown → overtime transition and trigger alarm
   useEffect(() => {
-    if (prevModeRef.current === "countdown" && mode === "overtime") {
+    if (prevModeRef.current === "countdown" && mode === "overtime" && !alarmFiredRef.current) {
+      alarmFiredRef.current = true;
       playAlarm();
     }
     prevModeRef.current = mode;
   }, [mode, playAlarm]);
+
+  // Backup: listen for OS-delivered alarm notification (fires even if the
+  // interval-based mode transition hasn't been processed yet)
+  useEffect(() => {
+    const sub = Notifications.addNotificationReceivedListener((notification) => {
+      if (
+        notification.request.content.data?.type === "meditation-alarm" &&
+        !alarmFiredRef.current
+      ) {
+        alarmFiredRef.current = true;
+        playAlarm();
+      }
+    });
+    return () => sub.remove();
+  }, [playAlarm]);
 
   // Update notification on each display tick
   useEffect(() => {
@@ -137,6 +155,7 @@ export default function TimerScreen() {
   }, [hasRecoveryData, recoveredElapsedMs, acceptRecovery, discardRecovery, router]);
 
   const handleStart = async () => {
+    alarmFiredRef.current = false;
     const targetMs =
       durationMinutes != null ? durationMinutes * 60 * 1000 : null;
 

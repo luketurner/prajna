@@ -85,24 +85,25 @@ export function useTimer(): UseTimerResult {
 
   // Start the display interval
   const startInterval = useCallback(() => {
-    if (intervalRef.current) return;
+    // Create interval if not already running
+    if (!intervalRef.current) {
+      intervalRef.current = setInterval(() => {
+        const elapsed = calculateElapsed();
+        setElapsedMs(elapsed);
 
-    intervalRef.current = setInterval(() => {
-      const elapsed = calculateElapsed();
-      setElapsedMs(elapsed);
+        // Check for countdown → overtime transition
+        if (
+          modeRef.current === "countdown" &&
+          durationMsRef.current !== null &&
+          elapsed >= durationMsRef.current
+        ) {
+          modeRef.current = "overtime";
+          setMode("overtime");
+        }
+      }, 1000);
+    }
 
-      // Check for countdown → overtime transition
-      if (
-        modeRef.current === "countdown" &&
-        durationMsRef.current !== null &&
-        elapsed >= durationMsRef.current
-      ) {
-        modeRef.current = "overtime";
-        setMode("overtime");
-      }
-    }, 1000);
-
-    // Immediate update
+    // Immediate update (always runs, even if interval already exists)
     const elapsed = calculateElapsed();
     setElapsedMs(elapsed);
 
@@ -158,16 +159,19 @@ export function useTimer(): UseTimerResult {
           appStateRef.current.match(/active/) &&
           nextAppState.match(/inactive|background/)
         ) {
-          // Going to background - persist state and stop interval
+          // Going to background — persist state for crash recovery.
+          // Keep interval running so it can detect transitions and update
+          // notifications during any background execution time the OS grants.
           if (isRunning) {
             persistState(true);
-            stopInterval();
           }
         } else if (
           appStateRef.current.match(/inactive|background/) &&
           nextAppState === "active"
         ) {
-          // Coming to foreground - restart interval
+          // Coming to foreground — ensure interval is running and do an
+          // immediate elapsed/transition check (handles iOS suspension where
+          // the interval callbacks were paused).
           if (isRunning) {
             startInterval();
           }
@@ -179,7 +183,7 @@ export function useTimer(): UseTimerResult {
     return () => {
       subscription.remove();
     };
-  }, [isRunning, persistState, stopInterval, startInterval]);
+  }, [isRunning, persistState, startInterval]);
 
   // Cleanup interval on unmount
   useEffect(() => {
