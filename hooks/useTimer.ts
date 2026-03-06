@@ -13,7 +13,7 @@ interface PersistedTimerState {
   startTime: number;
   accumulatedMs: number;
   isRunning: boolean;
-  durationMs: number | null;
+  stages: number[] | null; // array of stage durations in ms, null for open-ended
   mode: TimerMode;
 }
 
@@ -22,10 +22,13 @@ interface UseTimerResult {
   displayMs: number;
   isRunning: boolean;
   mode: TimerMode | null;
-  durationMs: number | null;
+  totalDurationMs: number | null;
+  currentStageIndex: number;
+  totalStages: number;
+  completedStageCount: number;
   hasRecoveryData: boolean;
   recoveredElapsedMs: number;
-  start: (durationMs?: number | null) => void;
+  start: (stages?: number[] | null) => void;
   stop: () => void;
   discard: () => void;
   reset: () => void;
@@ -43,20 +46,44 @@ function formatElapsedMs(ms: number): string {
     .padStart(2, "0")}:${seconds.toString().padStart(2, "0")}`;
 }
 
+/** Compute cumulative thresholds from stage durations. E.g. [5000, 3000] -> [5000, 8000] */
+function cumulativeThresholds(stages: number[]): number[] {
+  const thresholds: number[] = [];
+  let sum = 0;
+  for (const s of stages) {
+    sum += s;
+    thresholds.push(sum);
+  }
+  return thresholds;
+}
+
+/** Find which stage index the elapsed time falls in. Returns stages.length if past all stages. */
+function stageIndexForElapsed(elapsed: number, thresholds: number[]): number {
+  for (let i = 0; i < thresholds.length; i++) {
+    if (elapsed < thresholds[i]) return i;
+  }
+  return thresholds.length; // past all stages
+}
+
 export function useTimer(): UseTimerResult {
   const [elapsedMs, setElapsedMs] = useState(0);
   const [isRunning, setIsRunning] = useState(false);
   const [mode, setMode] = useState<TimerMode | null>(null);
-  const [durationMs, setDurationMs] = useState<number | null>(null);
+  const [currentStageIndex, setCurrentStageIndex] = useState(0);
+  const [completedStageCount, setCompletedStageCount] = useState(0);
   const [hasRecoveryData, setHasRecoveryData] = useState(false);
   const [recoveredElapsedMs, setRecoveredElapsedMs] = useState(0);
 
   const startTimeRef = useRef<number | null>(null);
   const accumulatedMsRef = useRef(0);
-  const durationMsRef = useRef<number | null>(null);
+  const stagesRef = useRef<number[] | null>(null);
   const modeRef = useRef<TimerMode | null>(null);
+  const currentStageIndexRef = useRef(0);
+  const completedStageCountRef = useRef(0);
   const intervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
   const appStateRef = useRef<AppStateStatus>(AppState.currentState);
+
+  const [totalDurationMs, setTotalDurationMs] = useState<number | null>(null);
 
   // Persist timer state to kv-store
   const persistState = useCallback((running: boolean) => {
@@ -64,7 +91,7 @@ export function useTimer(): UseTimerResult {
       startTime: startTimeRef.current ?? 0,
       accumulatedMs: accumulatedMsRef.current,
       isRunning: running,
-      durationMs: durationMsRef.current,
+      stages: stagesRef.current,
       mode: modeRef.current ?? "open-ended",
     };
     Storage.setItemSync(TIMER_STATE_KEY, JSON.stringify(state));
@@ -83,6 +110,45 @@ export function useTimer(): UseTimerResult {
     return accumulatedMsRef.current;
   }, []);
 
+  // Check stage transitions and mode changes for a given elapsed value
+  const checkTransitions = useCallback((elapsed: number) => {
+    const stages = stagesRef.current;
+    if (!stages || stages.length === 0) return; // open-ended, no transitions
+
+    const thresholds = cumulativeThresholds(stages);
+    const totalMs = thresholds[thresholds.length - 1];
+
+    // Check for overtime transition
+    if (modeRef.current === "countdown" && elapsed >= totalMs) {
+      modeRef.current = "overtime";
+      setMode("overtime");
+      // Complete any remaining stages
+      const remaining = stages.length - completedStageCountRef.current;
+      if (remaining > 0) {
+        completedStageCountRef.current = stages.length;
+        setCompletedStageCount(stages.length);
+      }
+      currentStageIndexRef.current = stages.length;
+      setCurrentStageIndex(stages.length);
+      return;
+    }
+
+    // Check for stage advancement within countdown
+    if (modeRef.current === "countdown") {
+      const newIndex = stageIndexForElapsed(elapsed, thresholds);
+      if (newIndex > currentStageIndexRef.current && newIndex <= stages.length) {
+        // Stages were completed
+        const newCompleted = newIndex;
+        if (newCompleted > completedStageCountRef.current) {
+          completedStageCountRef.current = newCompleted;
+          setCompletedStageCount(newCompleted);
+        }
+        currentStageIndexRef.current = newIndex;
+        setCurrentStageIndex(newIndex);
+      }
+    }
+  }, []);
+
   // Start the display interval
   const startInterval = useCallback(() => {
     // Create interval if not already running
@@ -90,33 +156,15 @@ export function useTimer(): UseTimerResult {
       intervalRef.current = setInterval(() => {
         const elapsed = calculateElapsed();
         setElapsedMs(elapsed);
-
-        // Check for countdown → overtime transition
-        if (
-          modeRef.current === "countdown" &&
-          durationMsRef.current !== null &&
-          elapsed >= durationMsRef.current
-        ) {
-          modeRef.current = "overtime";
-          setMode("overtime");
-        }
+        checkTransitions(elapsed);
       }, 1000);
     }
 
     // Immediate update (always runs, even if interval already exists)
     const elapsed = calculateElapsed();
     setElapsedMs(elapsed);
-
-    // Check transition on immediate update too
-    if (
-      modeRef.current === "countdown" &&
-      durationMsRef.current !== null &&
-      elapsed >= durationMsRef.current
-    ) {
-      modeRef.current = "overtime";
-      setMode("overtime");
-    }
-  }, [calculateElapsed]);
+    checkTransitions(elapsed);
+  }, [calculateElapsed, checkTransitions]);
 
   // Stop the display interval
   const stopInterval = useCallback(() => {
@@ -160,8 +208,6 @@ export function useTimer(): UseTimerResult {
           nextAppState.match(/inactive|background/)
         ) {
           // Going to background — persist state for crash recovery.
-          // Keep interval running so it can detect transitions and update
-          // notifications during any background execution time the OS grants.
           if (isRunning) {
             persistState(true);
           }
@@ -170,8 +216,7 @@ export function useTimer(): UseTimerResult {
           nextAppState === "active"
         ) {
           // Coming to foreground — ensure interval is running and do an
-          // immediate elapsed/transition check (handles iOS suspension where
-          // the interval callbacks were paused).
+          // immediate elapsed/transition check.
           if (isRunning) {
             startInterval();
           }
@@ -193,19 +238,23 @@ export function useTimer(): UseTimerResult {
   }, [stopInterval]);
 
   const start = useCallback(
-    (targetDurationMs?: number | null) => {
+    (stages?: number[] | null) => {
       startTimeRef.current = Date.now();
       accumulatedMsRef.current = 0;
 
-      const newMode: TimerMode =
-        targetDurationMs != null ? "countdown" : "open-ended";
+      const hasStages = stages != null && stages.length > 0;
+      const newMode: TimerMode = hasStages ? "countdown" : "open-ended";
       modeRef.current = newMode;
-      durationMsRef.current = targetDurationMs ?? null;
+      stagesRef.current = hasStages ? stages : null;
+      currentStageIndexRef.current = 0;
+      completedStageCountRef.current = 0;
 
       setIsRunning(true);
       setElapsedMs(0);
       setMode(newMode);
-      setDurationMs(targetDurationMs ?? null);
+      setTotalDurationMs(hasStages ? stages!.reduce((a, b) => a + b, 0) : null);
+      setCurrentStageIndex(0);
+      setCompletedStageCount(0);
 
       persistState(true);
       startInterval();
@@ -227,12 +276,16 @@ export function useTimer(): UseTimerResult {
   const discard = useCallback(() => {
     startTimeRef.current = null;
     accumulatedMsRef.current = 0;
-    durationMsRef.current = null;
+    stagesRef.current = null;
     modeRef.current = null;
+    currentStageIndexRef.current = 0;
+    completedStageCountRef.current = 0;
     setIsRunning(false);
     setElapsedMs(0);
     setMode(null);
-    setDurationMs(null);
+    setTotalDurationMs(null);
+    setCurrentStageIndex(0);
+    setCompletedStageCount(0);
     stopInterval();
     clearPersistedState();
   }, [stopInterval, clearPersistedState]);
@@ -256,32 +309,45 @@ export function useTimer(): UseTimerResult {
   const reset = useCallback(() => {
     startTimeRef.current = null;
     accumulatedMsRef.current = 0;
+    stagesRef.current = null;
     modeRef.current = null;
+    currentStageIndexRef.current = 0;
+    completedStageCountRef.current = 0;
     setElapsedMs(0);
     setMode(null);
-    setDurationMs(null);
+    setTotalDurationMs(null);
+    setCurrentStageIndex(0);
+    setCompletedStageCount(0);
     stopInterval();
     clearPersistedState();
   }, [stopInterval, clearPersistedState]);
 
-  // Compute display value based on mode
+  // Compute display value based on mode and current stage
   const displayMs = useMemo(() => {
-    if (mode === "countdown" && durationMs !== null) {
-      return Math.max(0, durationMs - elapsedMs);
+    const stages = stagesRef.current;
+    if (mode === "countdown" && stages && stages.length > 0) {
+      const thresholds = cumulativeThresholds(stages);
+      const idx = Math.min(currentStageIndex, stages.length - 1);
+      const stageEnd = thresholds[idx];
+      return Math.max(0, stageEnd - elapsedMs);
     }
-    if (mode === "overtime" && durationMs !== null) {
-      return elapsedMs - durationMs;
+    if (mode === "overtime" && stages && stages.length > 0) {
+      const total = stages.reduce((a, b) => a + b, 0);
+      return elapsedMs - total;
     }
     // open-ended or null mode
     return elapsedMs;
-  }, [mode, durationMs, elapsedMs]);
+  }, [mode, currentStageIndex, elapsedMs]);
 
   return {
     elapsedMs,
     displayMs,
     isRunning,
     mode,
-    durationMs,
+    totalDurationMs,
+    currentStageIndex,
+    totalStages: stagesRef.current?.length ?? 0,
+    completedStageCount,
     hasRecoveryData,
     recoveredElapsedMs,
     start,

@@ -14,14 +14,13 @@ import { MaterialIcons } from "@expo/vector-icons";
 import * as Notifications from "expo-notifications";
 import Storage from "expo-sqlite/kv-store";
 import { TimerDisplay } from "@/components/TimerDisplay";
-import { DurationInput } from "@/components/DurationInput";
+import { StagesInput } from "@/components/StagesInput";
 import { useTimer, formatElapsedMs } from "@/hooks/useTimer";
 import { useAlarm } from "@/hooks/useAlarm";
 import { useTimerNotification } from "@/hooks/useTimerNotification";
 import { Colors } from "@/constants/Colors";
-import type { TimerMode } from "@/hooks/useTimer";
 
-const DURATION_MINUTES_KEY = "duration_minutes";
+const STAGES_MINUTES_KEY = "stages_minutes";
 
 export default function TimerScreen() {
   const colorScheme = useColorScheme() ?? "light";
@@ -32,6 +31,9 @@ export default function TimerScreen() {
     displayMs,
     isRunning,
     mode,
+    currentStageIndex,
+    totalStages,
+    completedStageCount,
     hasRecoveryData,
     recoveredElapsedMs,
     start,
@@ -46,30 +48,30 @@ export default function TimerScreen() {
     requestPermissions,
     updateTimerNotification,
     dismissTimerNotification,
-    scheduleAlarmNotification,
-    cancelAlarmNotification,
+    scheduleStageAlarmNotifications,
+    cancelAlarmNotifications,
   } = useTimerNotification();
 
-  const [durationMinutes, setDurationMinutes] = useState<number | null>(() => {
+  const [stagesMinutes, setStagesMinutes] = useState<number[]>(() => {
     try {
-      const stored = Storage.getItemSync(DURATION_MINUTES_KEY);
-      if (stored != null) return parseInt(stored, 10);
+      const stored = Storage.getItemSync(STAGES_MINUTES_KEY);
+      if (stored != null) {
+        const parsed = JSON.parse(stored);
+        if (Array.isArray(parsed) && parsed.length > 0) return parsed;
+      }
     } catch {}
-    return null;
+    return [15]; // default: single 15-minute stage
   });
-  const prevModeRef = useRef<TimerMode | null>(null);
+
+  const prevCompletedRef = useRef(0);
   const notificationPermittedRef = useRef(false);
   const navigatedToSaveRef = useRef(false);
-  const alarmFiredRef = useRef(false);
+  const alarmCountRef = useRef(0); // tracks how many alarms we've already fired
 
-  // Persist duration whenever it changes
-  const handleDurationChange = useCallback((value: number | null) => {
-    setDurationMinutes(value);
-    if (value != null) {
-      Storage.setItemSync(DURATION_MINUTES_KEY, value.toString());
-    } else {
-      Storage.removeItemSync(DURATION_MINUTES_KEY);
-    }
+  // Persist stages whenever they change
+  const handleStagesChange = useCallback((value: number[]) => {
+    setStagesMinutes(value);
+    Storage.setItemSync(STAGES_MINUTES_KEY, JSON.stringify(value));
   }, []);
 
   // Reset timer when returning from save-session screen
@@ -85,25 +87,42 @@ export default function TimerScreen() {
   // Keep screen awake while timer is running
   useKeepAwake();
 
-  // Detect countdown → overtime transition and trigger alarm
+  // Detect stage completions and play alarms
   useEffect(() => {
-    if (prevModeRef.current === "countdown" && mode === "overtime" && !alarmFiredRef.current) {
-      alarmFiredRef.current = true;
-      playAlarm();
+    if (completedStageCount > prevCompletedRef.current) {
+      // Play alarms for each newly completed stage
+      for (let i = prevCompletedRef.current; i < completedStageCount; i++) {
+        const isFinal = i === totalStages - 1;
+        // Slight delay for chaining if multiple stages completed at once
+        const delay = (i - prevCompletedRef.current) * 500;
+        setTimeout(() => {
+          playAlarm(isFinal ? 2 : 1);
+        }, delay);
+      }
+      prevCompletedRef.current = completedStageCount;
     }
-    prevModeRef.current = mode;
-  }, [mode, playAlarm]);
+  }, [completedStageCount, totalStages, playAlarm]);
+
+  // Reset alarm tracking when timer starts
+  useEffect(() => {
+    if (isRunning && completedStageCount === 0) {
+      prevCompletedRef.current = 0;
+      alarmCountRef.current = 0;
+    }
+  }, [isRunning, completedStageCount]);
 
   // Backup: listen for OS-delivered alarm notification (fires even if the
-  // interval-based mode transition hasn't been processed yet)
+  // interval-based transition hasn't been processed yet)
   useEffect(() => {
     const sub = Notifications.addNotificationReceivedListener((notification) => {
-      if (
-        notification.request.content.data?.type === "meditation-alarm" &&
-        !alarmFiredRef.current
-      ) {
-        alarmFiredRef.current = true;
-        playAlarm();
+      const data = notification.request.content.data;
+      if (data?.type === "meditation-alarm") {
+        const stageIndex = typeof data.stageIndex === "number" ? data.stageIndex : -1;
+        if (stageIndex >= 0 && stageIndex >= alarmCountRef.current) {
+          const isFinal = Boolean(data.isFinal);
+          alarmCountRef.current = stageIndex + 1;
+          playAlarm(isFinal ? 2 : 1);
+        }
       }
     });
     return () => sub.remove();
@@ -114,16 +133,20 @@ export default function TimerScreen() {
     if (!isRunning || !notificationPermittedRef.current) return;
 
     const formattedTime = formatElapsedMs(displayMs);
-    const subtitle =
-      mode === "countdown"
-        ? "Countdown"
-        : mode === "overtime"
-          ? "Overtime"
-          : "Meditating";
+    let subtitle: string;
+    if (mode === "overtime") {
+      subtitle = "Overtime";
+    } else if (mode === "countdown" && totalStages > 1) {
+      subtitle = `Stage ${Math.min(currentStageIndex + 1, totalStages)} of ${totalStages}`;
+    } else if (mode === "countdown") {
+      subtitle = "Countdown";
+    } else {
+      subtitle = "Meditating";
+    }
 
     // Fire-and-forget — don't block the UI
     updateTimerNotification(formattedTime, subtitle);
-  }, [displayMs, isRunning, mode, updateTimerNotification]);
+  }, [displayMs, isRunning, mode, currentStageIndex, totalStages, updateTimerNotification]);
 
   // Show recovery dialog when app detects a crashed session
   useEffect(() => {
@@ -155,27 +178,27 @@ export default function TimerScreen() {
   }, [hasRecoveryData, recoveredElapsedMs, acceptRecovery, discardRecovery, router]);
 
   const handleStart = async () => {
-    alarmFiredRef.current = false;
-    const targetMs =
-      durationMinutes != null ? durationMinutes * 60 * 1000 : null;
+    prevCompletedRef.current = 0;
+    alarmCountRef.current = 0;
+
+    const stagesMs = stagesMinutes.map((m) => m * 60 * 1000);
 
     // Request notification permissions (first-use prompt)
     const permitted = await requestPermissions();
     notificationPermittedRef.current = permitted;
 
-    start(targetMs);
+    start(stagesMs);
 
-    // Schedule background alarm notification for countdown mode
-    if (permitted && targetMs != null) {
-      const seconds = Math.round(targetMs / 1000);
-      scheduleAlarmNotification(seconds);
+    // Schedule background alarm notifications for each stage boundary
+    if (permitted) {
+      scheduleStageAlarmNotifications(stagesMs);
     }
   };
 
   const handleStop = () => {
     stopAlarm();
     dismissTimerNotification();
-    cancelAlarmNotification();
+    cancelAlarmNotifications();
     stop();
     navigatedToSaveRef.current = true;
     router.push({
@@ -196,7 +219,7 @@ export default function TimerScreen() {
           onPress: () => {
             stopAlarm();
             dismissTimerNotification();
-            cancelAlarmNotification();
+            cancelAlarmNotifications();
             discard();
           },
         },
@@ -204,28 +227,33 @@ export default function TimerScreen() {
     );
   };
 
+  // Stage indicator text while running
+  const stageLabel =
+    mode === "overtime"
+      ? "Overtime"
+      : mode === "countdown" && totalStages > 1
+        ? `Stage ${Math.min(currentStageIndex + 1, totalStages)} of ${totalStages}`
+        : mode === "countdown"
+          ? "Remaining"
+          : null;
+
   return (
     <View style={[styles.container, { backgroundColor: colors.background }]}>
       {!isRunning && (
-        <DurationInput
-          value={durationMinutes}
-          onChange={handleDurationChange}
+        <StagesInput
+          stages={stagesMinutes}
+          onChange={handleStagesChange}
           disabled={isRunning}
         />
       )}
 
       <View style={styles.timerContainer}>
-        {mode === "overtime" && (
+        {stageLabel && (
           <Text style={[styles.modeLabel, { color: colors.textSecondary }]}>
-            Overtime
+            {stageLabel}
           </Text>
         )}
         <TimerDisplay elapsedMs={displayMs} />
-        {mode === "countdown" && (
-          <Text style={[styles.modeLabel, { color: colors.textSecondary }]}>
-            Remaining
-          </Text>
-        )}
       </View>
 
       <View style={styles.controls}>
