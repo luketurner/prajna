@@ -7,7 +7,7 @@ import type {
   ISessionRepository,
   ITagRepository,
   IGoalRepository,
-} from "@/specs/001-meditation-app/contracts/repository-interfaces";
+} from "@/data/repository-interfaces";
 
 interface RepositoryContextValue {
   sessionRepository: ISessionRepository;

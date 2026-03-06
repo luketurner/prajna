@@ -15,7 +15,7 @@ import type {
   SessionStats,
   TagBreakdown,
   ISessionRepository,
-} from "@/specs/001-meditation-app/contracts/repository-interfaces";
+} from "@/data/repository-interfaces";
 
 interface SessionRow {
   id: number;

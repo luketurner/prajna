@@ -4,7 +4,7 @@ import { queryKeys } from "@/data/query-keys";
 import type {
   CreateGoalInput,
   UpdateGoalInput,
-} from "@/specs/001-meditation-app/contracts/repository-interfaces";
+} from "@/data/repository-interfaces";
 
 export function useGoals() {
   const { goalRepository } = useRepositories();

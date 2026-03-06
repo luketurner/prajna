@@ -1,9 +1,8 @@
 /**
  * Repository Interfaces — Meditation Timer & Logger
  *
- * These TypeScript interfaces define the data access contracts between
- * the UI layer (React components/hooks) and the persistence layer (expo-sqlite).
- * Implementation uses repository classes that accept SQLiteDatabase.
+ * Data access contracts between the UI layer (React components/hooks)
+ * and the persistence layer (expo-sqlite).
  */
 
 // ─── Entity Types ───────────────────────────────────────────────────
@@ -142,22 +141,3 @@ export interface IGoalRepository {
   update(input: UpdateGoalInput): Promise<void>;
   delete(id: number): Promise<void>;
 }
-
-// ─── Query Keys (for @tanstack/react-query) ─────────────────────────
-
-export const queryKeys = {
-  sessions: {
-    all: ["sessions"] as const,
-    byId: (id: number) => ["sessions", id] as const,
-    stats: ["sessions", "stats"] as const,
-    tagBreakdown: ["sessions", "tagBreakdown"] as const,
-  },
-  tags: {
-    all: ["tags"] as const,
-    byId: (id: number) => ["tags", id] as const,
-  },
-  goals: {
-    all: ["goals"] as const,
-    byId: (id: number) => ["goals", id] as const,
-  },
-} as const;

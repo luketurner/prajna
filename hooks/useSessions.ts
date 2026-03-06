@@ -5,7 +5,7 @@ import type {
   SessionWithTags,
   CreateSessionInput,
   UpdateSessionInput,
-} from "@/specs/001-meditation-app/contracts/repository-interfaces";
+} from "@/data/repository-interfaces";
 
 export function useSessions() {
   const { sessionRepository } = useRepositories();

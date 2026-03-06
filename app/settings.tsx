@@ -14,7 +14,7 @@ import {
 import { MaterialIcons } from "@expo/vector-icons";
 import { useTags, useCreateTag, useUpdateTag, useDeleteTag } from "@/hooks/useTags";
 import { Colors } from "@/constants/Colors";
-import type { Tag } from "@/specs/001-meditation-app/contracts/repository-interfaces";
+import type { Tag } from "@/data/repository-interfaces";
 
 export default function SettingsScreen() {
   const colorScheme = useColorScheme() ?? "light";

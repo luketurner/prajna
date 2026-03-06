@@ -2,7 +2,7 @@ import { View, Text, Pressable, StyleSheet, useColorScheme } from "react-native"
 import { format, parseISO } from "date-fns";
 import { MaterialIcons } from "@expo/vector-icons";
 import { Colors } from "@/constants/Colors";
-import type { GoalWithProgress } from "@/specs/001-meditation-app/contracts/repository-interfaces";
+import type { GoalWithProgress } from "@/data/repository-interfaces";
 
 interface GoalCardProps {
   goal: GoalWithProgress;

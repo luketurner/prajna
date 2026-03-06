@@ -13,7 +13,7 @@ import DateTimePicker from "@react-native-community/datetimepicker";
 import { format, parseISO, isAfter, startOfDay } from "date-fns";
 import { Colors } from "@/constants/Colors";
 import { TagPicker } from "./TagPicker";
-import type { Tag } from "@/specs/001-meditation-app/contracts/repository-interfaces";
+import type { Tag } from "@/data/repository-interfaces";
 
 interface SessionFormProps {
   initialDate?: string; // ISO date YYYY-MM-DD

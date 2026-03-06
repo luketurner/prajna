@@ -8,7 +8,7 @@ import {
 } from "react-native";
 import { MaterialIcons } from "@expo/vector-icons";
 import { Colors } from "@/constants/Colors";
-import type { Tag } from "@/specs/001-meditation-app/contracts/repository-interfaces";
+import type { Tag } from "@/data/repository-interfaces";
 
 interface TagPickerProps {
   tags: Tag[];

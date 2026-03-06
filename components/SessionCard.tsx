@@ -1,7 +1,7 @@
 import { View, Text, Pressable, StyleSheet, useColorScheme } from "react-native";
 import { format, parseISO } from "date-fns";
 import { Colors } from "@/constants/Colors";
-import type { SessionWithTags } from "@/specs/001-meditation-app/contracts/repository-interfaces";
+import type { SessionWithTags } from "@/data/repository-interfaces";
 
 interface SessionCardProps {
   session: SessionWithTags;

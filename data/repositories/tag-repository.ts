@@ -4,7 +4,7 @@ import type {
   CreateTagInput,
   UpdateTagInput,
   ITagRepository,
-} from "@/specs/001-meditation-app/contracts/repository-interfaces";
+} from "@/data/repository-interfaces";
 
 interface TagRow {
   id: number;

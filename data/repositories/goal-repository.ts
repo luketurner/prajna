@@ -11,7 +11,7 @@ import type {
   CreateGoalInput,
   UpdateGoalInput,
   IGoalRepository,
-} from "@/specs/001-meditation-app/contracts/repository-interfaces";
+} from "@/data/repository-interfaces";
 
 interface GoalRow {
   id: number;
