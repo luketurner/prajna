@@ -88,6 +88,9 @@ RUN curl -Lo zellij.tar.gz "https://github.com/zellij-org/zellij/releases/downlo
   sudo install zellij -D -t /usr/local/bin/ && \
   rm zellij.tar.gz
 
+# install headless chrome for claude to mess with
+RUN npx playwright install chrome
+
 # Set up non-root user
 USER node
 
@@ -140,9 +143,9 @@ RUN npm install -g backlog.md
 RUN bun install -g @luketurner/wt
 
 # Install Claude plugins
-RUN claude plugin marketplace add lackeyjb/playwright-skill
-RUN claude plugin install playwright-skill@playwright-skill
-RUN cd ~/.claude/plugins/marketplaces/playwright-skill/skills/playwright-skill && bun install && cd -
+# RUN claude plugin marketplace add lackeyjb/playwright-skill
+# RUN claude plugin install playwright-skill@playwright-skill
+# RUN cd ~/.claude/plugins/marketplaces/playwright-skill/skills/playwright-skill && bun install && cd -
 
 # install spec-kit
 RUN curl -LsSf https://astral.sh/uv/install.sh | sh
