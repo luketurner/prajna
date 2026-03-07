@@ -11,7 +11,6 @@ import { useRouter } from "expo-router";
 import { useFocusEffect } from "@react-navigation/native";
 import { useKeepAwake } from "expo-keep-awake";
 import { MaterialIcons } from "@expo/vector-icons";
-import * as Notifications from "expo-notifications";
 import Storage from "expo-sqlite/kv-store";
 import { TimerDisplay } from "@/components/TimerDisplay";
 import { StagesInput } from "@/components/StagesInput";
@@ -48,8 +47,6 @@ export default function TimerScreen() {
     requestPermissions,
     startTimerNotification,
     dismissTimerNotification,
-    scheduleStageAlarmNotifications,
-    cancelAlarmNotifications,
   } = useTimerNotification();
 
   const [stagesMinutes, setStagesMinutes] = useState<number[]>(() => {
@@ -64,9 +61,7 @@ export default function TimerScreen() {
   });
 
   const prevCompletedRef = useRef(0);
-  const notificationPermittedRef = useRef(false);
   const navigatedToSaveRef = useRef(false);
-  const alarmCountRef = useRef(0); // tracks how many alarms we've already fired
 
   // Persist stages whenever they change
   const handleStagesChange = useCallback((value: number[]) => {
@@ -107,26 +102,8 @@ export default function TimerScreen() {
   useEffect(() => {
     if (isRunning && completedStageCount === 0) {
       prevCompletedRef.current = 0;
-      alarmCountRef.current = 0;
     }
   }, [isRunning, completedStageCount]);
-
-  // Backup: listen for OS-delivered alarm notification (fires even if the
-  // interval-based transition hasn't been processed yet)
-  useEffect(() => {
-    const sub = Notifications.addNotificationReceivedListener((notification) => {
-      const data = notification.request.content.data;
-      if (data?.type === "meditation-alarm") {
-        const stageIndex = typeof data.stageIndex === "number" ? data.stageIndex : -1;
-        if (stageIndex >= 0 && stageIndex >= alarmCountRef.current) {
-          const isFinal = Boolean(data.isFinal);
-          alarmCountRef.current = stageIndex + 1;
-          playAlarm(isFinal ? 2 : 1);
-        }
-      }
-    });
-    return () => sub.remove();
-  }, [playAlarm]);
 
   // Show recovery dialog when app detects a crashed session
   useEffect(() => {
@@ -159,18 +136,14 @@ export default function TimerScreen() {
 
   const handleStart = async () => {
     prevCompletedRef.current = 0;
-    alarmCountRef.current = 0;
 
     const stagesMs = stagesMinutes.map((m) => m * 60 * 1000);
 
-    // Request notification permissions (first-use prompt)
     const permitted = await requestPermissions();
-    notificationPermittedRef.current = permitted;
 
     const startTime = Date.now();
     start(stagesMs);
 
-    // Start foreground service notification (Android) or standard notification (iOS)
     if (permitted) {
       const totalMs = stagesMs.reduce((a, b) => a + b, 0);
       const initialDisplay = formatElapsedMs(
@@ -183,16 +156,12 @@ export default function TimerScreen() {
             ? "Countdown"
             : "Meditating";
       startTimerNotification(startTime, stagesMs, initialDisplay, initialSubtitle);
-
-      // Schedule background alarm notifications for each stage boundary
-      scheduleStageAlarmNotifications(stagesMs);
     }
   };
 
   const handleStop = () => {
     stopAlarm();
     dismissTimerNotification();
-    cancelAlarmNotifications();
     stop();
     navigatedToSaveRef.current = true;
     router.push({
@@ -213,7 +182,6 @@ export default function TimerScreen() {
           onPress: () => {
             stopAlarm();
             dismissTimerNotification();
-            cancelAlarmNotifications();
             discard();
           },
         },

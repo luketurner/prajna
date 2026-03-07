@@ -3,40 +3,10 @@ import { Stack } from "expo-router";
 import { StatusBar } from "expo-status-bar";
 import { SQLiteProvider } from "expo-sqlite";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { ActivityIndicator, Platform, View, useColorScheme } from "react-native";
-import * as Notifications from "expo-notifications";
+import { ActivityIndicator, View, useColorScheme } from "react-native";
 import { migrateDbIfNeeded } from "@/data/migrations";
 import { RepositoryProvider } from "@/data/database-provider";
 import { Colors } from "@/constants/Colors";
-
-// Configure foreground notification handler — suppress pop-ups for timer ticks,
-// but allow sound for alarm notifications
-Notifications.setNotificationHandler({
-  handleNotification: async (notification) => {
-    const isAlarm =
-      notification.request.content.data?.type === "meditation-alarm";
-    return {
-      shouldShowAlert: isAlarm,
-      shouldShowBanner: isAlarm,
-      shouldShowList: true,
-      shouldPlaySound: isAlarm,
-      shouldSetBadge: false,
-    };
-  },
-});
-
-// Create Android notification channel for alarm notifications
-// (Timer notification channel is created by Notifee in useTimerNotification)
-if (Platform.OS === "android") {
-  Notifications.setNotificationChannelAsync("meditation-alarm", {
-    name: "Meditation Alarm",
-    importance: Notifications.AndroidImportance.HIGH,
-    sound: "bell.mp3",
-    vibrationPattern: [0, 250, 250, 250],
-    lockscreenVisibility: Notifications.AndroidNotificationVisibility.PUBLIC,
-    showBadge: false,
-  });
-}
 
 const queryClient = new QueryClient({
   defaultOptions: {

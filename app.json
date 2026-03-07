@@ -43,12 +43,6 @@
       ],
       "expo-sqlite",
       "@react-native-community/datetimepicker",
-      [
-        "expo-notifications",
-        {
-          "sounds": ["./assets/audio/bell.mp3"]
-        }
-      ],
       "expo-audio",
       "./plugins/withNotifee",
       "./plugins/withIncreasedGradleMemory",
