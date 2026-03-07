@@ -25,17 +25,9 @@ Notifications.setNotificationHandler({
   },
 });
 
-// Create Android notification channels
+// Create Android notification channel for alarm notifications
+// (Timer notification channel is created by Notifee in useTimerNotification)
 if (Platform.OS === "android") {
-  Notifications.setNotificationChannelAsync("meditation-timer", {
-    name: "Meditation Timer",
-    importance: Notifications.AndroidImportance.DEFAULT,
-    vibrationPattern: [0],
-    sound: null,
-    lockscreenVisibility: Notifications.AndroidNotificationVisibility.PUBLIC,
-    showBadge: false,
-  });
-
   Notifications.setNotificationChannelAsync("meditation-alarm", {
     name: "Meditation Alarm",
     importance: Notifications.AndroidImportance.HIGH,

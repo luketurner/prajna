@@ -1,46 +1,62 @@
 import { useCallback } from "react";
 import * as Notifications from "expo-notifications";
+import notifee, { AndroidImportance } from "@notifee/react-native";
+import {
+  TIMER_CHANNEL_ID,
+  TIMER_NOTIFICATION_ID,
+} from "@/services/foreground-timer";
 
-const TIMER_NOTIFICATION_ID = "meditation-timer-notification";
 const ALARM_NOTIFICATION_PREFIX = "meditation-alarm";
 
 export function useTimerNotification() {
   const requestPermissions = useCallback(async (): Promise<boolean> => {
     const { status: existingStatus } =
       await Notifications.getPermissionsAsync();
-    if (existingStatus === "granted") {
-      return true;
+    if (existingStatus !== "granted") {
+      const { status } = await Notifications.requestPermissionsAsync();
+      if (status !== "granted") return false;
     }
-    const { status } = await Notifications.requestPermissionsAsync({
-      ios: {
-        allowAlert: true,
-        allowSound: true,
-        allowBadge: false,
-      },
-    });
-    return status === "granted";
+    return true;
   }, []);
 
-  const updateTimerNotification = useCallback(
-    async (displayTime: string, subtitle: string): Promise<void> => {
+  /**
+   * Start the foreground service with a persistent timer notification.
+   * The service self-updates every second via the registered handler.
+   */
+  const startTimerNotification = useCallback(
+    async (
+      startTime: number,
+      stages: number[] | null,
+      displayTime: string,
+      subtitle: string
+    ): Promise<void> => {
       try {
-        await Notifications.scheduleNotificationAsync({
-          identifier: TIMER_NOTIFICATION_ID,
-          content: {
-            title: "Prajna \u2014 Meditating",
-            body: displayTime,
-            subtitle,
-            sticky: true,
-            autoDismiss: false,
-            priority: Notifications.AndroidNotificationPriority.DEFAULT,
-            interruptionLevel: "active",
-            sound: false,
-            data: { type: "meditation-timer" },
+        await notifee.createChannel({
+          id: TIMER_CHANNEL_ID,
+          name: "Meditation Timer",
+          importance: AndroidImportance.LOW,
+          sound: undefined,
+        });
+
+        await notifee.displayNotification({
+          id: TIMER_NOTIFICATION_ID,
+          title: "Prajna \u2014 Meditating",
+          body: displayTime,
+          subtitle,
+          data: {
+            startTime: String(startTime),
+            stages: stages ? JSON.stringify(stages) : "",
           },
-          trigger: { channelId: "meditation-timer" },
+          android: {
+            channelId: TIMER_CHANNEL_ID,
+            asForegroundService: true,
+            ongoing: true,
+            autoCancel: false,
+            pressAction: { id: "default" },
+          },
         });
       } catch {
-        // Silently fail — notification is supplementary
+        // Foreground service failed — app will still work in foreground
       }
     },
     []
@@ -48,7 +64,12 @@ export function useTimerNotification() {
 
   const dismissTimerNotification = useCallback(async (): Promise<void> => {
     try {
-      await Notifications.dismissNotificationAsync(TIMER_NOTIFICATION_ID);
+      await notifee.stopForegroundService();
+    } catch {
+      // Service may not be running
+    }
+    try {
+      await notifee.cancelNotification(TIMER_NOTIFICATION_ID);
     } catch {
       // Silently fail
     }
@@ -56,7 +77,7 @@ export function useTimerNotification() {
 
   /**
    * Schedule alarm notifications for each stage boundary.
-   * @param stageDurationsMs - array of stage durations in milliseconds
+   * Uses expo-notifications (OS-scheduled, works in background).
    */
   const scheduleStageAlarmNotifications = useCallback(
     async (stageDurationsMs: number[]): Promise<void> => {
@@ -100,7 +121,6 @@ export function useTimerNotification() {
 
   const cancelAlarmNotifications = useCallback(async (): Promise<void> => {
     try {
-      // Cancel all scheduled notifications that match our alarm prefix
       const scheduled = await Notifications.getAllScheduledNotificationsAsync();
       for (const n of scheduled) {
         if (n.identifier.startsWith(ALARM_NOTIFICATION_PREFIX)) {
@@ -114,7 +134,7 @@ export function useTimerNotification() {
 
   return {
     requestPermissions,
-    updateTimerNotification,
+    startTimerNotification,
     dismissTimerNotification,
     scheduleStageAlarmNotifications,
     cancelAlarmNotifications,

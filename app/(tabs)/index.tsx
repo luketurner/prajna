@@ -46,7 +46,7 @@ export default function TimerScreen() {
   const { playAlarm, stopAlarm } = useAlarm();
   const {
     requestPermissions,
-    updateTimerNotification,
+    startTimerNotification,
     dismissTimerNotification,
     scheduleStageAlarmNotifications,
     cancelAlarmNotifications,
@@ -128,26 +128,6 @@ export default function TimerScreen() {
     return () => sub.remove();
   }, [playAlarm]);
 
-  // Update notification on each display tick
-  useEffect(() => {
-    if (!isRunning || !notificationPermittedRef.current) return;
-
-    const formattedTime = formatElapsedMs(displayMs);
-    let subtitle: string;
-    if (mode === "overtime") {
-      subtitle = "Overtime";
-    } else if (mode === "countdown" && totalStages > 1) {
-      subtitle = `Stage ${Math.min(currentStageIndex + 1, totalStages)} of ${totalStages}`;
-    } else if (mode === "countdown") {
-      subtitle = "Countdown";
-    } else {
-      subtitle = "Meditating";
-    }
-
-    // Fire-and-forget — don't block the UI
-    updateTimerNotification(formattedTime, subtitle);
-  }, [displayMs, isRunning, mode, currentStageIndex, totalStages, updateTimerNotification]);
-
   // Show recovery dialog when app detects a crashed session
   useEffect(() => {
     if (hasRecoveryData) {
@@ -187,10 +167,24 @@ export default function TimerScreen() {
     const permitted = await requestPermissions();
     notificationPermittedRef.current = permitted;
 
+    const startTime = Date.now();
     start(stagesMs);
 
-    // Schedule background alarm notifications for each stage boundary
+    // Start foreground service notification (Android) or standard notification (iOS)
     if (permitted) {
+      const totalMs = stagesMs.reduce((a, b) => a + b, 0);
+      const initialDisplay = formatElapsedMs(
+        stagesMs.length > 0 ? totalMs : 0
+      );
+      const initialSubtitle =
+        stagesMs.length > 1
+          ? `Stage 1 of ${stagesMs.length}`
+          : stagesMs.length === 1
+            ? "Countdown"
+            : "Meditating";
+      startTimerNotification(startTime, stagesMs, initialDisplay, initialSubtitle);
+
+      // Schedule background alarm notifications for each stage boundary
       scheduleStageAlarmNotifications(stagesMs);
     }
   };

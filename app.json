@@ -50,6 +50,7 @@
         }
       ],
       "expo-audio",
+      "./plugins/withNotifee",
       "./plugins/withIncreasedGradleMemory",
       "expo-asset"
     ],
