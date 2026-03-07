@@ -10,12 +10,3 @@ export function useSessionStats() {
     queryFn: () => sessionRepository.getStats(),
   });
 }
-
-export function useTagBreakdown() {
-  const { sessionRepository } = useRepositories();
-
-  return useQuery({
-    queryKey: queryKeys.sessions.tagBreakdown,
-    queryFn: () => sessionRepository.getTagBreakdown(),
-  });
-}

@@ -1,17 +1,14 @@
 import { createContext, useContext, useMemo, type ReactNode } from "react";
 import { useSQLiteContext } from "expo-sqlite";
 import { SessionRepository } from "./repositories/session-repository";
-import { TagRepository } from "./repositories/tag-repository";
 import { GoalRepository } from "./repositories/goal-repository";
 import type {
   ISessionRepository,
-  ITagRepository,
   IGoalRepository,
 } from "@/data/repository-interfaces";
 
 interface RepositoryContextValue {
   sessionRepository: ISessionRepository;
-  tagRepository: ITagRepository;
   goalRepository: IGoalRepository;
 }
 
@@ -27,7 +24,6 @@ export function RepositoryProvider({ children }: RepositoryProviderProps) {
   const repositories = useMemo(
     () => ({
       sessionRepository: new SessionRepository(db),
-      tagRepository: new TagRepository(db),
       goalRepository: new GoalRepository(db),
     }),
     [db]

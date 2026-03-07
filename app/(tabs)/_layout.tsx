@@ -104,7 +104,6 @@ function CustomTabBar({ state, descriptors, navigation }: BottomTabBarProps) {
 export default function TabLayout() {
   const colorScheme = useColorScheme() ?? "light";
   const colors = Colors[colorScheme];
-  const router = useRouter();
 
   return (
     <Tabs
@@ -112,15 +111,6 @@ export default function TabLayout() {
       screenOptions={{
         headerStyle: { backgroundColor: colors.background },
         headerTintColor: colors.text,
-        headerRight: () => (
-          <Pressable
-            onPress={() => router.push("/settings" as never)}
-            style={{ marginRight: 16 }}
-            accessibilityLabel="Settings"
-          >
-            <MaterialIcons name="settings" size={24} color={colors.icon} />
-          </Pressable>
-        ),
       }}
     >
       <Tabs.Screen

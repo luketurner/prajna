@@ -19,8 +19,7 @@ A simple Android app for meditation tracking.
 </p>
 
 1. Record meditation sessions.
-2. Tag sessions with user-defined tags (e.g. based on meditation type, how you felt, or whatever you want.)
-3. Compare aggregate meditation time to goals (e.g. yearly resolutions).
+2. Compare aggregate meditation time to goals (e.g. yearly resolutions).
 
 > [!WARNING]
 > This app was basically 100% written by AI using spec-driven development. In other words, it was vibe-coded, and comes with all the potential jank that implies. YMMV.

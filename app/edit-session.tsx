@@ -7,7 +7,6 @@ import {
 } from "react-native";
 import { useRouter, useLocalSearchParams } from "expo-router";
 import { SessionForm } from "@/components/SessionForm";
-import { useTags } from "@/hooks/useTags";
 import { useSession, useUpdateSession } from "@/hooks/useSessions";
 import { Colors } from "@/constants/Colors";
 
@@ -19,20 +18,17 @@ export default function EditSessionScreen() {
 
   const id = parseInt(sessionId ?? "0", 10);
   const { data: session, isLoading: sessionLoading } = useSession(id);
-  const { data: tags = [], isLoading: tagsLoading } = useTags();
   const updateSession = useUpdateSession();
 
   const handleSubmit = async (data: {
     date: string;
     durationSeconds: number;
-    tagIds: number[];
   }) => {
     try {
       await updateSession.mutateAsync({
         id,
         date: data.date,
         durationSeconds: data.durationSeconds,
-        tagIds: data.tagIds,
       });
       router.back();
     } catch {
@@ -44,15 +40,7 @@ export default function EditSessionScreen() {
     router.back();
   };
 
-  if (sessionLoading) {
-    return (
-      <View style={[styles.centered, { backgroundColor: colors.background }]}>
-        <ActivityIndicator size="large" color={colors.tint} />
-      </View>
-    );
-  }
-
-  if (!session) {
+  if (sessionLoading || !session) {
     return (
       <View style={[styles.centered, { backgroundColor: colors.background }]}>
         <ActivityIndicator size="large" color={colors.tint} />
@@ -65,9 +53,6 @@ export default function EditSessionScreen() {
       <SessionForm
         initialDate={session.date}
         initialDurationMinutes={Math.floor(session.durationSeconds / 60)}
-        initialTagIds={session.tags.map((t) => t.id)}
-        tags={tags}
-        tagsLoading={tagsLoading}
         onSubmit={handleSubmit}
         onCancel={handleCancel}
         submitLabel="Update Session"

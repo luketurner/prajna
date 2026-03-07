@@ -116,27 +116,6 @@ export default function SessionDetailScreen() {
           </Text>
         </View>
 
-        {/* Tags */}
-        {session.tags.length > 0 && (
-          <View style={styles.section}>
-            <Text style={[styles.label, { color: colors.textSecondary }]}>
-              Tags
-            </Text>
-            <View style={styles.tagsContainer}>
-              {session.tags.map((tag) => (
-                <View
-                  key={tag.id}
-                  style={[styles.tag, { backgroundColor: colors.backgroundSecondary }]}
-                >
-                  <Text style={[styles.tagText, { color: colors.text }]}>
-                    {tag.name}
-                  </Text>
-                </View>
-              ))}
-            </View>
-          </View>
-        )}
-
         {/* Actions */}
         <View style={styles.actions}>
           <Pressable
@@ -191,20 +170,6 @@ const styles = StyleSheet.create({
   },
   value: {
     fontSize: 18,
-    fontWeight: "500",
-  },
-  tagsContainer: {
-    flexDirection: "row",
-    flexWrap: "wrap",
-    gap: 8,
-  },
-  tag: {
-    paddingHorizontal: 14,
-    paddingVertical: 8,
-    borderRadius: 16,
-  },
-  tagText: {
-    fontSize: 14,
     fontWeight: "500",
   },
   actions: {

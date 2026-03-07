@@ -8,12 +8,10 @@ import {
   startOfWeek,
 } from "date-fns";
 import type {
-  SessionWithTags,
-  Tag,
+  Session,
   CreateSessionInput,
   UpdateSessionInput,
   SessionStats,
-  TagBreakdown,
   ISessionRepository,
 } from "@/data/repository-interfaces";
 
@@ -26,75 +24,41 @@ interface SessionRow {
   updated_at: string;
 }
 
-interface TagRow {
-  id: number;
-  name: string;
-  created_at: string;
-  updated_at: string;
-}
-
 export class SessionRepository implements ISessionRepository {
   constructor(private db: SQLiteDatabase) {}
 
-  async getAll(): Promise<SessionWithTags[]> {
+  async getAll(): Promise<Session[]> {
     const sessions = await this.db.getAllAsync<SessionRow>(
       `SELECT * FROM sessions ORDER BY date DESC, created_at DESC`
     );
 
-    return Promise.all(sessions.map((s) => this.attachTags(s)));
+    return sessions.map((s) => this.mapRow(s));
   }
 
-  async getById(id: number): Promise<SessionWithTags | null> {
+  async getById(id: number): Promise<Session | null> {
     const session = await this.db.getFirstAsync<SessionRow>(
       `SELECT * FROM sessions WHERE id = ?`,
       [id]
     );
 
     if (!session) return null;
-    return this.attachTags(session);
+    return this.mapRow(session);
   }
 
   async create(input: CreateSessionInput): Promise<number> {
-    let sessionId = 0;
+    const result = await this.db.runAsync(
+      `INSERT INTO sessions (date, duration_seconds, source) VALUES (?, ?, ?)`,
+      [input.date, input.durationSeconds, input.source]
+    );
 
-    await this.db.withTransactionAsync(async () => {
-      const result = await this.db.runAsync(
-        `INSERT INTO sessions (date, duration_seconds, source) VALUES (?, ?, ?)`,
-        [input.date, input.durationSeconds, input.source]
-      );
-
-      sessionId = result.lastInsertRowId;
-
-      // Insert tag associations
-      for (const tagId of input.tagIds) {
-        await this.db.runAsync(
-          `INSERT INTO session_tags (session_id, tag_id) VALUES (?, ?)`,
-          [sessionId, tagId]
-        );
-      }
-    });
-
-    return sessionId;
+    return result.lastInsertRowId;
   }
 
   async update(input: UpdateSessionInput): Promise<void> {
-    await this.db.withTransactionAsync(async () => {
-      await this.db.runAsync(
-        `UPDATE sessions SET date = ?, duration_seconds = ?, updated_at = datetime('now') WHERE id = ?`,
-        [input.date, input.durationSeconds, input.id]
-      );
-
-      // Replace tag associations
-      await this.db.runAsync(`DELETE FROM session_tags WHERE session_id = ?`, [
-        input.id,
-      ]);
-      for (const tagId of input.tagIds) {
-        await this.db.runAsync(
-          `INSERT INTO session_tags (session_id, tag_id) VALUES (?, ?)`,
-          [input.id, tagId]
-        );
-      }
-    });
+    await this.db.runAsync(
+      `UPDATE sessions SET date = ?, duration_seconds = ?, updated_at = datetime('now') WHERE id = ?`,
+      [input.date, input.durationSeconds, input.id]
+    );
   }
 
   async delete(id: number): Promise<void> {
@@ -148,53 +112,14 @@ export class SessionRepository implements ISessionRepository {
     };
   }
 
-  async getTagBreakdown(): Promise<TagBreakdown[]> {
-    const rows = await this.db.getAllAsync<{
-      tag_id: number;
-      tag_name: string;
-      total_seconds: number;
-    }>(`
-      SELECT
-        t.id as tag_id,
-        t.name as tag_name,
-        COALESCE(SUM(s.duration_seconds), 0) as total_seconds
-      FROM tags t
-      LEFT JOIN session_tags st ON st.tag_id = t.id
-      LEFT JOIN sessions s ON s.id = st.session_id
-      GROUP BY t.id
-      ORDER BY total_seconds DESC
-    `);
-
-    return rows.map((r) => ({
-      tagId: r.tag_id,
-      tagName: r.tag_name,
-      totalSeconds: r.total_seconds,
-    }));
-  }
-
-  private async attachTags(session: SessionRow): Promise<SessionWithTags> {
-    const tagRows = await this.db.getAllAsync<TagRow>(
-      `SELECT t.* FROM tags t
-       JOIN session_tags st ON st.tag_id = t.id
-       WHERE st.session_id = ?`,
-      [session.id]
-    );
-
-    const tags: Tag[] = tagRows.map((t) => ({
-      id: t.id,
-      name: t.name,
-      createdAt: t.created_at,
-      updatedAt: t.updated_at,
-    }));
-
+  private mapRow(row: SessionRow): Session {
     return {
-      id: session.id,
-      date: session.date,
-      durationSeconds: session.duration_seconds,
-      source: session.source,
-      createdAt: session.created_at,
-      updatedAt: session.updated_at,
-      tags,
+      id: row.id,
+      date: row.date,
+      durationSeconds: row.duration_seconds,
+      source: row.source,
+      createdAt: row.created_at,
+      updatedAt: row.updated_at,
     };
   }
 

@@ -7,7 +7,7 @@ import {
   ActivityIndicator,
 } from "react-native";
 import { MaterialIcons } from "@expo/vector-icons";
-import { useSessionStats, useTagBreakdown } from "@/hooks/useSessionStats";
+import { useSessionStats } from "@/hooks/useSessionStats";
 import { EmptyState } from "@/components/EmptyState";
 import { Colors } from "@/constants/Colors";
 
@@ -21,27 +21,11 @@ function formatDuration(seconds: number): string {
   return `${minutes}m`;
 }
 
-function formatDurationLong(seconds: number): string {
-  const hours = Math.floor(seconds / 3600);
-  const minutes = Math.floor((seconds % 3600) / 60);
-
-  if (hours > 0) {
-    if (minutes > 0) {
-      return `${hours} hr ${minutes} min`;
-    }
-    return `${hours} hr`;
-  }
-  return `${minutes} min`;
-}
-
 export default function StatsScreen() {
   const colorScheme = useColorScheme() ?? "light";
   const colors = Colors[colorScheme];
 
-  const { data: stats, isLoading: statsLoading } = useSessionStats();
-  const { data: tagBreakdown = [], isLoading: breakdownLoading } = useTagBreakdown();
-
-  const isLoading = statsLoading || breakdownLoading;
+  const { data: stats, isLoading } = useSessionStats();
 
   if (isLoading) {
     return (
@@ -170,35 +154,6 @@ export default function StatsScreen() {
         </View>
       </View>
 
-      {/* Tag Breakdown */}
-      {tagBreakdown.length > 0 && (
-        <View style={styles.section}>
-          <Text style={[styles.sectionTitle, { color: colors.text }]}>
-            Time by Tag
-          </Text>
-          <View style={[styles.tagBreakdownCard, { backgroundColor: colors.card, borderColor: colors.border }]}>
-            {tagBreakdown.map((item, index) => (
-              <View
-                key={item.tagId}
-                style={[
-                  styles.tagBreakdownRow,
-                  index < tagBreakdown.length - 1 && {
-                    borderBottomWidth: 1,
-                    borderBottomColor: colors.border,
-                  },
-                ]}
-              >
-                <Text style={[styles.tagBreakdownName, { color: colors.text }]}>
-                  {item.tagName}
-                </Text>
-                <Text style={[styles.tagBreakdownValue, { color: colors.tint }]}>
-                  {formatDurationLong(item.totalSeconds)}
-                </Text>
-              </View>
-            ))}
-          </View>
-        </View>
-      )}
     </ScrollView>
   );
 }
@@ -293,24 +248,5 @@ const styles = StyleSheet.create({
   streakUnit: {
     fontSize: 14,
     marginTop: 2,
-  },
-  tagBreakdownCard: {
-    borderRadius: 12,
-    borderWidth: 1,
-    overflow: "hidden",
-  },
-  tagBreakdownRow: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    alignItems: "center",
-    padding: 14,
-  },
-  tagBreakdownName: {
-    fontSize: 15,
-    fontWeight: "500",
-  },
-  tagBreakdownValue: {
-    fontSize: 15,
-    fontWeight: "600",
   },
 });

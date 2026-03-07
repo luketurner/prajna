@@ -19,8 +19,9 @@ export async function migrateDbIfNeeded(db: SQLiteDatabase): Promise<void> {
     await migrateToV1(db);
   }
 
-  // Future migrations go here:
-  // if (currentVersion < 2) { await migrateToV2(db); }
+  if (currentVersion < 2) {
+    await migrateToV2(db);
+  }
 }
 
 async function migrateToV1(db: SQLiteDatabase): Promise<void> {
@@ -61,5 +62,14 @@ async function migrateToV1(db: SQLiteDatabase): Promise<void> {
     CREATE INDEX IF NOT EXISTS idx_sessions_created_at ON sessions(created_at DESC);
 
     PRAGMA user_version = 1;
+  `);
+}
+
+async function migrateToV2(db: SQLiteDatabase): Promise<void> {
+  await db.execAsync(`
+    DROP TABLE IF EXISTS session_tags;
+    DROP TABLE IF EXISTS tags;
+
+    PRAGMA user_version = 2;
   `);
 }

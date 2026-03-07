@@ -7,11 +7,6 @@ export const queryKeys = {
     all: ["sessions"] as const,
     byId: (id: number) => ["sessions", id] as const,
     stats: ["sessions", "stats"] as const,
-    tagBreakdown: ["sessions", "tagBreakdown"] as const,
-  },
-  tags: {
-    all: ["tags"] as const,
-    byId: (id: number) => ["tags", id] as const,
   },
   goals: {
     all: ["goals"] as const,

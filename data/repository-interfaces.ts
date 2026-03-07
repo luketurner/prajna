@@ -16,17 +16,6 @@ export interface Session {
   updatedAt: string;
 }
 
-export interface SessionWithTags extends Session {
-  tags: Tag[];
-}
-
-export interface Tag {
-  id: number;
-  name: string;
-  createdAt: string;
-  updatedAt: string;
-}
-
 export interface Goal {
   id: number;
   targetHours: number;
@@ -54,23 +43,12 @@ export interface CreateSessionInput {
   date: string;
   durationSeconds: number;
   source: "timer" | "manual";
-  tagIds: number[];
 }
 
 export interface UpdateSessionInput {
   id: number;
   date: string;
   durationSeconds: number;
-  tagIds: number[];
-}
-
-export interface CreateTagInput {
-  name: string;
-}
-
-export interface UpdateTagInput {
-  id: number;
-  name: string;
 }
 
 export interface CreateGoalInput {
@@ -100,12 +78,6 @@ export interface SessionStats {
   longestStreak: number;
 }
 
-export interface TagBreakdown {
-  tagId: number;
-  tagName: string;
-  totalSeconds: number;
-}
-
 // ─── Timer State (kv-store) ─────────────────────────────────────────
 
 export interface PersistedTimerState {
@@ -117,21 +89,12 @@ export interface PersistedTimerState {
 // ─── Repository Interfaces ──────────────────────────────────────────
 
 export interface ISessionRepository {
-  getAll(): Promise<SessionWithTags[]>;
-  getById(id: number): Promise<SessionWithTags | null>;
+  getAll(): Promise<Session[]>;
+  getById(id: number): Promise<Session | null>;
   create(input: CreateSessionInput): Promise<number>;
   update(input: UpdateSessionInput): Promise<void>;
   delete(id: number): Promise<void>;
   getStats(): Promise<SessionStats>;
-  getTagBreakdown(): Promise<TagBreakdown[]>;
-}
-
-export interface ITagRepository {
-  getAll(): Promise<Tag[]>;
-  getById(id: number): Promise<Tag | null>;
-  create(input: CreateTagInput): Promise<number>;
-  update(input: UpdateTagInput): Promise<void>;
-  delete(id: number): Promise<void>;
 }
 
 export interface IGoalRepository {

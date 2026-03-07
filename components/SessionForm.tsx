@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import {
   View,
   Text,
@@ -12,19 +12,13 @@ import {
 import DateTimePicker from "@react-native-community/datetimepicker";
 import { format, parseISO, isAfter, startOfDay } from "date-fns";
 import { Colors } from "@/constants/Colors";
-import { TagPicker } from "./TagPicker";
-import type { Tag } from "@/data/repository-interfaces";
 
 interface SessionFormProps {
   initialDate?: string; // ISO date YYYY-MM-DD
   initialDurationMinutes?: number;
-  initialTagIds?: number[];
-  tags: Tag[];
-  tagsLoading?: boolean;
   onSubmit: (data: {
     date: string;
     durationSeconds: number;
-    tagIds: number[];
   }) => void;
   onCancel: () => void;
   submitLabel?: string;
@@ -34,9 +28,6 @@ interface SessionFormProps {
 export function SessionForm({
   initialDate,
   initialDurationMinutes = 0,
-  initialTagIds = [],
-  tags,
-  tagsLoading = false,
   onSubmit,
   onCancel,
   submitLabel = "Save",
@@ -52,21 +43,6 @@ export function SessionForm({
   const [durationMinutes, setDurationMinutes] = useState(
     initialDurationMinutes > 0 ? String(initialDurationMinutes) : ""
   );
-  const [selectedTagIds, setSelectedTagIds] = useState<number[]>(initialTagIds);
-
-  useEffect(() => {
-    if (initialTagIds.length > 0) {
-      setSelectedTagIds(initialTagIds);
-    }
-  }, [initialTagIds]);
-
-  const handleToggleTag = (tagId: number) => {
-    setSelectedTagIds((prev) =>
-      prev.includes(tagId)
-        ? prev.filter((id) => id !== tagId)
-        : [...prev, tagId]
-    );
-  };
 
   const handleDateChange = (_: unknown, selectedDate?: Date) => {
     setShowDatePicker(Platform.OS === "ios");
@@ -114,7 +90,6 @@ export function SessionForm({
               onSubmit({
                 date: format(date, "yyyy-MM-dd"),
                 durationSeconds: seconds,
-                tagIds: selectedTagIds,
               });
             },
           },
@@ -124,7 +99,6 @@ export function SessionForm({
       onSubmit({
         date: format(date, "yyyy-MM-dd"),
         durationSeconds: seconds,
-        tagIds: selectedTagIds,
       });
     }
   };
@@ -178,14 +152,6 @@ export function SessionForm({
           ]}
         />
       </View>
-
-      {/* Tag Picker */}
-      <TagPicker
-        tags={tags}
-        selectedTagIds={selectedTagIds}
-        onToggleTag={handleToggleTag}
-        isLoading={tagsLoading}
-      />
 
       {/* Buttons */}
       <View style={styles.buttons}>

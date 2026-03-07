@@ -1,10 +1,10 @@
 import { View, Text, Pressable, StyleSheet, useColorScheme } from "react-native";
 import { format, parseISO } from "date-fns";
 import { Colors } from "@/constants/Colors";
-import type { SessionWithTags } from "@/data/repository-interfaces";
+import type { Session } from "@/data/repository-interfaces";
 
 interface SessionCardProps {
-  session: SessionWithTags;
+  session: Session;
   onPress: () => void;
 }
 
@@ -44,21 +44,6 @@ export function SessionCard({ session, onPress }: SessionCardProps) {
           </Text>
         </View>
       </View>
-
-      {session.tags.length > 0 && (
-        <View style={styles.tagsRow}>
-          {session.tags.map((tag) => (
-            <View
-              key={tag.id}
-              style={[styles.tag, { backgroundColor: colors.backgroundSecondary }]}
-            >
-              <Text style={[styles.tagText, { color: colors.textSecondary }]}>
-                {tag.name}
-              </Text>
-            </View>
-          ))}
-        </View>
-      )}
     </Pressable>
   );
 }
@@ -94,20 +79,5 @@ const styles = StyleSheet.create({
     fontSize: 12,
     textTransform: "uppercase",
     letterSpacing: 0.5,
-  },
-  tagsRow: {
-    flexDirection: "row",
-    flexWrap: "wrap",
-    gap: 6,
-    marginTop: 12,
-  },
-  tag: {
-    paddingHorizontal: 10,
-    paddingVertical: 4,
-    borderRadius: 12,
-  },
-  tagText: {
-    fontSize: 12,
-    fontWeight: "500",
   },
 });

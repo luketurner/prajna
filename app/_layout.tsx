@@ -85,14 +85,6 @@ export default function RootLayout() {
                   headerShown: true,
                 }}
               />
-              <Stack.Screen
-                name="settings"
-                options={{
-                  presentation: "modal",
-                  title: "Settings",
-                  headerShown: true,
-                }}
-              />
             </Stack>
           </RepositoryProvider>
         </SQLiteProvider>
