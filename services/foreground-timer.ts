@@ -3,6 +3,7 @@ import notifee, {
   AndroidImportance,
 } from "@notifee/react-native";
 import { createAudioPlayer, setAudioModeAsync } from "expo-audio";
+import { Vibration } from "react-native";
 
 /** Channel used for the foreground timer notification. */
 export const TIMER_CHANNEL_ID = "meditation-timer-fg";
@@ -13,6 +14,8 @@ export const TIMER_NOTIFICATION_ID = "meditation-timer-fg-notification";
 interface TimerData {
   startTime: number;
   stages: number[] | null;
+  notifyStageEnd: string;
+  notifySessionEnd: string;
 }
 
 interface TimerState {
@@ -153,6 +156,24 @@ export function stopBell() {
   // activePlayers.clear();
 }
 
+/**
+ * Perform a notification action based on the notification type setting.
+ */
+function performNotification(type: string) {
+  switch (type) {
+    case "vibrate":
+      Vibration.vibrate(500);
+      break;
+    case "chime":
+      playBell(1);
+      break;
+    case "chime_twice":
+      playBell(2);
+      break;
+    // "silent" — do nothing
+  }
+}
+
 let intervalId: ReturnType<typeof setInterval> | null = null;
 
 /** Clear the foreground service update interval. */
@@ -181,6 +202,8 @@ export async function registerForegroundService() {
       const timerData: TimerData = {
         startTime: Number(data?.startTime ?? Date.now()),
         stages: data?.stages ? JSON.parse(data.stages) : null,
+        notifyStageEnd: data?.notifyStageEnd ?? "chime",
+        notifySessionEnd: data?.notifySessionEnd ?? "chime_twice",
       };
 
       let prevCompletedCount = 0;
@@ -193,15 +216,18 @@ export async function registerForegroundService() {
           timerData.stages,
         );
 
-        // Detect stage completions and play bell
+        // Detect stage completions and notify
         if (
           state.completedStageCount > prevCompletedCount &&
           state.totalStages > 0
         ) {
           for (let i = prevCompletedCount; i < state.completedStageCount; i++) {
             const isFinal = i === state.totalStages - 1;
+            const notifyType = isFinal
+              ? timerData.notifySessionEnd
+              : timerData.notifyStageEnd;
             const delay = (i - prevCompletedCount) * BELL_GAP_MS;
-            setTimeout(() => playBell(isFinal ? 2 : 1), delay);
+            setTimeout(() => performNotification(notifyType), delay);
           }
           prevCompletedCount = state.completedStageCount;
         }

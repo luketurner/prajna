@@ -1,13 +1,64 @@
-import { View, Text, StyleSheet, useColorScheme, Pressable, Alert } from "react-native";
+import { View, Text, StyleSheet, useColorScheme, Pressable, Alert, ScrollView } from "react-native";
 import { File, Paths } from "expo-file-system";
 import { shareAsync } from "expo-sharing";
 import { useRepositories } from "@/data/database-provider";
 import { Colors } from "@/constants/Colors";
+import {
+  useNotificationSettings,
+  type NotificationType,
+} from "@/hooks/useNotificationSettings";
+
+const NOTIFICATION_OPTIONS: { value: NotificationType; label: string }[] = [
+  { value: "silent", label: "Silent" },
+  { value: "vibrate", label: "Vibrate" },
+  { value: "chime", label: "Chime" },
+  { value: "chime_twice", label: "Chime ×2" },
+];
+
+function SegmentedControl({
+  value,
+  onChange,
+  colors,
+}: {
+  value: NotificationType;
+  onChange: (v: NotificationType) => void;
+  colors: (typeof Colors)["light"];
+}) {
+  return (
+    <View style={[segStyles.row, { borderColor: colors.border }]}>
+      {NOTIFICATION_OPTIONS.map((opt, i) => {
+        const selected = opt.value === value;
+        return (
+          <Pressable
+            key={opt.value}
+            onPress={() => onChange(opt.value)}
+            style={[
+              segStyles.segment,
+              selected && { backgroundColor: colors.tint },
+              i > 0 && { borderLeftWidth: 1, borderLeftColor: colors.border },
+            ]}
+          >
+            <Text
+              style={[
+                segStyles.segmentText,
+                { color: selected ? colors.background : colors.text },
+              ]}
+            >
+              {opt.label}
+            </Text>
+          </Pressable>
+        );
+      })}
+    </View>
+  );
+}
 
 export default function SettingsScreen() {
   const colorScheme = useColorScheme() ?? "light";
   const colors = Colors[colorScheme];
   const { sessionRepository, goalRepository } = useRepositories();
+  const { stageEnd, sessionEnd, setStageEnd, setSessionEnd } =
+    useNotificationSettings();
 
   const handleExport = async () => {
     try {
@@ -29,8 +80,31 @@ export default function SettingsScreen() {
   };
 
   return (
-    <View style={[styles.container, { backgroundColor: colors.background }]}>
+    <ScrollView style={[styles.container, { backgroundColor: colors.background }]}>
       <Text style={[styles.sectionHeader, { color: colors.textSecondary }]}>
+        Notifications
+      </Text>
+
+      <View style={styles.settingRow}>
+        <Text style={[styles.settingLabel, { color: colors.text }]}>
+          Stage end
+        </Text>
+        <SegmentedControl value={stageEnd} onChange={setStageEnd} colors={colors} />
+      </View>
+
+      <View style={styles.settingRow}>
+        <Text style={[styles.settingLabel, { color: colors.text }]}>
+          Session end
+        </Text>
+        <SegmentedControl value={sessionEnd} onChange={setSessionEnd} colors={colors} />
+      </View>
+
+      <Text
+        style={[
+          styles.sectionHeader,
+          { color: colors.textSecondary, marginTop: 32 },
+        ]}
+      >
         Data
       </Text>
       <Pressable
@@ -41,9 +115,28 @@ export default function SettingsScreen() {
           Export data as JSON
         </Text>
       </Pressable>
-    </View>
+    </ScrollView>
   );
 }
+
+const segStyles = StyleSheet.create({
+  row: {
+    flexDirection: "row",
+    borderWidth: 1,
+    borderRadius: 8,
+    overflow: "hidden",
+  },
+  segment: {
+    flex: 1,
+    paddingVertical: 8,
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  segmentText: {
+    fontSize: 13,
+    fontWeight: "600",
+  },
+});
 
 const styles = StyleSheet.create({
   container: {
@@ -57,6 +150,14 @@ const styles = StyleSheet.create({
     textTransform: "uppercase",
     letterSpacing: 0.5,
     marginBottom: 12,
+  },
+  settingRow: {
+    marginBottom: 16,
+  },
+  settingLabel: {
+    fontSize: 15,
+    fontWeight: "500",
+    marginBottom: 8,
   },
   exportButton: {
     borderWidth: 1,

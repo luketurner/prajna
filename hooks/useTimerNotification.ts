@@ -3,6 +3,7 @@ import {
   foregroundServiceNotification,
   TIMER_NOTIFICATION_ID,
 } from "@/services/foreground-timer";
+import { getNotificationSettings } from "@/hooks/useNotificationSettings";
 import notifee from "@notifee/react-native";
 import { useCallback } from "react";
 
@@ -26,6 +27,8 @@ export function useTimerNotification() {
           data: {
             startTime: String(startTime),
             stages: stages ? JSON.stringify(stages) : "",
+            notifyStageEnd: getNotificationSettings().stageEnd,
+            notifySessionEnd: getNotificationSettings().sessionEnd,
           },
         });
       } catch {
