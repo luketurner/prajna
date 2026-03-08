@@ -1,4 +1,4 @@
-import { Tabs, useRouter } from "expo-router";
+import { Tabs } from "expo-router";
 import { Pressable, View, StyleSheet, useColorScheme } from "react-native";
 import { MaterialIcons } from "@expo/vector-icons";
 import type { BottomTabBarProps } from "@react-navigation/bottom-tabs";
@@ -87,16 +87,11 @@ function CustomTabBar({ state, descriptors, navigation }: BottomTabBarProps) {
 }
 
 export default function TabLayout() {
-  const colorScheme = useColorScheme() ?? "light";
-  const colors = Colors[colorScheme];
-  const router = useRouter();
-
   return (
     <Tabs
       tabBar={(props) => <CustomTabBar {...props} />}
       screenOptions={{
-        headerStyle: { backgroundColor: colors.background },
-        headerTintColor: colors.text,
+        headerShown: false,
       }}
     >
       <Tabs.Screen
@@ -115,32 +110,12 @@ export default function TabLayout() {
         name="history"
         options={{
           title: "History",
-          headerRight: () => (
-            <Pressable
-              onPress={() => router.push("/manual-entry" as never)}
-              style={styles.headerButton}
-              accessibilityLabel="Log a session manually"
-              accessibilityRole="button"
-            >
-              <MaterialIcons name="add" size={28} color={colors.tint} />
-            </Pressable>
-          ),
         }}
       />
       <Tabs.Screen
         name="goals"
         options={{
           title: "Goals",
-          headerRight: () => (
-            <Pressable
-              onPress={() => router.push("/create-goal" as never)}
-              style={styles.headerButton}
-              accessibilityLabel="Create new goal"
-              accessibilityRole="button"
-            >
-              <MaterialIcons name="add" size={28} color={colors.tint} />
-            </Pressable>
-          ),
         }}
       />
       <Tabs.Screen
@@ -165,10 +140,6 @@ const styles = StyleSheet.create({
   tabItem: {
     flex: 1,
     alignItems: "center",
-    paddingVertical: 8,
-  },
-  headerButton: {
-    paddingHorizontal: 16,
     paddingVertical: 8,
   },
   fab: {
