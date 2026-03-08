@@ -1,5 +1,5 @@
 import { View, Text, StyleSheet, useColorScheme, Pressable, Alert, ScrollView } from "react-native";
-import { File, Paths } from "expo-file-system";
+import { Directory, File, Paths } from "expo-file-system";
 import { shareAsync } from "expo-sharing";
 import { useRepositories } from "@/data/database-provider";
 import { Colors } from "@/constants/Colors";
@@ -60,14 +60,17 @@ export default function SettingsScreen() {
   const { stageEnd, sessionEnd, setStageEnd, setSessionEnd } =
     useNotificationSettings();
 
-  const handleExport = async () => {
-    try {
-      const [sessions, goals] = await Promise.all([
-        sessionRepository.getAll(),
-        goalRepository.getAll(),
-      ]);
+  const prepareExportData = async () => {
+    const [sessions, goals] = await Promise.all([
+      sessionRepository.getAll(),
+      goalRepository.getAll(),
+    ]);
+    return JSON.stringify({ sessions, goals }, null, 2);
+  };
 
-      const data = JSON.stringify({ sessions, goals }, null, 2);
+  const handleShareData = async () => {
+    try {
+      const data = await prepareExportData();
       const file = new File(Paths.cache, "meditation-data.json");
       file.write(data);
       await shareAsync(file.uri, {
@@ -77,6 +80,27 @@ export default function SettingsScreen() {
     } catch {
       Alert.alert("Export failed", "Could not export data. Please try again.");
     }
+  };
+
+  const handleSaveToDevice = async () => {
+    try {
+      const data = await prepareExportData();
+      const directory = await Directory.pickDirectoryAsync();
+      if (!directory) return;
+      const file = directory.createFile("meditation-data.json", "application/json");
+      file.write(data);
+      Alert.alert("Saved", "Data exported successfully.");
+    } catch {
+      Alert.alert("Export failed", "Could not save data. Please try again.");
+    }
+  };
+
+  const handleExport = () => {
+    Alert.alert("Export data as JSON", "Choose how to export your data.", [
+      { text: "Share", onPress: handleShareData },
+      { text: "Save to device", onPress: handleSaveToDevice },
+      { text: "Cancel", style: "cancel" },
+    ]);
   };
 
   return (
