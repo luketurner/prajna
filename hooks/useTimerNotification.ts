@@ -1,9 +1,9 @@
-import { useCallback } from "react";
-import notifee, { AndroidImportance } from "@notifee/react-native";
 import {
-  TIMER_CHANNEL_ID,
+  foregroundServiceNotification,
   TIMER_NOTIFICATION_ID,
 } from "@/services/foreground-timer";
+import notifee from "@notifee/react-native";
+import { useCallback } from "react";
 
 export function useTimerNotification() {
   const requestPermissions = useCallback(async (): Promise<boolean> => {
@@ -12,42 +12,22 @@ export function useTimerNotification() {
   }, []);
 
   const startTimerNotification = useCallback(
-    async (
-      startTime: number,
-      stages: number[] | null,
-      displayTime: string,
-      subtitle: string
-    ): Promise<void> => {
+    async (startTime: number, stages: number[] | null): Promise<void> => {
       try {
-        await notifee.createChannel({
-          id: TIMER_CHANNEL_ID,
-          name: "Meditation Timer",
-          importance: AndroidImportance.LOW,
-          sound: undefined,
-        });
-
-        await notifee.displayNotification({
-          id: TIMER_NOTIFICATION_ID,
-          title: "Prajna \u2014 Meditating",
-          body: displayTime,
-          subtitle,
+        await foregroundServiceNotification({
+          subtitle: "Meditating",
+          timestamp: startTime,
+          chronometerDirection: "up",
           data: {
             startTime: String(startTime),
             stages: stages ? JSON.stringify(stages) : "",
-          },
-          android: {
-            channelId: TIMER_CHANNEL_ID,
-            asForegroundService: true,
-            ongoing: true,
-            autoCancel: false,
-            pressAction: { id: "default" },
           },
         });
       } catch {
         // Foreground service failed — app will still work in foreground
       }
     },
-    []
+    [],
   );
 
   const dismissTimerNotification = useCallback(async (): Promise<void> => {

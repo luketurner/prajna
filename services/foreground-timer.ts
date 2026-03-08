@@ -1,4 +1,7 @@
-import notifee, { EventType } from "@notifee/react-native";
+import notifee, {
+  AndroidForegroundServiceType,
+  AndroidImportance,
+} from "@notifee/react-native";
 
 /** Channel used for the foreground timer notification. */
 export const TIMER_CHANNEL_ID = "meditation-timer-fg";
@@ -11,14 +14,10 @@ interface TimerData {
   stages: number[] | null;
 }
 
-function formatMs(ms: number): string {
-  const totalSeconds = Math.floor(ms / 1000);
-  const hours = Math.floor(totalSeconds / 3600);
-  const minutes = Math.floor((totalSeconds % 3600) / 60);
-  const seconds = totalSeconds % 60;
-  return `${hours.toString().padStart(2, "0")}:${minutes
-    .toString()
-    .padStart(2, "0")}:${seconds.toString().padStart(2, "0")}`;
+interface TimerState {
+  subtitle: string;
+  timestamp: number;
+  chronometerDirection: "up" | "down";
 }
 
 function cumulativeThresholds(stages: number[]): number[] {
@@ -31,20 +30,28 @@ function cumulativeThresholds(stages: number[]): number[] {
   return thresholds;
 }
 
-function computeDisplay(
+function computeTimerState(
+  startTime: number,
   elapsedMs: number,
-  stages: number[] | null
-): { displayTime: string; subtitle: string } {
+  stages: number[] | null,
+): TimerState {
   if (!stages || stages.length === 0) {
-    return { displayTime: formatMs(elapsedMs), subtitle: "Meditating" };
+    return {
+      subtitle: "Meditating",
+      timestamp: startTime,
+      chronometerDirection: "up",
+    };
   }
 
   const thresholds = cumulativeThresholds(stages);
   const totalMs = thresholds[thresholds.length - 1];
 
   if (elapsedMs >= totalMs) {
-    const overtime = elapsedMs - totalMs;
-    return { displayTime: formatMs(overtime), subtitle: "Overtime" };
+    return {
+      subtitle: "Overtime",
+      timestamp: startTime + totalMs,
+      chronometerDirection: "up",
+    };
   }
 
   let stageIndex = 0;
@@ -55,21 +62,23 @@ function computeDisplay(
     }
   }
 
-  const stageEnd = thresholds[stageIndex];
-  const remaining = Math.max(0, stageEnd - elapsedMs);
   const subtitle =
     stages.length > 1
       ? `Stage ${stageIndex + 1} of ${stages.length}`
       : "Countdown";
 
-  return { displayTime: formatMs(remaining), subtitle };
+  return {
+    subtitle,
+    timestamp: startTime + thresholds[stageIndex],
+    chronometerDirection: "down",
+  };
 }
 
 /**
  * Register the Notifee foreground service handler and background event handler.
  * Must be called at app startup, outside of any React component.
  */
-export function registerForegroundService() {
+export async function registerForegroundService() {
   // Required by Notifee — must be registered even if we don't use background events
   notifee.onBackgroundEvent(async () => {
     // No-op: foreground service lifecycle is managed by stopForegroundService()
@@ -85,36 +94,98 @@ export function registerForegroundService() {
         stages: data?.stages ? JSON.parse(data.stages) : null,
       };
 
-      // Update notification every second
+      let prevSubtitle = "";
+      let prevDirection = "";
+
+      // Check for stage transitions every second
       setInterval(async () => {
         const elapsedMs = Date.now() - timerData.startTime;
-        const { displayTime, subtitle } = computeDisplay(
+        const state = computeTimerState(
+          timerData.startTime,
           elapsedMs,
-          timerData.stages
+          timerData.stages,
         );
 
-        try {
-          await notifee.displayNotification({
-            id: TIMER_NOTIFICATION_ID,
-            title: "Prajna \u2014 Meditating",
-            body: displayTime,
-            subtitle,
-            android: {
-              channelId: TIMER_CHANNEL_ID,
-              asForegroundService: true,
-              ongoing: true,
-              autoCancel: false,
+        // Only update notification when state actually changes
+        if (
+          state.subtitle === prevSubtitle &&
+          state.chronometerDirection === prevDirection
+        ) {
+          return;
+        }
+        prevSubtitle = state.subtitle;
+        prevDirection = state.chronometerDirection;
 
-              pressAction: { id: "default" },
-            },
+        try {
+          await foregroundServiceNotification({
+            subtitle: state.subtitle,
+            timestamp: state.timestamp,
+            chronometerDirection: state.chronometerDirection,
           });
         } catch {
           // Notification update failed — service may be stopping
         }
       }, 1000);
 
+      // Also fire immediately so the notification shows the chronometer right away
+      const initialState = computeTimerState(
+        timerData.startTime,
+        Date.now() - timerData.startTime,
+        timerData.stages,
+      );
+      prevSubtitle = initialState.subtitle;
+      prevDirection = initialState.chronometerDirection;
+      foregroundServiceNotification({
+        subtitle: initialState.subtitle,
+        timestamp: initialState.timestamp,
+        chronometerDirection: initialState.chronometerDirection,
+      }).catch(() => {});
+
       // The promise intentionally never resolves — the service runs until
       // stopForegroundService() is called from the app (dismissTimerNotification).
     });
+  });
+
+  await notifee.createChannel({
+    id: TIMER_CHANNEL_ID,
+    name: "Meditation Timer",
+    importance: AndroidImportance.HIGH,
+    sound: undefined,
+  });
+}
+
+export async function foregroundServiceNotification({
+  subtitle,
+  timestamp,
+  chronometerDirection,
+  data,
+}: {
+  subtitle?: string | undefined;
+  timestamp?: number | undefined;
+  chronometerDirection?: "up" | "down" | undefined;
+  data?:
+    | {
+        [key: string]: string | number | object;
+      }
+    | undefined;
+}) {
+  return notifee.displayNotification({
+    id: TIMER_NOTIFICATION_ID,
+    title: "Prajna \u2014 Meditating",
+    subtitle,
+    data,
+    android: {
+      channelId: TIMER_CHANNEL_ID,
+      asForegroundService: true,
+      ongoing: true,
+      autoCancel: false,
+      showChronometer: true,
+      chronometerDirection: chronometerDirection ?? "up",
+      timestamp: timestamp ?? Date.now(),
+      foregroundServiceTypes: [
+        AndroidForegroundServiceType.FOREGROUND_SERVICE_TYPE_MEDIA_PLAYBACK,
+      ],
+      pressAction: { id: "default" },
+    },
   });
 }

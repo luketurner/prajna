@@ -1,12 +1,12 @@
-import { Suspense } from "react";
-import { Stack } from "expo-router";
-import { StatusBar } from "expo-status-bar";
-import { SQLiteProvider } from "expo-sqlite";
-import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { ActivityIndicator, View, useColorScheme } from "react-native";
-import { migrateDbIfNeeded } from "@/data/migrations";
-import { RepositoryProvider } from "@/data/database-provider";
 import { Colors } from "@/constants/Colors";
+import { RepositoryProvider } from "@/data/database-provider";
+import { migrateDbIfNeeded } from "@/data/migrations";
+import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+import { Stack } from "expo-router";
+import { SQLiteProvider } from "expo-sqlite";
+import { StatusBar } from "expo-status-bar";
+import { Suspense } from "react";
+import { ActivityIndicator, View, useColorScheme } from "react-native";
 
 const queryClient = new QueryClient({
   defaultOptions: {

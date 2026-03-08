@@ -145,17 +145,7 @@ export default function TimerScreen() {
     start(stagesMs);
 
     if (permitted) {
-      const totalMs = stagesMs.reduce((a, b) => a + b, 0);
-      const initialDisplay = formatElapsedMs(
-        stagesMs.length > 0 ? totalMs : 0
-      );
-      const initialSubtitle =
-        stagesMs.length > 1
-          ? `Stage 1 of ${stagesMs.length}`
-          : stagesMs.length === 1
-            ? "Countdown"
-            : "Meditating";
-      startTimerNotification(startTime, stagesMs, initialDisplay, initialSubtitle);
+      startTimerNotification(startTime, stagesMs);
     }
   };
 
