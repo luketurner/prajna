@@ -18,11 +18,17 @@ A simple Android app for meditation tracking.
 
 </p>
 
-1. Record meditation sessions.
-2. Compare aggregate meditation time to goals (e.g. yearly resolutions).
+Features:
+
+- Record your meditation sessions in the app, or enter past sessions manually.
+- Create a timer for your meditation, e.g. "20 minutes". Get notified when the timer is done by a singing bowl sound.
+- Create multiple stages of timers, e.g. 10 minutes, then 5 minutes, then 10 minutes. Get notified between each stage. Useful for longer sessions where you want to take scheduled breaks.
+- Define goals, e.g. "I'll meditate 100 hours this year", and compare your progress against the goal.
+- See statistics like total meditation time, streaks, etc.
+- Export user data (including meditation history) as JSON.
 
 > [!WARNING]
-> This app was basically 100% written by AI using spec-driven development. In other words, it was vibe-coded, and comes with all the potential jank that implies. YMMV.
+> This app was written with AI assistance. If that bothers you, don't use it.
 
 ## Installation
 
