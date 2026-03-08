@@ -21,6 +21,7 @@ interface TimerState {
   chronometerDirection: "up" | "down";
   completedStageCount: number;
   totalStages: number;
+  progress: { max: number; current: number } | { indeterminate: true };
 }
 
 function cumulativeThresholds(stages: number[]): number[] {
@@ -45,6 +46,7 @@ function computeTimerState(
       chronometerDirection: "up",
       completedStageCount: 0,
       totalStages: 0,
+      progress: { indeterminate: true },
     };
   }
 
@@ -58,6 +60,7 @@ function computeTimerState(
       chronometerDirection: "up",
       completedStageCount: stages.length,
       totalStages: stages.length,
+      progress: { max: 100, current: 100 },
     };
   }
 
@@ -74,12 +77,15 @@ function computeTimerState(
       ? `Stage ${stageIndex + 1} of ${stages.length}`
       : "Countdown";
 
+  const progressPercent = Math.min(100, Math.round((elapsedMs / totalMs) * 100));
+
   return {
     subtitle,
     timestamp: startTime + thresholds[stageIndex],
     chronometerDirection: "down",
     completedStageCount: stageIndex,
     totalStages: stages.length,
+    progress: { max: 100, current: progressPercent },
   };
 }
 
@@ -164,12 +170,9 @@ export async function registerForegroundService() {
         stages: data?.stages ? JSON.parse(data.stages) : null,
       };
 
-      let prevSubtitle = "";
-      let prevDirection = "";
       let prevCompletedCount = 0;
 
-      // Check for stage transitions every second
-      setInterval(async () => {
+      async function updateNotification() {
         const elapsedMs = Date.now() - timerData.startTime;
         const state = computeTimerState(
           timerData.startTime,
@@ -190,40 +193,23 @@ export async function registerForegroundService() {
           prevCompletedCount = state.completedStageCount;
         }
 
-        // Only update notification when state actually changes
-        if (
-          state.subtitle === prevSubtitle &&
-          state.chronometerDirection === prevDirection
-        ) {
-          return;
-        }
-        prevSubtitle = state.subtitle;
-        prevDirection = state.chronometerDirection;
-
         try {
           await foregroundServiceNotification({
             subtitle: state.subtitle,
             timestamp: state.timestamp,
             chronometerDirection: state.chronometerDirection,
+            progress: state.progress,
           });
         } catch {
           // Notification update failed — service may be stopping
         }
-      }, 1000);
+      }
 
-      // Also fire immediately so the notification shows the chronometer right away
-      const initialState = computeTimerState(
-        timerData.startTime,
-        Date.now() - timerData.startTime,
-        timerData.stages,
-      );
-      prevSubtitle = initialState.subtitle;
-      prevDirection = initialState.chronometerDirection;
-      foregroundServiceNotification({
-        subtitle: initialState.subtitle,
-        timestamp: initialState.timestamp,
-        chronometerDirection: initialState.chronometerDirection,
-      }).catch(() => {});
+      // Update every second for progress bar
+      setInterval(updateNotification, 1000);
+
+      // Fire immediately so the notification shows right away
+      updateNotification();
 
       // The promise intentionally never resolves — the service runs until
       // stopForegroundService() is called from the app (dismissTimerNotification).
@@ -242,11 +228,16 @@ export async function foregroundServiceNotification({
   subtitle,
   timestamp,
   chronometerDirection,
+  progress,
   data,
 }: {
   subtitle?: string | undefined;
   timestamp?: number | undefined;
   chronometerDirection?: "up" | "down" | undefined;
+  progress?:
+    | { max: number; current: number }
+    | { indeterminate: true }
+    | undefined;
   data?:
     | {
         [key: string]: string | number | object;
@@ -255,7 +246,6 @@ export async function foregroundServiceNotification({
 }) {
   return notifee.displayNotification({
     id: TIMER_NOTIFICATION_ID,
-    title: "Prajna \u2014 Meditating",
     subtitle,
     data,
     android: {
@@ -263,9 +253,11 @@ export async function foregroundServiceNotification({
       asForegroundService: true,
       ongoing: true,
       autoCancel: false,
+      onlyAlertOnce: true,
       showChronometer: true,
       chronometerDirection: chronometerDirection ?? "up",
       timestamp: timestamp ?? Date.now(),
+      progress,
       foregroundServiceTypes: [
         AndroidForegroundServiceType.FOREGROUND_SERVICE_TYPE_MEDIA_PLAYBACK,
       ],

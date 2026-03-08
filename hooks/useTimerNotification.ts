@@ -18,6 +18,10 @@ export function useTimerNotification() {
           subtitle: "Meditating",
           timestamp: startTime,
           chronometerDirection: "up",
+          progress:
+            stages && stages.length > 0
+              ? { max: 100, current: 0 }
+              : { indeterminate: true },
           data: {
             startTime: String(startTime),
             stages: stages ? JSON.stringify(stages) : "",
