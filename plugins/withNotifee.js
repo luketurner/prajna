@@ -25,14 +25,14 @@ module.exports = function withNotifee(config) {
 
     if (existing) {
       // Update existing entry
-      existing.$["android:foregroundServiceType"] = "specialUse";
+      existing.$["android:foregroundServiceType"] = "mediaPlayback";
       existing.$["tools:replace"] = "android:foregroundServiceType";
     } else {
       // Add new service entry
       application.service.push({
         $: {
           "android:name": "app.notifee.core.ForegroundService",
-          "android:foregroundServiceType": "specialUse",
+          "android:foregroundServiceType": "mediaPlayback",
           "tools:replace": "android:foregroundServiceType",
         },
       });
@@ -49,14 +49,14 @@ module.exports = function withNotifee(config) {
       manifest.manifest["uses-permission"] = [];
     }
     const permissions = manifest.manifest["uses-permission"];
-    const specialUsePermission =
-      "android.permission.FOREGROUND_SERVICE_SPECIAL_USE";
+    const mediaPlaybackPermission =
+      "android.permission.FOREGROUND_SERVICE_MEDIA_PLAYBACK";
     const hasPermission = permissions.some(
-      (p) => p.$?.["android:name"] === specialUsePermission
+      (p) => p.$?.["android:name"] === mediaPlaybackPermission
     );
     if (!hasPermission) {
       permissions.push({
-        $: { "android:name": specialUsePermission },
+        $: { "android:name": mediaPlaybackPermission },
       });
     }
 
