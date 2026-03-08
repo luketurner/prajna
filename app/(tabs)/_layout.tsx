@@ -8,10 +8,9 @@ import { Colors } from "@/constants/Colors";
 function CustomTabBar({ state, descriptors, navigation }: BottomTabBarProps) {
   const colorScheme = useColorScheme() ?? "light";
   const colors = Colors[colorScheme];
-  const router = useRouter();
   const insets = useSafeAreaInsets();
 
-  // Tab bar order: [stats] [history] [TIMER FAB] [goals] [manual-entry]
+  // Tab bar order: [stats] [history] [TIMER FAB] [goals] [settings]
   const renderItems = () => {
     const items: React.ReactNode[] = [];
 
@@ -41,6 +40,7 @@ function CustomTabBar({ state, descriptors, navigation }: BottomTabBarProps) {
       if (route.name === "history") iconName = "history";
       else if (route.name === "goals") iconName = "flag";
       else if (route.name === "stats") iconName = "bar-chart";
+      else if (route.name === "settings") iconName = "settings";
 
       items.push(
         <Pressable
@@ -74,24 +74,6 @@ function CustomTabBar({ state, descriptors, navigation }: BottomTabBarProps) {
         );
       }
 
-      // Insert manual entry button after Goals tab
-      if (route.name === "goals") {
-        items.push(
-          <Pressable
-            key="log-session"
-            onPress={() => router.push("/manual-entry" as never)}
-            style={styles.tabItem}
-            accessibilityRole="button"
-            accessibilityLabel="Log a session manually"
-          >
-            <MaterialIcons
-              name="add"
-              size={24}
-              color={colors.tabIconDefault}
-            />
-          </Pressable>
-        );
-      }
     });
 
     return items;
@@ -159,6 +141,12 @@ export default function TabLayout() {
               <MaterialIcons name="add" size={28} color={colors.tint} />
             </Pressable>
           ),
+        }}
+      />
+      <Tabs.Screen
+        name="settings"
+        options={{
+          title: "Settings",
         }}
       />
     </Tabs>
