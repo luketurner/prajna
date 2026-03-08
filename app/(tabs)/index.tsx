@@ -15,8 +15,8 @@ import Storage from "expo-sqlite/kv-store";
 import { TimerDisplay } from "@/components/TimerDisplay";
 import { StagesInput } from "@/components/StagesInput";
 import { useTimer, formatElapsedMs } from "@/hooks/useTimer";
-import { useAlarm } from "@/hooks/useAlarm";
 import { useTimerNotification } from "@/hooks/useTimerNotification";
+import { stopBell } from "@/services/foreground-timer";
 import { Colors } from "@/constants/Colors";
 
 const STAGES_MINUTES_KEY = "stages_minutes";
@@ -32,7 +32,6 @@ export default function TimerScreen() {
     mode,
     currentStageIndex,
     totalStages,
-    completedStageCount,
     hasRecoveryData,
     recoveredElapsedMs,
     start,
@@ -42,7 +41,6 @@ export default function TimerScreen() {
     acceptRecovery,
     discardRecovery,
   } = useTimer();
-  const { playAlarm, stopAlarm } = useAlarm();
   const {
     requestPermissions,
     startTimerNotification,
@@ -60,7 +58,6 @@ export default function TimerScreen() {
     return [15]; // default: single 15-minute stage
   });
 
-  const prevCompletedRef = useRef(0);
   const navigatedToSaveRef = useRef(false);
 
   // Persist stages whenever they change
@@ -81,29 +78,6 @@ export default function TimerScreen() {
 
   // Keep screen awake while timer is running
   useKeepAwake();
-
-  // Detect stage completions and play alarms
-  useEffect(() => {
-    if (completedStageCount > prevCompletedRef.current) {
-      // Play alarms for each newly completed stage
-      for (let i = prevCompletedRef.current; i < completedStageCount; i++) {
-        const isFinal = i === totalStages - 1;
-        // Slight delay for chaining if multiple stages completed at once
-        const delay = (i - prevCompletedRef.current) * 500;
-        setTimeout(() => {
-          playAlarm(isFinal ? 2 : 1);
-        }, delay);
-      }
-      prevCompletedRef.current = completedStageCount;
-    }
-  }, [completedStageCount, totalStages, playAlarm]);
-
-  // Reset alarm tracking when timer starts
-  useEffect(() => {
-    if (isRunning && completedStageCount === 0) {
-      prevCompletedRef.current = 0;
-    }
-  }, [isRunning, completedStageCount]);
 
   // Show recovery dialog when app detects a crashed session
   useEffect(() => {
@@ -135,8 +109,6 @@ export default function TimerScreen() {
   }, [hasRecoveryData, recoveredElapsedMs, acceptRecovery, discardRecovery, router]);
 
   const handleStart = async () => {
-    prevCompletedRef.current = 0;
-
     const stagesMs = stagesMinutes.map((m) => m * 60 * 1000);
 
     const permitted = await requestPermissions();
@@ -150,7 +122,7 @@ export default function TimerScreen() {
   };
 
   const handleStop = () => {
-    stopAlarm();
+    stopBell();
     dismissTimerNotification();
     stop();
     navigatedToSaveRef.current = true;
@@ -170,7 +142,7 @@ export default function TimerScreen() {
           text: "Discard",
           style: "destructive",
           onPress: () => {
-            stopAlarm();
+            stopBell();
             dismissTimerNotification();
             discard();
           },
