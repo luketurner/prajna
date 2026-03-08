@@ -139,18 +139,28 @@ function playBell(times: number) {
   playOnce();
 }
 
-/** Stop all currently playing bells and cancel pending bell timeouts. */
+/** Cancel pending bell timeouts. Allow existing bells to continue to play. */
 export function stopBell() {
   for (const t of activeTimeouts) {
     clearTimeout(t);
   }
   activeTimeouts.clear();
 
-  for (const p of activePlayers) {
-    p.pause();
-    p.remove();
+  // for (const p of activePlayers) {
+  //   p.pause();
+  //   p.remove();
+  // }
+  // activePlayers.clear();
+}
+
+let intervalId: ReturnType<typeof setInterval> | null = null;
+
+/** Clear the foreground service update interval. */
+export function clearForegroundInterval() {
+  if (intervalId !== null) {
+    clearInterval(intervalId);
+    intervalId = null;
   }
-  activePlayers.clear();
 }
 
 /**
@@ -209,7 +219,7 @@ export async function registerForegroundService() {
       }
 
       // Update every second for progress bar
-      setInterval(updateNotification, 1000);
+      intervalId = setInterval(updateNotification, 1000);
 
       // Fire immediately so the notification shows right away
       updateNotification();

@@ -1,4 +1,5 @@
 import {
+  clearForegroundInterval,
   foregroundServiceNotification,
   TIMER_NOTIFICATION_ID,
 } from "@/services/foreground-timer";
@@ -35,6 +36,7 @@ export function useTimerNotification() {
   );
 
   const dismissTimerNotification = useCallback(async (): Promise<void> => {
+    clearForegroundInterval();
     try {
       await notifee.stopForegroundService();
     } catch {
