@@ -104,6 +104,7 @@ function CustomTabBar({ state, descriptors, navigation }: BottomTabBarProps) {
 export default function TabLayout() {
   const colorScheme = useColorScheme() ?? "light";
   const colors = Colors[colorScheme];
+  const router = useRouter();
 
   return (
     <Tabs
@@ -117,6 +118,16 @@ export default function TabLayout() {
         name="index"
         options={{
           title: "Timer",
+          headerRight: () => (
+            <Pressable
+              onPress={() => router.push("/manual-entry" as never)}
+              style={styles.headerButton}
+              accessibilityLabel="Log a session manually"
+              accessibilityRole="button"
+            >
+              <MaterialIcons name="add" size={28} color={colors.tint} />
+            </Pressable>
+          ),
         }}
       />
       <Tabs.Screen
@@ -155,6 +166,10 @@ const styles = StyleSheet.create({
   tabItem: {
     flex: 1,
     alignItems: "center",
+    paddingVertical: 8,
+  },
+  headerButton: {
+    paddingHorizontal: 16,
     paddingVertical: 8,
   },
   fab: {

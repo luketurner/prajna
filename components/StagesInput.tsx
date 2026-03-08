@@ -25,7 +25,7 @@ export function StagesInput({ stages, onChange, disabled }: StagesInputProps) {
 
   // Track text for each stage separately so partial input doesn't get clobbered
   const [texts, setTexts] = useState<string[]>(() =>
-    stages.map((s) => s.toString())
+    stages.map((s) => s.toString()),
   );
 
   const handleChangeText = (index: number, input: string) => {
@@ -117,8 +117,8 @@ export function StagesInput({ stages, onChange, disabled }: StagesInputProps) {
           accessibilityLabel="Add stage"
           accessibilityRole="button"
         >
-          <MaterialIcons name="add" size={20} color={colors.tint} />
-          <Text style={[styles.addText, { color: colors.tint }]}>
+          <MaterialIcons name="add" size={20} color={colors.textSecondary} />
+          <Text style={[styles.addText, { color: colors.textSecondary }]}>
             Add Stage
           </Text>
         </Pressable>

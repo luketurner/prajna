@@ -1,5 +1,6 @@
 import { useRouter } from "expo-router";
-import { Alert, useColorScheme, View, StyleSheet } from "react-native";
+import { Alert, useColorScheme, StyleSheet } from "react-native";
+import { SafeAreaView } from "react-native-safe-area-context";
 import { SessionForm } from "@/components/SessionForm";
 import { useCreateSession } from "@/hooks/useSessions";
 import { Colors } from "@/constants/Colors";
@@ -32,14 +33,14 @@ export default function ManualEntryScreen() {
   };
 
   return (
-    <View style={[styles.container, { backgroundColor: colors.background }]}>
+    <SafeAreaView style={[styles.container, { backgroundColor: colors.background }]}>
       <SessionForm
         onSubmit={handleSubmit}
         onCancel={handleCancel}
         submitLabel="Save Session"
         isSubmitting={createSession.isPending}
       />
-    </View>
+    </SafeAreaView>
   );
 }
 

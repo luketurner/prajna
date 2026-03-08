@@ -1,23 +1,24 @@
-import { useCallback, useEffect, useRef, useState } from "react";
-import {
-  View,
-  Text,
-  Pressable,
-  StyleSheet,
-  useColorScheme,
-  Alert,
-} from "react-native";
-import { useRouter } from "expo-router";
-import { useFocusEffect } from "@react-navigation/native";
-import { useKeepAwake } from "expo-keep-awake";
-import { MaterialIcons } from "@expo/vector-icons";
-import Storage from "expo-sqlite/kv-store";
-import { TimerDisplay } from "@/components/TimerDisplay";
 import { StagesInput } from "@/components/StagesInput";
-import { useTimer, formatElapsedMs } from "@/hooks/useTimer";
+import { TimerDisplay } from "@/components/TimerDisplay";
+import { Colors } from "@/constants/Colors";
+import { formatElapsedMs, useTimer } from "@/hooks/useTimer";
 import { useTimerNotification } from "@/hooks/useTimerNotification";
 import { stopBell } from "@/services/foreground-timer";
-import { Colors } from "@/constants/Colors";
+import { MaterialIcons } from "@expo/vector-icons";
+import { useFocusEffect } from "@react-navigation/native";
+import { useKeepAwake } from "expo-keep-awake";
+import { useRouter } from "expo-router";
+import Storage from "expo-sqlite/kv-store";
+import { useCallback, useEffect, useRef, useState } from "react";
+import {
+  Alert,
+  Pressable,
+  ScrollView,
+  StyleSheet,
+  Text,
+  useColorScheme,
+  View,
+} from "react-native";
 
 const STAGES_MINUTES_KEY = "stages_minutes";
 
@@ -73,7 +74,7 @@ export default function TimerScreen() {
         navigatedToSaveRef.current = false;
         reset();
       }
-    }, [reset])
+    }, [reset]),
   );
 
   // Keep screen awake while timer is running
@@ -103,10 +104,16 @@ export default function TimerScreen() {
               });
             },
           },
-        ]
+        ],
       );
     }
-  }, [hasRecoveryData, recoveredElapsedMs, acceptRecovery, discardRecovery, router]);
+  }, [
+    hasRecoveryData,
+    recoveredElapsedMs,
+    acceptRecovery,
+    discardRecovery,
+    router,
+  ]);
 
   const handleStart = async () => {
     const stagesMs = stagesMinutes.map((m) => m * 60 * 1000);
@@ -147,7 +154,7 @@ export default function TimerScreen() {
             discard();
           },
         },
-      ]
+      ],
     );
   };
 
@@ -162,7 +169,10 @@ export default function TimerScreen() {
           : null;
 
   return (
-    <View style={[styles.container, { backgroundColor: colors.background }]}>
+    <ScrollView
+      style={{ flex: 1, backgroundColor: colors.background }}
+      contentContainerStyle={styles.scrollContent}
+    >
       {!isRunning && (
         <StagesInput
           stages={stagesMinutes}
@@ -188,7 +198,11 @@ export default function TimerScreen() {
             accessibilityLabel="Start meditation timer"
             accessibilityRole="button"
           >
-            <MaterialIcons name="play-arrow" size={48} color={colors.background} />
+            <MaterialIcons
+              name="play-arrow"
+              size={48}
+              color={colors.background}
+            />
           </Pressable>
         ) : (
           <View style={styles.runningControls}>
@@ -203,7 +217,10 @@ export default function TimerScreen() {
 
             <Pressable
               onPress={handleStop}
-              style={[styles.primaryButton, { backgroundColor: colors.success }]}
+              style={[
+                styles.primaryButton,
+                { backgroundColor: colors.success },
+              ]}
               accessibilityLabel="Stop and save session"
               accessibilityRole="button"
             >
@@ -219,18 +236,13 @@ export default function TimerScreen() {
         </Text>
       )}
 
-      {!isRunning && elapsedMs === 0 && (
-        <Text style={[styles.hint, { color: colors.textSecondary }]}>
-          Tap play to start your meditation
-        </Text>
-      )}
-    </View>
+    </ScrollView>
   );
 }
 
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
+  scrollContent: {
+    flexGrow: 1,
     justifyContent: "center",
     alignItems: "center",
     padding: 24,
