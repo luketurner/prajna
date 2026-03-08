@@ -39,8 +39,8 @@ npm run start
 
 # Development Android build on EAS
 eas login
-eas build --platform android --profile development
+npm run build:develop
 
 # Build an APK
-eas build --platform android --profile preview
+npm run build:preview
 ```

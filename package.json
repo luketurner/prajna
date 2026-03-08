@@ -9,8 +9,8 @@
     "ios": "expo start --ios",
     "web": "expo start --web",
     "lint": "expo lint",
-    "draft": "npx eas-cli@latest workflow:run create-draft.yml",
-    "development-builds": "npx eas-cli@latest workflow:run create-development-builds.yml",
+    "build:preview": "eas build --platform android --profile preview",
+    "build:develop": "eas build --platform android --profile development",
     "deploy": "npx eas-cli@latest workflow:run deploy-to-production.yml"
   },
   "dependencies": {
