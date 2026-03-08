@@ -11,13 +11,13 @@ function CustomTabBar({ state, descriptors, navigation }: BottomTabBarProps) {
   const router = useRouter();
   const insets = useSafeAreaInsets();
 
-  // Insert FAB between History (index 1) and Goals (index 2)
+  // Tab bar order: [stats] [history] [TIMER FAB] [goals] [manual-entry]
   const renderItems = () => {
     const items: React.ReactNode[] = [];
 
-    state.routes.forEach((route, index) => {
+    state.routes.forEach((route) => {
       const { options } = descriptors[route.key];
-      const isFocused = state.index === index;
+      const isFocused = state.index === state.routes.indexOf(route);
 
       const onPress = () => {
         const event = navigation.emit({
@@ -33,22 +33,6 @@ function CustomTabBar({ state, descriptors, navigation }: BottomTabBarProps) {
 
       // Timer tab renders as the center FAB instead of a regular tab
       if (route.name === "index") {
-        // Put "Log session" button in the first tab position
-        items.push(
-          <Pressable
-            key="log-session"
-            onPress={() => router.push("/manual-entry" as never)}
-            style={styles.tabItem}
-            accessibilityRole="button"
-            accessibilityLabel="Log a session manually"
-          >
-            <MaterialIcons
-              name="add"
-              size={24}
-              color={colors.tabIconDefault}
-            />
-          </Pressable>
-        );
         return;
       }
 
@@ -75,8 +59,8 @@ function CustomTabBar({ state, descriptors, navigation }: BottomTabBarProps) {
         </Pressable>
       );
 
-      // Insert Timer FAB after History tab (index 1)
-      if (index === 1) {
+      // Insert Timer FAB after History tab
+      if (route.name === "history") {
         items.push(
           <Pressable
             key="fab"
@@ -86,6 +70,25 @@ function CustomTabBar({ state, descriptors, navigation }: BottomTabBarProps) {
             accessibilityLabel="Timer"
           >
             <MaterialIcons name="timer" size={28} color={colors.fabIcon} />
+          </Pressable>
+        );
+      }
+
+      // Insert manual entry button after Goals tab
+      if (route.name === "goals") {
+        items.push(
+          <Pressable
+            key="log-session"
+            onPress={() => router.push("/manual-entry" as never)}
+            style={styles.tabItem}
+            accessibilityRole="button"
+            accessibilityLabel="Log a session manually"
+          >
+            <MaterialIcons
+              name="add"
+              size={24}
+              color={colors.tabIconDefault}
+            />
           </Pressable>
         );
       }
@@ -118,6 +121,18 @@ export default function TabLayout() {
         name="index"
         options={{
           title: "Timer",
+        }}
+      />
+      <Tabs.Screen
+        name="stats"
+        options={{
+          title: "Stats",
+        }}
+      />
+      <Tabs.Screen
+        name="history"
+        options={{
+          title: "History",
           headerRight: () => (
             <Pressable
               onPress={() => router.push("/manual-entry" as never)}
@@ -131,23 +146,19 @@ export default function TabLayout() {
         }}
       />
       <Tabs.Screen
-        name="history"
-        options={{
-          title: "History",
-          headerShown: false,
-        }}
-      />
-      <Tabs.Screen
         name="goals"
         options={{
           title: "Goals",
-          headerShown: false,
-        }}
-      />
-      <Tabs.Screen
-        name="stats"
-        options={{
-          title: "Stats",
+          headerRight: () => (
+            <Pressable
+              onPress={() => router.push("/create-goal" as never)}
+              style={styles.headerButton}
+              accessibilityLabel="Create new goal"
+              accessibilityRole="button"
+            >
+              <MaterialIcons name="add" size={28} color={colors.tint} />
+            </Pressable>
+          ),
         }}
       />
     </Tabs>

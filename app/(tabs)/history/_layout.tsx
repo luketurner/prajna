@@ -16,7 +16,7 @@ export default function HistoryLayout() {
       <Stack.Screen
         name="index"
         options={{
-          title: "History",
+          headerShown: false,
         }}
       />
       <Stack.Screen

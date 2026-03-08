@@ -1,12 +1,10 @@
-import { Stack, useRouter } from "expo-router";
-import { useColorScheme, Pressable } from "react-native";
-import { MaterialIcons } from "@expo/vector-icons";
+import { Stack } from "expo-router";
+import { useColorScheme } from "react-native";
 import { Colors } from "@/constants/Colors";
 
 export default function GoalsLayout() {
   const colorScheme = useColorScheme() ?? "light";
   const colors = Colors[colorScheme];
-  const router = useRouter();
 
   return (
     <Stack
@@ -18,16 +16,7 @@ export default function GoalsLayout() {
       <Stack.Screen
         name="index"
         options={{
-          title: "Goals",
-          headerRight: () => (
-            <Pressable
-              onPress={() => router.push("/create-goal" as never)}
-              style={{ marginRight: 8 }}
-              accessibilityLabel="Create new goal"
-            >
-              <MaterialIcons name="add" size={28} color={colors.tint} />
-            </Pressable>
-          ),
+          headerShown: false,
         }}
       />
       <Stack.Screen

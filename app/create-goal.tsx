@@ -1,8 +1,9 @@
-import { View, StyleSheet, useColorScheme, Alert } from "react-native";
-import { useRouter } from "expo-router";
 import { GoalForm } from "@/components/GoalForm";
-import { useCreateGoal } from "@/hooks/useGoals";
 import { Colors } from "@/constants/Colors";
+import { useCreateGoal } from "@/hooks/useGoals";
+import { useRouter } from "expo-router";
+import { Alert, StyleSheet, useColorScheme } from "react-native";
+import { SafeAreaView } from "react-native-safe-area-context";
 
 export default function CreateGoalScreen() {
   const colorScheme = useColorScheme() ?? "light";
@@ -30,14 +31,16 @@ export default function CreateGoalScreen() {
   };
 
   return (
-    <View style={[styles.container, { backgroundColor: colors.background }]}>
+    <SafeAreaView
+      style={[styles.container, { backgroundColor: colors.background }]}
+    >
       <GoalForm
         onSubmit={handleSubmit}
         onCancel={handleCancel}
         submitLabel="Create Goal"
         isSubmitting={createGoal.isPending}
       />
-    </View>
+    </SafeAreaView>
   );
 }
 
