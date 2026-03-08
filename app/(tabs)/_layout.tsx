@@ -1,9 +1,9 @@
-import { Tabs } from "expo-router";
-import { Pressable, View, StyleSheet, useColorScheme } from "react-native";
+import { Colors } from "@/constants/Colors";
 import { MaterialIcons } from "@expo/vector-icons";
 import type { BottomTabBarProps } from "@react-navigation/bottom-tabs";
+import { Tabs } from "expo-router";
+import { Pressable, StyleSheet, useColorScheme, View } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
-import { Colors } from "@/constants/Colors";
 
 function CustomTabBar({ state, descriptors, navigation }: BottomTabBarProps) {
   const colorScheme = useColorScheme() ?? "light";
@@ -56,7 +56,7 @@ function CustomTabBar({ state, descriptors, navigation }: BottomTabBarProps) {
             size={24}
             color={isFocused ? colors.tabIconSelected : colors.tabIconDefault}
           />
-        </Pressable>
+        </Pressable>,
       );
 
       // Insert Timer FAB after History tab
@@ -70,17 +70,25 @@ function CustomTabBar({ state, descriptors, navigation }: BottomTabBarProps) {
             accessibilityLabel="Timer"
           >
             <MaterialIcons name="timer" size={28} color={colors.fabIcon} />
-          </Pressable>
+          </Pressable>,
         );
       }
-
     });
 
     return items;
   };
 
   return (
-    <View style={[styles.tabBar, { backgroundColor: colors.background, borderTopColor: colors.border, paddingBottom: Math.max(insets.bottom, 8) }]}>
+    <View
+      style={[
+        styles.tabBar,
+        {
+          backgroundColor: colors.background,
+          borderTopColor: colors.border,
+          paddingBottom: Math.max(insets.bottom, 8),
+        },
+      ]}
+    >
       {renderItems()}
     </View>
   );
@@ -140,7 +148,8 @@ const styles = StyleSheet.create({
   tabItem: {
     flex: 1,
     alignItems: "center",
-    paddingVertical: 8,
+    paddingTop: 8,
+    paddingBottom: 12,
   },
   fab: {
     width: 56,
