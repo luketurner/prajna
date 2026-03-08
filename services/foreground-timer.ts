@@ -77,7 +77,10 @@ function computeTimerState(
       ? `Stage ${stageIndex + 1} of ${stages.length}`
       : "Countdown";
 
-  const progressPercent = Math.min(100, Math.round((elapsedMs / totalMs) * 100));
+  const progressPercent = Math.min(
+    100,
+    Math.round((elapsedMs / totalMs) * 100),
+  );
 
   return {
     subtitle,
@@ -89,7 +92,7 @@ function computeTimerState(
   };
 }
 
-const ALARM_AUTO_STOP_MS = 9000;
+const ALARM_AUTO_STOP_MS = 10000;
 const BELL_GAP_MS = 500;
 const bellSource = require("@/assets/audio/bell.mp3");
 
