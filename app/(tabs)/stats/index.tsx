@@ -1,22 +1,22 @@
-import {
-  View,
-  Text,
-  StyleSheet,
-  useColorScheme,
-  ScrollView,
-  ActivityIndicator,
-} from "react-native";
-import { MaterialIcons } from "@expo/vector-icons";
-import { useSessionStats } from "@/hooks/useSessionStats";
 import { EmptyState } from "@/components/EmptyState";
 import { Colors } from "@/constants/Colors";
+import { useSessionStats } from "@/hooks/useSessionStats";
+import { MaterialIcons } from "@expo/vector-icons";
+import {
+  ActivityIndicator,
+  ScrollView,
+  StyleSheet,
+  Text,
+  useColorScheme,
+  View,
+} from "react-native";
 
 function formatDuration(seconds: number): string {
   const hours = Math.floor(seconds / 3600);
   const minutes = Math.floor((seconds % 3600) / 60);
 
   if (hours > 0) {
-    return `${hours}h ${minutes}m`;
+    return `${hours}h\n${minutes}m`;
   }
   return `${minutes}m`;
 }
@@ -58,7 +58,12 @@ export default function StatsScreen() {
           Time Meditated
         </Text>
         <View style={styles.statsGrid}>
-          <View style={[styles.statCard, { backgroundColor: colors.card, borderColor: colors.border }]}>
+          <View
+            style={[
+              styles.statCard,
+              { backgroundColor: colors.card, borderColor: colors.border },
+            ]}
+          >
             <MaterialIcons name="all-inclusive" size={24} color={colors.tint} />
             <Text style={[styles.statValue, { color: colors.text }]}>
               {formatDuration(stats.totalSecondsAllTime)}
@@ -67,8 +72,17 @@ export default function StatsScreen() {
               All Time
             </Text>
           </View>
-          <View style={[styles.statCard, { backgroundColor: colors.card, borderColor: colors.border }]}>
-            <MaterialIcons name="calendar-today" size={24} color={colors.tint} />
+          <View
+            style={[
+              styles.statCard,
+              { backgroundColor: colors.card, borderColor: colors.border },
+            ]}
+          >
+            <MaterialIcons
+              name="calendar-today"
+              size={24}
+              color={colors.tint}
+            />
             <Text style={[styles.statValue, { color: colors.text }]}>
               {formatDuration(stats.totalSecondsThisMonth)}
             </Text>
@@ -76,7 +90,12 @@ export default function StatsScreen() {
               This Month
             </Text>
           </View>
-          <View style={[styles.statCard, { backgroundColor: colors.card, borderColor: colors.border }]}>
+          <View
+            style={[
+              styles.statCard,
+              { backgroundColor: colors.card, borderColor: colors.border },
+            ]}
+          >
             <MaterialIcons name="date-range" size={24} color={colors.tint} />
             <Text style={[styles.statValue, { color: colors.text }]}>
               {formatDuration(stats.totalSecondsThisWeek)}
@@ -94,27 +113,41 @@ export default function StatsScreen() {
           Sessions
         </Text>
         <View style={styles.statsRow}>
-          <View style={[styles.statRowCard, { backgroundColor: colors.card, borderColor: colors.border }]}>
+          <View
+            style={[
+              styles.statRowCard,
+              { backgroundColor: colors.card, borderColor: colors.border },
+            ]}
+          >
             <View style={styles.statRowContent}>
               <MaterialIcons name="event" size={28} color={colors.tint} />
               <View style={styles.statRowText}>
                 <Text style={[styles.statRowValue, { color: colors.text }]}>
                   {stats.totalSessions}
                 </Text>
-                <Text style={[styles.statRowLabel, { color: colors.textSecondary }]}>
+                <Text
+                  style={[styles.statRowLabel, { color: colors.textSecondary }]}
+                >
                   Total Sessions
                 </Text>
               </View>
             </View>
           </View>
-          <View style={[styles.statRowCard, { backgroundColor: colors.card, borderColor: colors.border }]}>
+          <View
+            style={[
+              styles.statRowCard,
+              { backgroundColor: colors.card, borderColor: colors.border },
+            ]}
+          >
             <View style={styles.statRowContent}>
               <MaterialIcons name="timer" size={28} color={colors.tint} />
               <View style={styles.statRowText}>
                 <Text style={[styles.statRowValue, { color: colors.text }]}>
                   {formatDuration(stats.averageSessionSeconds)}
                 </Text>
-                <Text style={[styles.statRowLabel, { color: colors.textSecondary }]}>
+                <Text
+                  style={[styles.statRowLabel, { color: colors.textSecondary }]}
+                >
                   Average Session
                 </Text>
               </View>
@@ -125,10 +158,21 @@ export default function StatsScreen() {
 
       {/* Streaks */}
       <View style={styles.section}>
-        <Text style={[styles.sectionTitle, { color: colors.text }]}>Streaks</Text>
+        <Text style={[styles.sectionTitle, { color: colors.text }]}>
+          Streaks
+        </Text>
         <View style={styles.streakRow}>
-          <View style={[styles.streakCard, { backgroundColor: colors.card, borderColor: colors.border }]}>
-            <MaterialIcons name="local-fire-department" size={32} color={colors.warning} />
+          <View
+            style={[
+              styles.streakCard,
+              { backgroundColor: colors.card, borderColor: colors.border },
+            ]}
+          >
+            <MaterialIcons
+              name="local-fire-department"
+              size={32}
+              color={colors.warning}
+            />
             <Text style={[styles.streakValue, { color: colors.text }]}>
               {stats.currentStreak}
             </Text>
@@ -139,8 +183,17 @@ export default function StatsScreen() {
               {stats.currentStreak === 1 ? "day" : "days"}
             </Text>
           </View>
-          <View style={[styles.streakCard, { backgroundColor: colors.card, borderColor: colors.border }]}>
-            <MaterialIcons name="emoji-events" size={32} color={colors.success} />
+          <View
+            style={[
+              styles.streakCard,
+              { backgroundColor: colors.card, borderColor: colors.border },
+            ]}
+          >
+            <MaterialIcons
+              name="emoji-events"
+              size={32}
+              color={colors.success}
+            />
             <Text style={[styles.streakValue, { color: colors.text }]}>
               {stats.longestStreak}
             </Text>
@@ -153,7 +206,6 @@ export default function StatsScreen() {
           </View>
         </View>
       </View>
-
     </ScrollView>
   );
 }
@@ -194,6 +246,7 @@ const styles = StyleSheet.create({
     fontSize: 20,
     fontWeight: "700",
     marginTop: 8,
+    textAlign: "center",
   },
   statLabel: {
     fontSize: 11,
