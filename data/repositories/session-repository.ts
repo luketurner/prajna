@@ -141,6 +141,7 @@ export class SessionRepository implements ISessionRepository {
     let currentStreak = 0;
     let longestStreak = 0;
     let streak = 0;
+    let currentStreakEnded = false;
     let prevDate: Date | null = null;
 
     for (const date of dates) {
@@ -153,21 +154,19 @@ export class SessionRepository implements ISessionRepository {
         } else {
           // Gap from today, so current streak is 0 but we still count longest
           streak = 1;
+          currentStreakEnded = true;
         }
       } else {
         const daysDiff = differenceInCalendarDays(prevDate, date);
         if (daysDiff === 1) {
           streak++;
-          if (currentStreak > 0) {
+          if (!currentStreakEnded) {
             currentStreak = streak;
           }
         } else {
           longestStreak = Math.max(longestStreak, streak);
           streak = 1;
-          if (currentStreak > 0) {
-            // Current streak ended, keep its value
-            currentStreak = Math.max(longestStreak, currentStreak);
-          }
+          currentStreakEnded = true;
         }
       }
       prevDate = date;
