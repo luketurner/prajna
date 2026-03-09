@@ -1,7 +1,7 @@
-import { Stack, useRouter } from "expo-router";
-import { Pressable, useColorScheme, StyleSheet } from "react-native";
-import { MaterialIcons } from "@expo/vector-icons";
 import { Colors } from "@/constants/Colors";
+import { MaterialIcons } from "@expo/vector-icons";
+import { Stack, useRouter } from "expo-router";
+import { Pressable, StyleSheet, useColorScheme } from "react-native";
 
 export default function HistoryLayout() {
   const colorScheme = useColorScheme() ?? "light";
@@ -18,7 +18,7 @@ export default function HistoryLayout() {
       <Stack.Screen
         name="index"
         options={{
-          title: "History",
+          title: "Past Sessions",
           headerRight: () => (
             <Pressable
               onPress={() => router.push("/manual-entry" as never)}

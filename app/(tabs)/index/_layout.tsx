@@ -1,6 +1,6 @@
+import { Colors } from "@/constants/Colors";
 import { Stack } from "expo-router";
 import { useColorScheme } from "react-native";
-import { Colors } from "@/constants/Colors";
 
 export default function TimerLayout() {
   const colorScheme = useColorScheme() ?? "light";
@@ -16,7 +16,7 @@ export default function TimerLayout() {
       <Stack.Screen
         name="index"
         options={{
-          title: "Timer",
+          title: "Meditation Timer",
         }}
       />
     </Stack>

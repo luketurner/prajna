@@ -105,7 +105,7 @@ export default function TabLayout() {
       <Tabs.Screen
         name="index"
         options={{
-          title: "Timer",
+          title: "Meditation Timer",
         }}
       />
       <Tabs.Screen
@@ -117,7 +117,7 @@ export default function TabLayout() {
       <Tabs.Screen
         name="history"
         options={{
-          title: "History",
+          title: "Past Sessions",
         }}
       />
       <Tabs.Screen

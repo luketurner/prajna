@@ -1,7 +1,13 @@
-import { View, Text, Pressable, StyleSheet, useColorScheme } from "react-native";
-import { format, parseISO } from "date-fns";
 import { Colors } from "@/constants/Colors";
 import type { Session } from "@/data/repository-interfaces";
+import { format, parseISO } from "date-fns";
+import {
+  Pressable,
+  StyleSheet,
+  Text,
+  useColorScheme,
+  View,
+} from "react-native";
 
 interface SessionCardProps {
   session: Session;
@@ -29,18 +35,22 @@ export function SessionCard({ session, onPress }: SessionCardProps) {
   return (
     <Pressable
       onPress={onPress}
-      style={[styles.card, { backgroundColor: colors.card, borderColor: colors.border }]}
+      style={[
+        styles.card,
+        { backgroundColor: colors.card, borderColor: colors.border },
+      ]}
       accessibilityRole="button"
       accessibilityLabel={`Session on ${formattedDate}, ${duration}`}
     >
       <View style={styles.mainRow}>
         <View style={styles.leftSection}>
-          <Text style={[styles.date, { color: colors.text }]}>{formattedDate}</Text>
-          <Text style={[styles.duration, { color: colors.tint }]}>{duration}</Text>
+          <Text style={[styles.date, { color: colors.text }]}>
+            {formattedDate}
+          </Text>
         </View>
         <View style={styles.sourceIndicator}>
-          <Text style={[styles.sourceText, { color: colors.textSecondary }]}>
-            {session.source === "timer" ? "Timed" : "Manual"}
+          <Text style={[styles.duration, { color: colors.tint }]}>
+            {duration}
           </Text>
         </View>
       </View>

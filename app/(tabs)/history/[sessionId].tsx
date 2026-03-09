@@ -1,18 +1,18 @@
+import { Colors } from "@/constants/Colors";
+import { useDeleteSession, useSession } from "@/hooks/useSessions";
+import { MaterialIcons } from "@expo/vector-icons";
+import { format, parseISO } from "date-fns";
+import { useLocalSearchParams, useRouter } from "expo-router";
 import {
-  View,
-  Text,
-  Pressable,
-  StyleSheet,
-  useColorScheme,
   ActivityIndicator,
   Alert,
+  Pressable,
   ScrollView,
+  StyleSheet,
+  Text,
+  useColorScheme,
+  View,
 } from "react-native";
-import { useRouter, useLocalSearchParams } from "expo-router";
-import { format, parseISO } from "date-fns";
-import { MaterialIcons } from "@expo/vector-icons";
-import { useSession, useDeleteSession } from "@/hooks/useSessions";
-import { Colors } from "@/constants/Colors";
 
 function formatDuration(seconds: number): string {
   const hours = Math.floor(seconds / 3600);
@@ -63,7 +63,7 @@ export default function SessionDetailScreen() {
             }
           },
         },
-      ]
+      ],
     );
   };
 
@@ -86,7 +86,9 @@ export default function SessionDetailScreen() {
   const date = parseISO(session.date);
 
   return (
-    <ScrollView style={[styles.container, { backgroundColor: colors.background }]}>
+    <ScrollView
+      style={[styles.container, { backgroundColor: colors.background }]}
+    >
       <View style={styles.content}>
         {/* Duration */}
         <View style={styles.section}>
@@ -100,7 +102,9 @@ export default function SessionDetailScreen() {
 
         {/* Date */}
         <View style={styles.section}>
-          <Text style={[styles.label, { color: colors.textSecondary }]}>Date</Text>
+          <Text style={[styles.label, { color: colors.textSecondary }]}>
+            Date
+          </Text>
           <Text style={[styles.value, { color: colors.text }]}>
             {format(date, "EEEE, MMMM d, yyyy")}
           </Text>
@@ -112,7 +116,7 @@ export default function SessionDetailScreen() {
             Recorded Via
           </Text>
           <Text style={[styles.value, { color: colors.text }]}>
-            {session.source === "timer" ? "Timer" : "Manual Entry"}
+            {session.source === "timer" ? "Meditation Timer" : "Manual Entry"}
           </Text>
         </View>
 
@@ -123,12 +127,20 @@ export default function SessionDetailScreen() {
             style={[styles.actionButton, { backgroundColor: colors.tint }]}
           >
             <MaterialIcons name="edit" size={20} color={colors.background} />
-            <Text style={[styles.actionButtonText, { color: colors.background }]}>Edit</Text>
+            <Text
+              style={[styles.actionButtonText, { color: colors.background }]}
+            >
+              Edit
+            </Text>
           </Pressable>
 
           <Pressable
             onPress={handleDelete}
-            style={[styles.actionButton, styles.deleteButton, { borderColor: colors.error }]}
+            style={[
+              styles.actionButton,
+              styles.deleteButton,
+              { borderColor: colors.error },
+            ]}
             disabled={deleteSession.isPending}
           >
             <MaterialIcons name="delete" size={20} color={colors.error} />
