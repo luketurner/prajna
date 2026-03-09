@@ -1,13 +1,10 @@
 import { StagesInput } from "@/components/StagesInput";
 import { TimerDisplay } from "@/components/TimerDisplay";
 import { Colors } from "@/constants/Colors";
+import { getNotificationSettings } from "@/hooks/useNotificationSettings";
 import { formatElapsedMs, useTimer } from "@/hooks/useTimer";
 import { useTimerNotification } from "@/hooks/useTimerNotification";
-import { getNotificationSettings } from "@/hooks/useNotificationSettings";
-import {
-  notifyStageCompletions,
-  stopBell,
-} from "@/services/foreground-timer";
+import { notifyStageCompletions, stopBell } from "@/services/foreground-timer";
 import { MaterialIcons } from "@expo/vector-icons";
 import { useFocusEffect } from "@react-navigation/native";
 import { useRouter } from "expo-router";
@@ -15,6 +12,7 @@ import Storage from "expo-sqlite/kv-store";
 import { useCallback, useEffect, useRef, useState } from "react";
 import {
   Alert,
+  AppState,
   Pressable,
   ScrollView,
   StyleSheet,
@@ -70,7 +68,8 @@ export default function TimerScreen() {
   useEffect(() => {
     if (
       completedStageCount > prevCompletedCountRef.current &&
-      totalStages > 0
+      totalStages > 0 &&
+      AppState.currentState === "active"
     ) {
       notifyStageCompletions(
         prevCompletedCountRef.current,
