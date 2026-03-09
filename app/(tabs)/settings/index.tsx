@@ -1,5 +1,6 @@
 import { Colors } from "@/constants/Colors";
 import { useRepositories } from "@/data/database-provider";
+import { queryKeys } from "@/data/query-keys";
 import {
   useNotificationSettings,
   type NotificationType,
@@ -8,8 +9,11 @@ import {
   useStatsSettings,
   type EarliestDateSource,
 } from "@/hooks/useStatsSettings";
+import { importData } from "@/services/import-data";
+import { useQueryClient } from "@tanstack/react-query";
 import { Directory, File, Paths } from "expo-file-system";
 import { shareAsync } from "expo-sharing";
+import { useSQLiteContext } from "expo-sqlite";
 import {
   Alert,
   Pressable,
@@ -76,6 +80,8 @@ export default function SettingsScreen() {
   const colorScheme = useColorScheme() ?? "light";
   const colors = Colors[colorScheme];
   const { sessionRepository, goalRepository } = useRepositories();
+  const db = useSQLiteContext();
+  const queryClient = useQueryClient();
   const { stageEnd, sessionEnd, setStageEnd, setSessionEnd } =
     useNotificationSettings();
   const { earliestDateSource, setEarliestDateSource } = useStatsSettings();
@@ -124,6 +130,40 @@ export default function SettingsScreen() {
       { text: "Save to device", onPress: handleSaveToDevice },
       { text: "Cancel", style: "cancel" },
     ]);
+  };
+
+  const handleImport = async () => {
+    try {
+      const file = await File.pickFileAsync(undefined, "application/json");
+      if (!file) return;
+      const text = await file.text();
+      const json = JSON.parse(text);
+
+      if (!json || typeof json !== "object") {
+        Alert.alert("Invalid file", "The file does not contain valid JSON.");
+        return;
+      }
+      if (!Array.isArray(json.sessions) && !Array.isArray(json.goals)) {
+        Alert.alert(
+          "Invalid format",
+          "The JSON file must contain a \"sessions\" and/or \"goals\" array.",
+        );
+        return;
+      }
+
+      const result = await importData(db, json);
+
+      queryClient.invalidateQueries({ queryKey: queryKeys.sessions.all });
+      queryClient.invalidateQueries({ queryKey: queryKeys.sessions.stats });
+      queryClient.invalidateQueries({ queryKey: queryKeys.goals.all });
+
+      Alert.alert(
+        "Import complete",
+        `Imported ${result.sessions} session(s) and ${result.goals} goal(s).`,
+      );
+    } catch {
+      Alert.alert("Import failed", "Could not import data. Please make sure the file is a valid JSON export.");
+    }
   };
 
   return (
@@ -193,6 +233,17 @@ export default function SettingsScreen() {
       >
         <Text style={[styles.exportButtonText, { color: colors.text }]}>
           Export data as JSON
+        </Text>
+      </Pressable>
+      <Pressable
+        onPress={handleImport}
+        style={[
+          styles.exportButton,
+          { borderColor: colors.border, marginTop: 12 },
+        ]}
+      >
+        <Text style={[styles.exportButtonText, { color: colors.text }]}>
+          Import data from JSON
         </Text>
       </Pressable>
     </ScrollView>
