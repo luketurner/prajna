@@ -114,7 +114,7 @@ export class SessionRepository implements ISessionRepository {
       const daysSinceFirst =
         differenceInCalendarDays(now, parseISO(resolvedEarliest)) + 1;
       averageSessionsPerDay =
-        Math.round((totalSessions / daysSinceFirst) * 10) / 10;
+        Math.round((totalSessions / daysSinceFirst) * 100) / 100;
     }
 
     // Streaks
