@@ -1,6 +1,7 @@
 import notifee, {
   AndroidForegroundServiceType,
   AndroidImportance,
+  AndroidVisibility,
 } from "@notifee/react-native";
 import { createAudioPlayer, setAudioModeAsync } from "expo-audio";
 import { Vibration } from "react-native";
@@ -258,7 +259,7 @@ export async function registerForegroundService() {
   await notifee.createChannel({
     id: TIMER_CHANNEL_ID,
     name: "Meditation Timer",
-    importance: AndroidImportance.LOW,
+    importance: AndroidImportance.DEFAULT,
     sound: undefined,
   });
 }
@@ -290,6 +291,7 @@ export async function foregroundServiceNotification({
     android: {
       channelId: TIMER_CHANNEL_ID,
       asForegroundService: true,
+      visibility: AndroidVisibility.PUBLIC,
       ongoing: true,
       autoCancel: false,
       onlyAlertOnce: true,
