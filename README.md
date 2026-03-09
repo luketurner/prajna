@@ -25,7 +25,7 @@ Features:
 - Create multiple stages of timers, e.g. 10 minutes, then 5 minutes, then 10 minutes. Get notified between each stage. Useful for longer sessions where you want to take scheduled breaks.
 - Define goals, e.g. "I'll meditate 100 hours this year", and compare your progress against the goal.
 - See statistics like total meditation time, streaks, etc.
-- Export user data (including meditation history) as JSON.
+- Import/Export user data (sessions and goals) as JSON.
 
 > [!WARNING]
 > This app was written with AI assistance. If that bothers you, don't use it.
