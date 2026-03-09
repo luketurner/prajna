@@ -1,19 +1,19 @@
-import type { SQLiteDatabase } from "expo-sqlite";
+import type {
+  CreateSessionInput,
+  ISessionRepository,
+  Session,
+  SessionStats,
+  UpdateSessionInput,
+} from "@/data/repository-interfaces";
 import {
   differenceInCalendarDays,
+  format,
   parseISO,
   startOfDay,
-  format,
   startOfMonth,
   startOfWeek,
 } from "date-fns";
-import type {
-  Session,
-  CreateSessionInput,
-  UpdateSessionInput,
-  SessionStats,
-  ISessionRepository,
-} from "@/data/repository-interfaces";
+import type { SQLiteDatabase } from "expo-sqlite";
 
 interface SessionRow {
   id: number;
@@ -29,7 +29,7 @@ export class SessionRepository implements ISessionRepository {
 
   async getAll(): Promise<Session[]> {
     const sessions = await this.db.getAllAsync<SessionRow>(
-      `SELECT * FROM sessions ORDER BY date DESC, created_at DESC`
+      `SELECT * FROM sessions ORDER BY date DESC, created_at DESC`,
     );
 
     return sessions.map((s) => this.mapRow(s));
@@ -38,7 +38,7 @@ export class SessionRepository implements ISessionRepository {
   async getById(id: number): Promise<Session | null> {
     const session = await this.db.getFirstAsync<SessionRow>(
       `SELECT * FROM sessions WHERE id = ?`,
-      [id]
+      [id],
     );
 
     if (!session) return null;
@@ -48,7 +48,7 @@ export class SessionRepository implements ISessionRepository {
   async create(input: CreateSessionInput): Promise<number> {
     const result = await this.db.runAsync(
       `INSERT INTO sessions (date, duration_seconds, source) VALUES (?, ?, ?)`,
-      [input.date, input.durationSeconds, input.source]
+      [input.date, input.durationSeconds, input.source],
     );
 
     return result.lastInsertRowId;
@@ -57,7 +57,7 @@ export class SessionRepository implements ISessionRepository {
   async update(input: UpdateSessionInput): Promise<void> {
     await this.db.runAsync(
       `UPDATE sessions SET date = ?, duration_seconds = ?, updated_at = datetime('now') WHERE id = ?`,
-      [input.date, input.durationSeconds, input.id]
+      [input.date, input.durationSeconds, input.id],
     );
   }
 
@@ -68,35 +68,50 @@ export class SessionRepository implements ISessionRepository {
   async getStats(): Promise<SessionStats> {
     const now = new Date();
     const monthStart = format(startOfMonth(now), "yyyy-MM-dd");
-    const weekStart = format(startOfWeek(now, { weekStartsOn: 1 }), "yyyy-MM-dd");
+    const weekStart = format(
+      startOfWeek(now, { weekStartsOn: 1 }),
+      "yyyy-MM-dd",
+    );
 
     // Total all time
     const allTimeResult = await this.db.getFirstAsync<{ total: number }>(
-      `SELECT COALESCE(SUM(duration_seconds), 0) as total FROM sessions`
+      `SELECT COALESCE(SUM(duration_seconds), 0) as total FROM sessions`,
     );
     const totalSecondsAllTime = allTimeResult?.total ?? 0;
 
     // Total this month
     const monthResult = await this.db.getFirstAsync<{ total: number }>(
       `SELECT COALESCE(SUM(duration_seconds), 0) as total FROM sessions WHERE date >= ?`,
-      [monthStart]
+      [monthStart],
     );
     const totalSecondsThisMonth = monthResult?.total ?? 0;
 
     // Total this week
     const weekResult = await this.db.getFirstAsync<{ total: number }>(
       `SELECT COALESCE(SUM(duration_seconds), 0) as total FROM sessions WHERE date >= ?`,
-      [weekStart]
+      [weekStart],
     );
     const totalSecondsThisWeek = weekResult?.total ?? 0;
 
     // Count and average
     const countResult = await this.db.getFirstAsync<{ count: number }>(
-      `SELECT COUNT(*) as count FROM sessions`
+      `SELECT COUNT(*) as count FROM sessions`,
     );
     const totalSessions = countResult?.count ?? 0;
     const averageSessionSeconds =
       totalSessions > 0 ? Math.round(totalSecondsAllTime / totalSessions) : 0;
+
+    // Average sessions per day
+    const earliestResult = await this.db.getFirstAsync<{
+      earliest: string | null;
+    }>(`SELECT MIN(date) as earliest FROM sessions`);
+    let averageSessionsPerDay = 0;
+    if (totalSessions > 0 && earliestResult?.earliest) {
+      const daysSinceFirst =
+        differenceInCalendarDays(now, parseISO(earliestResult.earliest)) + 1;
+      averageSessionsPerDay =
+        Math.round((totalSessions / daysSinceFirst) * 10) / 10;
+    }
 
     // Streaks
     const { currentStreak, longestStreak } = await this.calculateStreaks();
@@ -107,6 +122,7 @@ export class SessionRepository implements ISessionRepository {
       totalSecondsThisWeek,
       averageSessionSeconds,
       totalSessions,
+      averageSessionsPerDay,
       currentStreak,
       longestStreak,
     };
@@ -128,7 +144,7 @@ export class SessionRepository implements ISessionRepository {
     longestStreak: number;
   }> {
     const rows = await this.db.getAllAsync<{ date: string }>(
-      `SELECT DISTINCT date FROM sessions ORDER BY date DESC`
+      `SELECT DISTINCT date FROM sessions ORDER BY date DESC`,
     );
 
     if (rows.length === 0) {

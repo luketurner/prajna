@@ -147,6 +147,26 @@ export default function StatsScreen() {
               </View>
             </View>
           </View>
+          <View
+            style={[
+              styles.statRowCard,
+              { backgroundColor: colors.card, borderColor: colors.border },
+            ]}
+          >
+            <View style={styles.statRowContent}>
+              <MaterialIcons name="speed" size={28} color={colors.tint} />
+              <View style={styles.statRowText}>
+                <Text style={[styles.statRowValue, { color: colors.text }]}>
+                  {stats.averageSessionsPerDay.toFixed(2)}
+                </Text>
+                <Text
+                  style={[styles.statRowLabel, { color: colors.textSecondary }]}
+                >
+                  Average Sessions Per Day
+                </Text>
+              </View>
+            </View>
+          </View>
         </View>
       </View>
 

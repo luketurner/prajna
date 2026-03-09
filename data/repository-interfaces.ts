@@ -74,6 +74,7 @@ export interface SessionStats {
   totalSecondsThisWeek: number;
   averageSessionSeconds: number;
   totalSessions: number;
+  averageSessionsPerDay: number;
   currentStreak: number; // consecutive days
   longestStreak: number;
 }
