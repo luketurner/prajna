@@ -1,12 +1,20 @@
-import { View, Text, StyleSheet, useColorScheme, Pressable, Alert, ScrollView } from "react-native";
-import { Directory, File, Paths } from "expo-file-system";
-import { shareAsync } from "expo-sharing";
-import { useRepositories } from "@/data/database-provider";
 import { Colors } from "@/constants/Colors";
+import { useRepositories } from "@/data/database-provider";
 import {
   useNotificationSettings,
   type NotificationType,
 } from "@/hooks/useNotificationSettings";
+import { Directory, File, Paths } from "expo-file-system";
+import { shareAsync } from "expo-sharing";
+import {
+  Alert,
+  Pressable,
+  ScrollView,
+  StyleSheet,
+  Text,
+  useColorScheme,
+  View,
+} from "react-native";
 
 const NOTIFICATION_OPTIONS: { value: NotificationType; label: string }[] = [
   { value: "silent", label: "Silent" },
@@ -87,7 +95,10 @@ export default function SettingsScreen() {
       const data = await prepareExportData();
       const directory = await Directory.pickDirectoryAsync();
       if (!directory) return;
-      const file = directory.createFile("meditation-data.json", "application/json");
+      const file = directory.createFile(
+        "meditation-data.json",
+        "application/json",
+      );
       file.write(data);
       Alert.alert("Saved", "Data exported successfully.");
     } catch {
@@ -104,7 +115,9 @@ export default function SettingsScreen() {
   };
 
   return (
-    <ScrollView style={[styles.container, { backgroundColor: colors.background }]}>
+    <ScrollView
+      style={[styles.container, { backgroundColor: colors.background }]}
+    >
       <Text style={[styles.sectionHeader, { color: colors.textSecondary }]}>
         Notifications
       </Text>
@@ -113,14 +126,22 @@ export default function SettingsScreen() {
         <Text style={[styles.settingLabel, { color: colors.text }]}>
           Stage end
         </Text>
-        <SegmentedControl value={stageEnd} onChange={setStageEnd} colors={colors} />
+        <SegmentedControl
+          value={stageEnd}
+          onChange={setStageEnd}
+          colors={colors}
+        />
       </View>
 
       <View style={styles.settingRow}>
         <Text style={[styles.settingLabel, { color: colors.text }]}>
           Session end
         </Text>
-        <SegmentedControl value={sessionEnd} onChange={setSessionEnd} colors={colors} />
+        <SegmentedControl
+          value={sessionEnd}
+          onChange={setSessionEnd}
+          colors={colors}
+        />
       </View>
 
       <Text
@@ -169,11 +190,12 @@ const styles = StyleSheet.create({
     paddingTop: 24,
   },
   sectionHeader: {
-    fontSize: 13,
+    fontSize: 16,
     fontWeight: "600",
     textTransform: "uppercase",
     letterSpacing: 0.5,
     marginBottom: 12,
+    textAlign: "center",
   },
   settingRow: {
     marginBottom: 16,
