@@ -9,6 +9,7 @@
     "ios": "expo start --ios",
     "web": "expo start --web",
     "lint": "expo lint",
+    "format": "prettier --write .",
     "build:preview": "eas build --platform android --profile preview",
     "build:develop": "eas build --platform android --profile development",
     "deploy": "npx eas-cli@latest workflow:run deploy-to-production.yml"
@@ -53,6 +54,7 @@
     "@types/react": "~19.1.0",
     "eslint": "^9.25.0",
     "eslint-config-expo": "~10.0.0",
+    "prettier": "3.8.1",
     "typescript": "~5.9.2"
   }
 }
