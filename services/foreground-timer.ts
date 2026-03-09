@@ -78,7 +78,7 @@ function computeTimerState(
   const subtitle =
     stages.length > 1
       ? `Stage ${stageIndex + 1} of ${stages.length}`
-      : "Countdown";
+      : "Meditating";
 
   const progressPercent = Math.min(
     100,
