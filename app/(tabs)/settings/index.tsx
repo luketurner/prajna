@@ -134,8 +134,9 @@ export default function SettingsScreen() {
 
   const handleImport = async () => {
     try {
-      const file = await File.pickFileAsync(undefined, "application/json");
-      if (!file) return;
+      const picked = await File.pickFileAsync(undefined, "application/json");
+      if (!picked) return;
+      const file = Array.isArray(picked) ? picked[0] : picked;
       const text = await file.text();
       const json = JSON.parse(text);
 
@@ -164,6 +165,34 @@ export default function SettingsScreen() {
     } catch {
       Alert.alert("Import failed", "Could not import data. Please make sure the file is a valid JSON export.");
     }
+  };
+
+  const handleDeleteAllData = () => {
+    Alert.alert(
+      "Delete all data?",
+      'This will permanently delete all sessions and goals. This cannot be undone.',
+      [
+        { text: "Cancel", style: "cancel" },
+        {
+          text: "Delete",
+          style: "destructive",
+          onPress: async () => {
+            try {
+              await db.withTransactionAsync(async () => {
+                await db.execAsync("DELETE FROM sessions;");
+                await db.execAsync("DELETE FROM goals;");
+              });
+              queryClient.invalidateQueries({ queryKey: queryKeys.sessions.all });
+              queryClient.invalidateQueries({ queryKey: queryKeys.sessions.stats });
+              queryClient.invalidateQueries({ queryKey: queryKeys.goals.all });
+              Alert.alert("Done", "All data has been deleted.");
+            } catch {
+              Alert.alert("Error", "Could not delete data. Please try again.");
+            }
+          },
+        },
+      ],
+    );
   };
 
   return (
@@ -244,6 +273,17 @@ export default function SettingsScreen() {
       >
         <Text style={[styles.exportButtonText, { color: colors.text }]}>
           Import data from JSON
+        </Text>
+      </Pressable>
+      <Pressable
+        onPress={handleDeleteAllData}
+        style={[
+          styles.exportButton,
+          { borderColor: colors.error, marginTop: 12 },
+        ]}
+      >
+        <Text style={[styles.exportButtonText, { color: colors.error }]}>
+          Delete all data
         </Text>
       </Pressable>
     </ScrollView>
