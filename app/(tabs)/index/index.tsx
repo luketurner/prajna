@@ -6,7 +6,6 @@ import { useTimerNotification } from "@/hooks/useTimerNotification";
 import { stopBell } from "@/services/foreground-timer";
 import { MaterialIcons } from "@expo/vector-icons";
 import { useFocusEffect } from "@react-navigation/native";
-import { useKeepAwake } from "expo-keep-awake";
 import { useRouter } from "expo-router";
 import Storage from "expo-sqlite/kv-store";
 import { useCallback, useEffect, useRef, useState } from "react";
@@ -76,9 +75,6 @@ export default function TimerScreen() {
       }
     }, [reset]),
   );
-
-  // Keep screen awake while timer is running
-  useKeepAwake();
 
   // Show recovery dialog when app detects a crashed session
   useEffect(() => {
