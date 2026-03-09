@@ -3,7 +3,11 @@ import { TimerDisplay } from "@/components/TimerDisplay";
 import { Colors } from "@/constants/Colors";
 import { formatElapsedMs, useTimer } from "@/hooks/useTimer";
 import { useTimerNotification } from "@/hooks/useTimerNotification";
-import { stopBell } from "@/services/foreground-timer";
+import { getNotificationSettings } from "@/hooks/useNotificationSettings";
+import {
+  notifyStageCompletions,
+  stopBell,
+} from "@/services/foreground-timer";
 import { MaterialIcons } from "@expo/vector-icons";
 import { useFocusEffect } from "@react-navigation/native";
 import { useRouter } from "expo-router";
@@ -32,6 +36,7 @@ export default function TimerScreen() {
     mode,
     currentStageIndex,
     totalStages,
+    completedStageCount,
     hasRecoveryData,
     recoveredElapsedMs,
     start,
@@ -59,6 +64,23 @@ export default function TimerScreen() {
   });
 
   const navigatedToSaveRef = useRef(false);
+  const prevCompletedCountRef = useRef(0);
+
+  // Play bell in the foreground when stages complete
+  useEffect(() => {
+    if (
+      completedStageCount > prevCompletedCountRef.current &&
+      totalStages > 0
+    ) {
+      notifyStageCompletions(
+        prevCompletedCountRef.current,
+        completedStageCount,
+        totalStages,
+        getNotificationSettings(),
+      );
+    }
+    prevCompletedCountRef.current = completedStageCount;
+  }, [completedStageCount, totalStages]);
 
   // Persist stages whenever they change
   const handleStagesChange = useCallback((value: number[]) => {
@@ -112,6 +134,7 @@ export default function TimerScreen() {
   ]);
 
   const handleStart = async () => {
+    prevCompletedCountRef.current = 0;
     const stagesMs = stagesMinutes.map((m) => m * 60 * 1000);
 
     const permitted = await requestPermissions();
