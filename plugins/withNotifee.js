@@ -20,7 +20,7 @@ module.exports = function withNotifee(config) {
 
     // Check if Notifee ForegroundService is already declared
     const existing = application.service.find(
-      (s) => s.$?.["android:name"] === "app.notifee.core.ForegroundService"
+      (s) => s.$?.["android:name"] === "app.notifee.core.ForegroundService",
     );
 
     if (existing) {
@@ -40,8 +40,7 @@ module.exports = function withNotifee(config) {
 
     // Ensure xmlns:tools is declared on the manifest element
     if (!manifest.manifest.$["xmlns:tools"]) {
-      manifest.manifest.$["xmlns:tools"] =
-        "http://schemas.android.com/tools";
+      manifest.manifest.$["xmlns:tools"] = "http://schemas.android.com/tools";
     }
 
     // Add FOREGROUND_SERVICE_SPECIAL_USE permission (Android 14+)
@@ -52,7 +51,7 @@ module.exports = function withNotifee(config) {
     const mediaPlaybackPermission =
       "android.permission.FOREGROUND_SERVICE_MEDIA_PLAYBACK";
     const hasPermission = permissions.some(
-      (p) => p.$?.["android:name"] === mediaPlaybackPermission
+      (p) => p.$?.["android:name"] === mediaPlaybackPermission,
     );
     if (!hasPermission) {
       permissions.push({

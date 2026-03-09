@@ -8,7 +8,11 @@ export function useSessionStats() {
   const { earliestDateSource } = useStatsSettings();
 
   return useQuery({
-    queryKey: [...queryKeys.sessions.stats, ...queryKeys.goals.all, earliestDateSource],
+    queryKey: [
+      ...queryKeys.sessions.stats,
+      ...queryKeys.goals.all,
+      earliestDateSource,
+    ],
     queryFn: async () => {
       let earliestDate: string | undefined;
       if (earliestDateSource === "earliest_goal") {

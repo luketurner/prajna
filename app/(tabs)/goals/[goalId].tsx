@@ -54,7 +54,7 @@ export default function GoalDetailScreen() {
             }
           },
         },
-      ]
+      ],
     );
   };
 
@@ -139,10 +139,17 @@ export default function GoalDetailScreen() {
   }
 
   return (
-    <ScrollView style={[styles.container, { backgroundColor: colors.background }]}>
+    <ScrollView
+      style={[styles.container, { backgroundColor: colors.background }]}
+    >
       <View style={styles.content}>
         {/* Status Badge */}
-        <View style={[styles.statusBadge, { backgroundColor: statusColor + "20", alignSelf: "flex-start" }]}>
+        <View
+          style={[
+            styles.statusBadge,
+            { backgroundColor: statusColor + "20", alignSelf: "flex-start" },
+          ]}
+        >
           <MaterialIcons name={statusIcon} size={20} color={statusColor} />
           <Text style={[styles.statusText, { color: statusColor }]}>
             {statusText}
@@ -176,7 +183,12 @@ export default function GoalDetailScreen() {
             Progress
           </Text>
           <View style={styles.progressBarWrapper}>
-            <View style={[styles.progressBarBg, { backgroundColor: colors.progressBarBackground }]}>
+            <View
+              style={[
+                styles.progressBarBg,
+                { backgroundColor: colors.progressBarBackground },
+              ]}
+            >
               <View
                 style={[
                   styles.progressBarFill,
@@ -214,12 +226,7 @@ export default function GoalDetailScreen() {
             <Text style={[styles.value, { color: colors.text }]}>
               {formatHours(goal.expectedHours)}
             </Text>
-            <Text
-              style={[
-                styles.deltaText,
-                { color: deltaColor },
-              ]}
-            >
+            <Text style={[styles.deltaText, { color: deltaColor }]}>
               {goal.deltaHours >= 0 ? "+" : "−"}
               {formatHours(Math.abs(goal.deltaHours))} {deltaLabel}
             </Text>
@@ -257,12 +264,20 @@ export default function GoalDetailScreen() {
             style={[styles.actionButton, { backgroundColor: colors.tint }]}
           >
             <MaterialIcons name="edit" size={20} color={colors.background} />
-            <Text style={[styles.actionButtonText, { color: colors.background }]}>Edit</Text>
+            <Text
+              style={[styles.actionButtonText, { color: colors.background }]}
+            >
+              Edit
+            </Text>
           </Pressable>
 
           <Pressable
             onPress={handleDelete}
-            style={[styles.actionButton, styles.deleteButton, { borderColor: colors.error }]}
+            style={[
+              styles.actionButton,
+              styles.deleteButton,
+              { borderColor: colors.error },
+            ]}
             disabled={deleteGoal.isPending}
           >
             <MaterialIcons name="delete" size={20} color={colors.error} />

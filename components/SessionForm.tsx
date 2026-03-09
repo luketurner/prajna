@@ -16,10 +16,7 @@ import { Colors } from "@/constants/Colors";
 interface SessionFormProps {
   initialDate?: string; // ISO date YYYY-MM-DD
   initialDurationMinutes?: number;
-  onSubmit: (data: {
-    date: string;
-    durationSeconds: number;
-  }) => void;
+  onSubmit: (data: { date: string; durationSeconds: number }) => void;
   onCancel: () => void;
   submitLabel?: string;
   isSubmitting?: boolean;
@@ -37,11 +34,11 @@ export function SessionForm({
   const colors = Colors[colorScheme];
 
   const [date, setDate] = useState<Date>(
-    initialDate ? parseISO(initialDate) : new Date()
+    initialDate ? parseISO(initialDate) : new Date(),
   );
   const [showDatePicker, setShowDatePicker] = useState(false);
   const [durationMinutes, setDurationMinutes] = useState(
-    initialDurationMinutes > 0 ? String(initialDurationMinutes) : ""
+    initialDurationMinutes > 0 ? String(initialDurationMinutes) : "",
   );
 
   const handleDateChange = (_: unknown, selectedDate?: Date) => {
@@ -64,7 +61,10 @@ export function SessionForm({
     // Check duration
     const minutes = parseInt(durationMinutes, 10);
     if (isNaN(minutes) || minutes <= 0) {
-      Alert.alert("Invalid Duration", "Duration must be greater than 0 minutes.");
+      Alert.alert(
+        "Invalid Duration",
+        "Duration must be greater than 0 minutes.",
+      );
       return false;
     }
 
@@ -93,7 +93,7 @@ export function SessionForm({
               });
             },
           },
-        ]
+        ],
       );
     } else {
       onSubmit({
@@ -112,7 +112,10 @@ export function SessionForm({
           onPress={() => setShowDatePicker(true)}
           style={[
             styles.input,
-            { backgroundColor: colors.backgroundSecondary, borderColor: colors.border },
+            {
+              backgroundColor: colors.backgroundSecondary,
+              borderColor: colors.border,
+            },
           ]}
         >
           <Text style={[styles.inputText, { color: colors.text }]}>
@@ -157,14 +160,24 @@ export function SessionForm({
       <View style={styles.buttons}>
         <Pressable
           onPress={onCancel}
-          style={[styles.button, styles.cancelButton, { borderColor: colors.border }]}
+          style={[
+            styles.button,
+            styles.cancelButton,
+            { borderColor: colors.border },
+          ]}
           disabled={isSubmitting}
         >
-          <Text style={[styles.buttonText, { color: colors.text }]}>Cancel</Text>
+          <Text style={[styles.buttonText, { color: colors.text }]}>
+            Cancel
+          </Text>
         </Pressable>
         <Pressable
           onPress={handleSubmit}
-          style={[styles.button, styles.submitButton, { backgroundColor: colors.tint }]}
+          style={[
+            styles.button,
+            styles.submitButton,
+            { backgroundColor: colors.tint },
+          ]}
           disabled={isSubmitting}
         >
           <Text style={[styles.buttonText, { color: colors.background }]}>

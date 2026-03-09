@@ -52,7 +52,7 @@ export class GoalRepository implements IGoalRepository {
       WHERE g.id = ?
       GROUP BY g.id
     `,
-      [id]
+      [id],
     );
 
     if (!row) return null;
@@ -62,7 +62,7 @@ export class GoalRepository implements IGoalRepository {
   async create(input: CreateGoalInput): Promise<number> {
     const result = await this.db.runAsync(
       `INSERT INTO goals (target_hours, period_type, start_date, end_date) VALUES (?, ?, ?, ?)`,
-      [input.targetHours, input.periodType, input.startDate, input.endDate]
+      [input.targetHours, input.periodType, input.startDate, input.endDate],
     );
     return result.lastInsertRowId;
   }
@@ -76,7 +76,7 @@ export class GoalRepository implements IGoalRepository {
         input.startDate,
         input.endDate,
         input.id,
-      ]
+      ],
     );
   }
 
@@ -99,7 +99,7 @@ export class GoalRepository implements IGoalRepository {
         : 0;
     const remainingHours = Math.max(
       0,
-      row.target_hours - row.progress_seconds / 3600
+      row.target_hours - row.progress_seconds / 3600,
     );
     const isCompleted = row.progress_seconds >= targetSeconds;
 
@@ -110,7 +110,10 @@ export class GoalRepository implements IGoalRepository {
     const start = parseISO(row.start_date);
     const end = parseISO(row.end_date);
     const totalDays = differenceInCalendarDays(end, start) + 1;
-    const elapsedDays = Math.max(0, differenceInCalendarDays(todayDate, start) + 1);
+    const elapsedDays = Math.max(
+      0,
+      differenceInCalendarDays(todayDate, start) + 1,
+    );
     const fraction = Math.min(1, Math.max(0, elapsedDays / totalDays));
 
     const expectedHours = row.target_hours * fraction;

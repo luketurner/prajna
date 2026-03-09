@@ -136,7 +136,10 @@ export function useTimer(): UseTimerResult {
     // Check for stage advancement within countdown
     if (modeRef.current === "countdown") {
       const newIndex = stageIndexForElapsed(elapsed, thresholds);
-      if (newIndex > currentStageIndexRef.current && newIndex <= stages.length) {
+      if (
+        newIndex > currentStageIndexRef.current &&
+        newIndex <= stages.length
+      ) {
         // Stages were completed
         const newCompleted = newIndex;
         if (newCompleted > completedStageCountRef.current) {
@@ -222,7 +225,7 @@ export function useTimer(): UseTimerResult {
           }
         }
         appStateRef.current = nextAppState;
-      }
+      },
     );
 
     return () => {
@@ -259,7 +262,7 @@ export function useTimer(): UseTimerResult {
       persistState(true);
       startInterval();
     },
-    [persistState, startInterval]
+    [persistState, startInterval],
   );
 
   const stop = useCallback(() => {

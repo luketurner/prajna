@@ -27,7 +27,10 @@ export default function SaveSessionScreen() {
 
   const handleSave = async () => {
     if (durationSeconds <= 0) {
-      Alert.alert("Invalid Duration", "Session duration must be greater than 0.");
+      Alert.alert(
+        "Invalid Duration",
+        "Session duration must be greater than 0.",
+      );
       return;
     }
 
@@ -61,7 +64,7 @@ export default function SaveSessionScreen() {
             router.back();
           },
         },
-      ]
+      ],
     );
   };
 
@@ -78,7 +81,9 @@ export default function SaveSessionScreen() {
       </View>
 
       <View style={styles.dateContainer}>
-        <Text style={[styles.label, { color: colors.textSecondary }]}>Date</Text>
+        <Text style={[styles.label, { color: colors.textSecondary }]}>
+          Date
+        </Text>
         <Text style={[styles.dateText, { color: colors.text }]}>
           {format(new Date(), "EEEE, MMMM d, yyyy")}
         </Text>
@@ -87,7 +92,11 @@ export default function SaveSessionScreen() {
       <View style={styles.buttons}>
         <Pressable
           onPress={handleDiscard}
-          style={[styles.button, styles.discardButton, { borderColor: colors.error }]}
+          style={[
+            styles.button,
+            styles.discardButton,
+            { borderColor: colors.error },
+          ]}
           disabled={createSession.isPending}
         >
           <Text style={[styles.buttonText, { color: colors.error }]}>
@@ -96,7 +105,11 @@ export default function SaveSessionScreen() {
         </Pressable>
         <Pressable
           onPress={handleSave}
-          style={[styles.button, styles.saveButton, { backgroundColor: colors.tint }]}
+          style={[
+            styles.button,
+            styles.saveButton,
+            { backgroundColor: colors.tint },
+          ]}
           disabled={createSession.isPending}
         >
           <Text style={[styles.buttonText, { color: colors.background }]}>

@@ -235,7 +235,6 @@ export default function TimerScreen() {
           Tap stop when you finish meditating
         </Text>
       )}
-
     </ScrollView>
   );
 }

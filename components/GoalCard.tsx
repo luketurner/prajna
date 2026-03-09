@@ -1,4 +1,10 @@
-import { View, Text, Pressable, StyleSheet, useColorScheme } from "react-native";
+import {
+  View,
+  Text,
+  Pressable,
+  StyleSheet,
+  useColorScheme,
+} from "react-native";
 import { format, parseISO } from "date-fns";
 import { MaterialIcons } from "@expo/vector-icons";
 import { Colors } from "@/constants/Colors";
@@ -66,7 +72,10 @@ export function GoalCard({ goal, onPress }: GoalCardProps) {
   return (
     <Pressable
       onPress={onPress}
-      style={[styles.card, { backgroundColor: colors.card, borderColor: colors.border }]}
+      style={[
+        styles.card,
+        { backgroundColor: colors.card, borderColor: colors.border },
+      ]}
       accessibilityRole="button"
       accessibilityLabel={`Goal: ${goal.targetHours} hours, ${Math.round(progressPercent)}% complete${!goal.isCompleted && goal.expectedPercent > 0 ? `, ${formatHours(Math.abs(goal.deltaHours))} ${deltaLabel}` : ""}`}
     >
@@ -80,7 +89,9 @@ export function GoalCard({ goal, onPress }: GoalCardProps) {
             {formatPeriod(goal)}
           </Text>
         </View>
-        <View style={[styles.statusBadge, { backgroundColor: statusColor + "20" }]}>
+        <View
+          style={[styles.statusBadge, { backgroundColor: statusColor + "20" }]}
+        >
           <MaterialIcons name={statusIcon} size={16} color={statusColor} />
           <Text style={[styles.statusText, { color: statusColor }]}>
             {statusText}
@@ -90,7 +101,12 @@ export function GoalCard({ goal, onPress }: GoalCardProps) {
 
       {/* Progress Bar */}
       <View style={styles.progressBarWrapper}>
-        <View style={[styles.progressBarBg, { backgroundColor: colors.progressBarBackground }]}>
+        <View
+          style={[
+            styles.progressBarBg,
+            { backgroundColor: colors.progressBarBackground },
+          ]}
+        >
           <View
             style={[
               styles.progressBarFill,
@@ -153,7 +169,8 @@ export function GoalCard({ goal, onPress }: GoalCardProps) {
         ) : (
           <View style={styles.stat}>
             <Text style={[styles.statValue, { color: deltaColor }]}>
-              {goal.deltaHours >= 0 ? "+" : "−"}{formatHours(Math.abs(goal.deltaHours))}
+              {goal.deltaHours >= 0 ? "+" : "−"}
+              {formatHours(Math.abs(goal.deltaHours))}
             </Text>
             <Text style={[styles.statLabel, { color: deltaColor }]}>
               {deltaLabel}

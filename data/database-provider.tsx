@@ -26,7 +26,7 @@ export function RepositoryProvider({ children }: RepositoryProviderProps) {
       sessionRepository: new SessionRepository(db),
       goalRepository: new GoalRepository(db),
     }),
-    [db]
+    [db],
   );
 
   return (

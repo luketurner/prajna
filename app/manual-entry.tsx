@@ -33,7 +33,9 @@ export default function ManualEntryScreen() {
   };
 
   return (
-    <SafeAreaView style={[styles.container, { backgroundColor: colors.background }]}>
+    <SafeAreaView
+      style={[styles.container, { backgroundColor: colors.background }]}
+    >
       <SessionForm
         onSubmit={handleSubmit}
         onCancel={handleCancel}

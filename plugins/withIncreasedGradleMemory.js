@@ -14,7 +14,7 @@ module.exports = function withIncreasedGradleMemory(config) {
       "-Xmx4096m -XX:MaxMetaspaceSize=512m -XX:+HeapDumpOnOutOfMemoryError -Dfile.encoding=UTF-8";
 
     const existing = config.modResults.find(
-      (item) => item.type === "property" && item.key === jvmArgsKey
+      (item) => item.type === "property" && item.key === jvmArgsKey,
     );
 
     if (existing) {

@@ -55,14 +55,14 @@ export function GoalForm({
   const now = new Date();
 
   const [targetHours, setTargetHours] = useState(
-    initialTargetHours ? String(initialTargetHours) : ""
+    initialTargetHours ? String(initialTargetHours) : "",
   );
   const [periodType, setPeriodType] = useState<PeriodType>(initialPeriodType);
   const [startDate, setStartDate] = useState<Date>(
-    initialStartDate ? parseISO(initialStartDate) : startOfYear(now)
+    initialStartDate ? parseISO(initialStartDate) : startOfYear(now),
   );
   const [endDate, setEndDate] = useState<Date>(
-    initialEndDate ? parseISO(initialEndDate) : endOfYear(now)
+    initialEndDate ? parseISO(initialEndDate) : endOfYear(now),
   );
   const [showStartPicker, setShowStartPicker] = useState(false);
   const [showEndPicker, setShowEndPicker] = useState(false);
@@ -123,9 +123,7 @@ export function GoalForm({
     <ScrollView style={styles.container}>
       {/* Target Hours */}
       <View style={styles.field}>
-        <Text style={[styles.label, { color: colors.text }]}>
-          Target Hours
-        </Text>
+        <Text style={[styles.label, { color: colors.text }]}>Target Hours</Text>
         <TextInput
           value={targetHours}
           onChangeText={setTargetHours}
@@ -166,7 +164,10 @@ export function GoalForm({
               <Text
                 style={[
                   styles.periodOptionText,
-                  { color: periodType === type ? colors.background : colors.text },
+                  {
+                    color:
+                      periodType === type ? colors.background : colors.text,
+                  },
                 ]}
               >
                 {type.charAt(0).toUpperCase() + type.slice(1)}
@@ -239,14 +240,24 @@ export function GoalForm({
       <View style={styles.buttons}>
         <Pressable
           onPress={onCancel}
-          style={[styles.button, styles.cancelButton, { borderColor: colors.border }]}
+          style={[
+            styles.button,
+            styles.cancelButton,
+            { borderColor: colors.border },
+          ]}
           disabled={isSubmitting}
         >
-          <Text style={[styles.buttonText, { color: colors.text }]}>Cancel</Text>
+          <Text style={[styles.buttonText, { color: colors.text }]}>
+            Cancel
+          </Text>
         </Pressable>
         <Pressable
           onPress={handleSubmit}
-          style={[styles.button, styles.submitButton, { backgroundColor: colors.tint }]}
+          style={[
+            styles.button,
+            styles.submitButton,
+            { backgroundColor: colors.tint },
+          ]}
           disabled={isSubmitting}
         >
           <Text style={[styles.buttonText, { color: colors.background }]}>

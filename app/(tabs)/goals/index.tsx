@@ -1,4 +1,10 @@
-import { FlatList, StyleSheet, useColorScheme, View, ActivityIndicator } from "react-native";
+import {
+  FlatList,
+  StyleSheet,
+  useColorScheme,
+  View,
+  ActivityIndicator,
+} from "react-native";
 import { useRouter } from "expo-router";
 import { useGoals } from "@/hooks/useGoals";
 import { GoalCard } from "@/components/GoalCard";
