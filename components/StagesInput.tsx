@@ -68,15 +68,13 @@ export function StagesInput({ stages, onChange, disabled }: StagesInputProps) {
 
   return (
     <View style={styles.container}>
-      <Text style={[styles.label, { color: colors.textSecondary }]}>
-        Stages
-      </Text>
-
       {stages.map((_, index) => (
         <View key={index} style={styles.stageRow}>
-          <Text style={[styles.stageNumber, { color: colors.textSecondary }]}>
-            {index + 1}.
-          </Text>
+          {stages.length > 1 ? (
+            <Text style={[styles.stageNumber, { color: colors.textSecondary }]}>
+              {index + 1}.
+            </Text>
+          ) : null}
           <TextInput
             style={[
               styles.input,
