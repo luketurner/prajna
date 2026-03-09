@@ -54,9 +54,6 @@ export default function StatsScreen() {
     >
       {/* Time Totals */}
       <View style={styles.section}>
-        <Text style={[styles.sectionTitle, { color: colors.text }]}>
-          Time Meditated
-        </Text>
         <View style={styles.statsGrid}>
           <View
             style={[
@@ -109,9 +106,6 @@ export default function StatsScreen() {
 
       {/* Session Stats */}
       <View style={styles.section}>
-        <Text style={[styles.sectionTitle, { color: colors.text }]}>
-          Sessions
-        </Text>
         <View style={styles.statsRow}>
           <View
             style={[
@@ -158,9 +152,6 @@ export default function StatsScreen() {
 
       {/* Streaks */}
       <View style={styles.section}>
-        <Text style={[styles.sectionTitle, { color: colors.text }]}>
-          Streaks
-        </Text>
         <View style={styles.streakRow}>
           <View
             style={[
@@ -224,12 +215,7 @@ const styles = StyleSheet.create({
     paddingBottom: 32,
   },
   section: {
-    marginBottom: 24,
-  },
-  sectionTitle: {
-    fontSize: 18,
-    fontWeight: "700",
-    marginBottom: 12,
+    marginBottom: 10,
   },
   statsGrid: {
     flexDirection: "row",
