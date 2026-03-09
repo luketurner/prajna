@@ -1,15 +1,15 @@
+import { EmptyState } from "@/components/EmptyState";
+import { GoalCard } from "@/components/GoalCard";
+import { Colors } from "@/constants/Colors";
+import { useGoals } from "@/hooks/useGoals";
+import { useRouter } from "expo-router";
 import {
+  ActivityIndicator,
   FlatList,
   StyleSheet,
   useColorScheme,
   View,
-  ActivityIndicator,
 } from "react-native";
-import { useRouter } from "expo-router";
-import { useGoals } from "@/hooks/useGoals";
-import { GoalCard } from "@/components/GoalCard";
-import { EmptyState } from "@/components/EmptyState";
-import { Colors } from "@/constants/Colors";
 
 export default function GoalsScreen() {
   const colorScheme = useColorScheme() ?? "light";

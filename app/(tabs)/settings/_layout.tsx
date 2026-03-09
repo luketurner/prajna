@@ -1,6 +1,6 @@
+import { Colors } from "@/constants/Colors";
 import { Stack } from "expo-router";
 import { useColorScheme } from "react-native";
-import { Colors } from "@/constants/Colors";
 
 export default function SettingsLayout() {
   const colorScheme = useColorScheme() ?? "light";

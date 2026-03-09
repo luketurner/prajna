@@ -1,14 +1,14 @@
+import { SessionForm } from "@/components/SessionForm";
+import { Colors } from "@/constants/Colors";
+import { useSession, useUpdateSession } from "@/hooks/useSessions";
+import { useLocalSearchParams, useRouter } from "expo-router";
 import {
-  View,
-  StyleSheet,
-  useColorScheme,
   ActivityIndicator,
   Alert,
+  StyleSheet,
+  useColorScheme,
+  View,
 } from "react-native";
-import { useRouter, useLocalSearchParams } from "expo-router";
-import { SessionForm } from "@/components/SessionForm";
-import { useSession, useUpdateSession } from "@/hooks/useSessions";
-import { Colors } from "@/constants/Colors";
 
 export default function EditSessionScreen() {
   const colorScheme = useColorScheme() ?? "light";

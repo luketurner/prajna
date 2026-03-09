@@ -1,26 +1,26 @@
-import { useState } from "react";
-import {
-  View,
-  Text,
-  TextInput,
-  Pressable,
-  StyleSheet,
-  useColorScheme,
-  Alert,
-  Platform,
-  ScrollView,
-} from "react-native";
+import { Colors } from "@/constants/Colors";
 import DateTimePicker from "@react-native-community/datetimepicker";
 import {
-  format,
-  parseISO,
-  startOfYear,
-  endOfYear,
-  startOfMonth,
   endOfMonth,
+  endOfYear,
+  format,
   isAfter,
+  parseISO,
+  startOfMonth,
+  startOfYear,
 } from "date-fns";
-import { Colors } from "@/constants/Colors";
+import { useState } from "react";
+import {
+  Alert,
+  Platform,
+  Pressable,
+  ScrollView,
+  StyleSheet,
+  Text,
+  TextInput,
+  useColorScheme,
+  View,
+} from "react-native";
 
 type PeriodType = "year" | "month" | "custom";
 

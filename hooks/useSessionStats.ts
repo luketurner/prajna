@@ -1,7 +1,7 @@
-import { useQuery } from "@tanstack/react-query";
 import { useRepositories } from "@/data/database-provider";
 import { queryKeys } from "@/data/query-keys";
 import { useStatsSettings } from "@/hooks/useStatsSettings";
+import { useQuery } from "@tanstack/react-query";
 
 export function useSessionStats() {
   const { sessionRepository, goalRepository } = useRepositories();

@@ -1,6 +1,6 @@
-import { useState, useRef, useEffect, useCallback, useMemo } from "react";
-import { AppState, type AppStateStatus } from "react-native";
 import Storage from "expo-sqlite/kv-store";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { AppState, type AppStateStatus } from "react-native";
 
 const TIMER_STATE_KEY = "timer_state";
 

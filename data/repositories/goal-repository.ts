@@ -1,17 +1,17 @@
-import type { SQLiteDatabase } from "expo-sqlite";
-import {
-  format,
-  parseISO,
-  isBefore,
-  startOfDay,
-  differenceInCalendarDays,
-} from "date-fns";
 import type {
-  GoalWithProgress,
   CreateGoalInput,
-  UpdateGoalInput,
+  GoalWithProgress,
   IGoalRepository,
+  UpdateGoalInput,
 } from "@/data/repository-interfaces";
+import {
+  differenceInCalendarDays,
+  format,
+  isBefore,
+  parseISO,
+  startOfDay,
+} from "date-fns";
+import type { SQLiteDatabase } from "expo-sqlite";
 
 interface GoalRow {
   id: number;

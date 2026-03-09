@@ -1,5 +1,5 @@
-import { Text, StyleSheet, useColorScheme } from "react-native";
 import { Colors } from "@/constants/Colors";
+import { StyleSheet, Text, useColorScheme } from "react-native";
 
 interface TimerDisplayProps {
   elapsedMs: number;

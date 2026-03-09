@@ -1,11 +1,11 @@
-import { createContext, useContext, useMemo, type ReactNode } from "react";
-import { useSQLiteContext } from "expo-sqlite";
-import { SessionRepository } from "./repositories/session-repository";
-import { GoalRepository } from "./repositories/goal-repository";
 import type {
-  ISessionRepository,
   IGoalRepository,
+  ISessionRepository,
 } from "@/data/repository-interfaces";
+import { useSQLiteContext } from "expo-sqlite";
+import { createContext, useContext, useMemo, type ReactNode } from "react";
+import { GoalRepository } from "./repositories/goal-repository";
+import { SessionRepository } from "./repositories/session-repository";
 
 interface RepositoryContextValue {
   sessionRepository: ISessionRepository;

@@ -1,7 +1,7 @@
-import { Stack, useRouter } from "expo-router";
-import { Pressable, useColorScheme, StyleSheet } from "react-native";
-import { MaterialIcons } from "@expo/vector-icons";
 import { Colors } from "@/constants/Colors";
+import { MaterialIcons } from "@expo/vector-icons";
+import { Stack, useRouter } from "expo-router";
+import { Pressable, StyleSheet, useColorScheme } from "react-native";
 
 export default function GoalsLayout() {
   const colorScheme = useColorScheme() ?? "light";

@@ -1,6 +1,6 @@
-import { View, Text, StyleSheet, useColorScheme } from "react-native";
-import { MaterialIcons } from "@expo/vector-icons";
 import { Colors } from "@/constants/Colors";
+import { MaterialIcons } from "@expo/vector-icons";
+import { StyleSheet, Text, useColorScheme, View } from "react-native";
 
 interface EmptyStateProps {
   icon: keyof typeof MaterialIcons.glyphMap;

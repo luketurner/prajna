@@ -1,5 +1,5 @@
-import { useCallback, useSyncExternalStore } from "react";
 import Storage from "expo-sqlite/kv-store";
+import { useCallback, useSyncExternalStore } from "react";
 
 export type NotificationType = "silent" | "vibrate" | "chime" | "chime_twice";
 

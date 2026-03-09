@@ -1,14 +1,14 @@
-import {
-  View,
-  Text,
-  Pressable,
-  StyleSheet,
-  useColorScheme,
-} from "react-native";
-import { format, parseISO } from "date-fns";
-import { MaterialIcons } from "@expo/vector-icons";
 import { Colors } from "@/constants/Colors";
 import type { GoalWithProgress } from "@/data/repository-interfaces";
+import { MaterialIcons } from "@expo/vector-icons";
+import { format, parseISO } from "date-fns";
+import {
+  Pressable,
+  StyleSheet,
+  Text,
+  useColorScheme,
+  View,
+} from "react-native";
 
 interface GoalCardProps {
   goal: GoalWithProgress;

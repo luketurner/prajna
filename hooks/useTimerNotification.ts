@@ -1,9 +1,9 @@
+import { getNotificationSettings } from "@/hooks/useNotificationSettings";
 import {
   clearForegroundInterval,
   foregroundServiceNotification,
   TIMER_NOTIFICATION_ID,
 } from "@/services/foreground-timer";
-import { getNotificationSettings } from "@/hooks/useNotificationSettings";
 import notifee from "@notifee/react-native";
 import { useCallback } from "react";
 

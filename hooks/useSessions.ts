@@ -1,10 +1,10 @@
-import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useRepositories } from "@/data/database-provider";
 import { queryKeys } from "@/data/query-keys";
 import type {
   CreateSessionInput,
   UpdateSessionInput,
 } from "@/data/repository-interfaces";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 
 export function useSessions() {
   const { sessionRepository } = useRepositories();

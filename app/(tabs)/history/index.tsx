@@ -1,15 +1,15 @@
+import { EmptyState } from "@/components/EmptyState";
+import { SessionCard } from "@/components/SessionCard";
+import { Colors } from "@/constants/Colors";
+import { useSessions } from "@/hooks/useSessions";
+import { useRouter } from "expo-router";
 import {
+  ActivityIndicator,
   FlatList,
   StyleSheet,
   useColorScheme,
   View,
-  ActivityIndicator,
 } from "react-native";
-import { useRouter } from "expo-router";
-import { useSessions } from "@/hooks/useSessions";
-import { SessionCard } from "@/components/SessionCard";
-import { EmptyState } from "@/components/EmptyState";
-import { Colors } from "@/constants/Colors";
 
 export default function HistoryScreen() {
   const colorScheme = useColorScheme() ?? "light";
