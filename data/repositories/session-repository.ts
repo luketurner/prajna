@@ -65,7 +65,7 @@ export class SessionRepository implements ISessionRepository {
     await this.db.runAsync(`DELETE FROM sessions WHERE id = ?`, [id]);
   }
 
-  async getStats(): Promise<SessionStats> {
+  async getStats(earliestDate?: string): Promise<SessionStats> {
     const now = new Date();
     const monthStart = format(startOfMonth(now), "yyyy-MM-dd");
     const weekStart = format(
@@ -102,13 +102,17 @@ export class SessionRepository implements ISessionRepository {
       totalSessions > 0 ? Math.round(totalSecondsAllTime / totalSessions) : 0;
 
     // Average sessions per day
-    const earliestResult = await this.db.getFirstAsync<{
-      earliest: string | null;
-    }>(`SELECT MIN(date) as earliest FROM sessions`);
+    let resolvedEarliest = earliestDate ?? null;
+    if (!resolvedEarliest) {
+      const earliestResult = await this.db.getFirstAsync<{
+        earliest: string | null;
+      }>(`SELECT MIN(date) as earliest FROM sessions`);
+      resolvedEarliest = earliestResult?.earliest ?? null;
+    }
     let averageSessionsPerDay = 0;
-    if (totalSessions > 0 && earliestResult?.earliest) {
+    if (totalSessions > 0 && resolvedEarliest) {
       const daysSinceFirst =
-        differenceInCalendarDays(now, parseISO(earliestResult.earliest)) + 1;
+        differenceInCalendarDays(now, parseISO(resolvedEarliest)) + 1;
       averageSessionsPerDay =
         Math.round((totalSessions / daysSinceFirst) * 10) / 10;
     }

@@ -95,7 +95,7 @@ export interface ISessionRepository {
   create(input: CreateSessionInput): Promise<number>;
   update(input: UpdateSessionInput): Promise<void>;
   delete(id: number): Promise<void>;
-  getStats(): Promise<SessionStats>;
+  getStats(earliestDate?: string): Promise<SessionStats>;
 }
 
 export interface IGoalRepository {
@@ -104,4 +104,5 @@ export interface IGoalRepository {
   create(input: CreateGoalInput): Promise<number>;
   update(input: UpdateGoalInput): Promise<void>;
   delete(id: number): Promise<void>;
+  getEarliestGoalDate(): Promise<string | null>;
 }

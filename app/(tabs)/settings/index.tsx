@@ -4,6 +4,10 @@ import {
   useNotificationSettings,
   type NotificationType,
 } from "@/hooks/useNotificationSettings";
+import {
+  useStatsSettings,
+  type EarliestDateSource,
+} from "@/hooks/useStatsSettings";
 import { Directory, File, Paths } from "expo-file-system";
 import { shareAsync } from "expo-sharing";
 import {
@@ -23,18 +27,25 @@ const NOTIFICATION_OPTIONS: { value: NotificationType; label: string }[] = [
   { value: "chime_twice", label: "Chime ×2" },
 ];
 
-function SegmentedControl({
+const EARLIEST_DATE_OPTIONS: { value: EarliestDateSource; label: string }[] = [
+  { value: "earliest_goal", label: "Earliest goal" },
+  { value: "first_session", label: "First session" },
+];
+
+function SegmentedControl<T extends string>({
+  options,
   value,
   onChange,
   colors,
 }: {
-  value: NotificationType;
-  onChange: (v: NotificationType) => void;
+  options: { value: T; label: string }[];
+  value: T;
+  onChange: (v: T) => void;
   colors: (typeof Colors)["light"];
 }) {
   return (
     <View style={[segStyles.row, { borderColor: colors.border }]}>
-      {NOTIFICATION_OPTIONS.map((opt, i) => {
+      {options.map((opt, i) => {
         const selected = opt.value === value;
         return (
           <Pressable
@@ -67,6 +78,7 @@ export default function SettingsScreen() {
   const { sessionRepository, goalRepository } = useRepositories();
   const { stageEnd, sessionEnd, setStageEnd, setSessionEnd } =
     useNotificationSettings();
+  const { earliestDateSource, setEarliestDateSource } = useStatsSettings();
 
   const prepareExportData = async () => {
     const [sessions, goals] = await Promise.all([
@@ -127,6 +139,7 @@ export default function SettingsScreen() {
           Stage end
         </Text>
         <SegmentedControl
+          options={NOTIFICATION_OPTIONS}
           value={stageEnd}
           onChange={setStageEnd}
           colors={colors}
@@ -138,8 +151,30 @@ export default function SettingsScreen() {
           Session end
         </Text>
         <SegmentedControl
+          options={NOTIFICATION_OPTIONS}
           value={sessionEnd}
           onChange={setSessionEnd}
+          colors={colors}
+        />
+      </View>
+
+      <Text
+        style={[
+          styles.sectionHeader,
+          { color: colors.textSecondary, marginTop: 32 },
+        ]}
+      >
+        Statistics
+      </Text>
+
+      <View style={styles.settingRow}>
+        <Text style={[styles.settingLabel, { color: colors.text }]}>
+          Starting date for stats calculations
+        </Text>
+        <SegmentedControl
+          options={EARLIEST_DATE_OPTIONS}
+          value={earliestDateSource}
+          onChange={setEarliestDateSource}
           colors={colors}
         />
       </View>

@@ -84,6 +84,13 @@ export class GoalRepository implements IGoalRepository {
     await this.db.runAsync(`DELETE FROM goals WHERE id = ?`, [id]);
   }
 
+  async getEarliestGoalDate(): Promise<string | null> {
+    const result = await this.db.getFirstAsync<{ earliest: string | null }>(
+      `SELECT MIN(start_date) as earliest FROM goals`,
+    );
+    return result?.earliest ?? null;
+  }
+
   private mapRowWithProgress(row: GoalRow): GoalWithProgress {
     const targetSeconds = row.target_hours * 3600;
     const progressPercent =
