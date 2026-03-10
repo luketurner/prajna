@@ -9,6 +9,7 @@ import {
   useColorScheme,
   View,
 } from "react-native";
+import { SafeAreaView } from "react-native-safe-area-context";
 
 export default function EditSessionScreen() {
   const colorScheme = useColorScheme() ?? "light";
@@ -49,7 +50,7 @@ export default function EditSessionScreen() {
   }
 
   return (
-    <View style={[styles.container, { backgroundColor: colors.background }]}>
+    <SafeAreaView style={[styles.container, { backgroundColor: colors.background }]}>
       <SessionForm
         initialDate={session.date}
         initialDurationMinutes={Math.floor(session.durationSeconds / 60)}
@@ -58,7 +59,7 @@ export default function EditSessionScreen() {
         submitLabel="Update Session"
         isSubmitting={updateSession.isPending}
       />
-    </View>
+    </SafeAreaView>
   );
 }
 

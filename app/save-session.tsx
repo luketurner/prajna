@@ -7,12 +7,12 @@ import Storage from "expo-sqlite/kv-store";
 import {
   Alert,
   Pressable,
-  ScrollView,
   StyleSheet,
   Text,
   useColorScheme,
   View,
 } from "react-native";
+import { SafeAreaView } from "react-native-safe-area-context";
 
 export default function SaveSessionScreen() {
   const colorScheme = useColorScheme() ?? "light";
@@ -69,9 +69,8 @@ export default function SaveSessionScreen() {
   };
 
   return (
-    <ScrollView
+    <SafeAreaView
       style={[styles.container, { backgroundColor: colors.background }]}
-      contentContainerStyle={styles.content}
     >
       <View style={styles.durationContainer}>
         <Text style={[styles.label, { color: colors.textSecondary }]}>
@@ -117,15 +116,13 @@ export default function SaveSessionScreen() {
           </Text>
         </Pressable>
       </View>
-    </ScrollView>
+    </SafeAreaView>
   );
 }
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-  },
-  content: {
     padding: 24,
   },
   durationContainer: {
