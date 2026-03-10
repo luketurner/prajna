@@ -1,3 +1,4 @@
+import { SegmentedControl } from "@/components/SegmentedControl";
 import { Colors } from "@/constants/Colors";
 import { useRepositories } from "@/data/database-provider";
 import { queryKeys } from "@/data/query-keys";
@@ -39,46 +40,6 @@ const EARLIEST_DATE_OPTIONS: { value: EarliestDateSource; label: string }[] = [
 
 function exportFilename() {
   return `prajna-export-${formatISO(new Date(), { representation: "date" })}.json`;
-}
-
-function SegmentedControl<T extends string>({
-  options,
-  value,
-  onChange,
-  colors,
-}: {
-  options: { value: T; label: string }[];
-  value: T;
-  onChange: (v: T) => void;
-  colors: (typeof Colors)["light"];
-}) {
-  return (
-    <View style={[segStyles.row, { borderColor: colors.border }]}>
-      {options.map((opt, i) => {
-        const selected = opt.value === value;
-        return (
-          <Pressable
-            key={opt.value}
-            onPress={() => onChange(opt.value)}
-            style={[
-              segStyles.segment,
-              selected && { backgroundColor: colors.tint },
-              i > 0 && { borderLeftWidth: 1, borderLeftColor: colors.border },
-            ]}
-          >
-            <Text
-              style={[
-                segStyles.segmentText,
-                { color: selected ? colors.background : colors.text },
-              ]}
-            >
-              {opt.label}
-            </Text>
-          </Pressable>
-        );
-      })}
-    </View>
-  );
 }
 
 export default function SettingsScreen() {
@@ -298,25 +259,6 @@ export default function SettingsScreen() {
     </ScrollView>
   );
 }
-
-const segStyles = StyleSheet.create({
-  row: {
-    flexDirection: "row",
-    borderWidth: 1,
-    borderRadius: 8,
-    overflow: "hidden",
-  },
-  segment: {
-    flex: 1,
-    paddingVertical: 8,
-    alignItems: "center",
-    justifyContent: "center",
-  },
-  segmentText: {
-    fontSize: 13,
-    fontWeight: "600",
-  },
-});
 
 const styles = StyleSheet.create({
   container: {
