@@ -172,8 +172,7 @@ export function notifyStageCompletions(
   for (let i = from; i < to; i++) {
     const isFinal = i === totalStages - 1;
     const notifyType = isFinal ? settings.sessionEnd : settings.stageEnd;
-    const delay = (i - from) * BELL_GAP_MS;
-    setTimeout(() => performNotification(notifyType), delay);
+    performNotification(notifyType);
   }
 }
 
