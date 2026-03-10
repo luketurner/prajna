@@ -24,7 +24,6 @@ What is prajna? It's a Sanskrit word roughly meaning _wisdom_, or _knowledge of 
 
 > Meditation and wisdom are of one essence and not two.
 > Meditation is the body of wisdom, and wisdom is the function of meditation.
->
 > Wherever you find wisdom, you find meditation. And wherever you find meditation, you find wisdom.
 >
 > _The Platform Sutra_
@@ -45,7 +44,7 @@ Non-features:
 - No guided meditations or other "content."
 
 > [!WARNING]
-> This app was written with AI assistance. If that bothers you, don't use it.
+> This app was written with AI assistance. If that bothers you, don't use it. I understand.
 
 ## Installation
 
