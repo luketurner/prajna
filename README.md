@@ -18,6 +18,17 @@ A simple Android app for meditation tracking.
 
 </p>
 
+What is prajna? It's a Sanskrit word roughly meaning _wisdom_, or _knowledge of the truth_.
+
+> Meditation and wisdom are of one essence and not two.
+> Meditation is the body of wisdom, and wisdom is the function of meditation.
+>
+> Wherever you find wisdom, you find meditation. And wherever you find meditation, you find wisdom.
+>
+> _The Platform Sutra_
+
+Set meditation goals. Work towards them day by day. No soundscapes, no guided sessions. Just this single moment. _Om shāntih shāntih shāntih_.
+
 Features:
 
 - Record your meditation sessions in the app, or enter past sessions manually.
