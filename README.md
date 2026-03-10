@@ -51,6 +51,16 @@ Non-features:
 
 Prajna is not distributed on the Google Play Store. To install it, you need to manually download and install the `.apk` file from the [latest release](https://github.com/luketurner/prajna/releases/latest).
 
+## Learn More about Meditation
+
+Meditation can be easy or it can be hard. It can be simple or it can be complicated. It can be physical or it can be mental. It seems like everyone has their own techniques to espouse. What is "true" meditation? That's for you to decide.
+
+If you want to learn more about meditation, consider perusing the following books:
+
+- _Zen Mind, Beginner's Mind_, by Shunryu Suzuki.
+- _The Miracle of Mindfulness_, by Thich Nhat Hanh.
+- _The Tibetan Book of Living and Dying_, by Sogyal Rinpoche.
+
 ## Development
 
 Prajna is written using [React Native](https://reactnative.dev/) and [Expo](https://expo.dev).
