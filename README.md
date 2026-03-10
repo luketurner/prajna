@@ -8,6 +8,8 @@
 
 A simple Android app for meditation tracking.
 
+Set meditation goals. Work towards them day by day. No soundscapes, no guided sessions. Just this single moment. _Om shāntih shāntih shāntih_.
+
 <p style="margin: auto;" align="center" width="100%">
 
 <img width="30%" src="docs/goals.png">
@@ -26,8 +28,6 @@ What is prajna? It's a Sanskrit word roughly meaning _wisdom_, or _knowledge of 
 > Wherever you find wisdom, you find meditation. And wherever you find meditation, you find wisdom.
 >
 > _The Platform Sutra_
-
-Set meditation goals. Work towards them day by day. No soundscapes, no guided sessions. Just this single moment. _Om shāntih shāntih shāntih_.
 
 Features:
 
