@@ -279,8 +279,10 @@ export async function registerForegroundService() {
   await notifee.createChannel({
     id: TIMER_CHANNEL_ID,
     name: "Meditation Timer",
-    importance: AndroidImportance.LOW,
+    importance: AndroidImportance.DEFAULT,
     sound: undefined,
+    visibility: AndroidVisibility.PUBLIC,
+    vibration: false,
   });
 }
 
