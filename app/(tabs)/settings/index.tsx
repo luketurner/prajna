@@ -11,6 +11,7 @@ import {
 } from "@/hooks/useStatsSettings";
 import { importData } from "@/services/import-data";
 import { useQueryClient } from "@tanstack/react-query";
+import { formatISO } from "date-fns";
 import { Directory, File, Paths } from "expo-file-system";
 import { shareAsync } from "expo-sharing";
 import { useSQLiteContext } from "expo-sqlite";
@@ -35,6 +36,10 @@ const EARLIEST_DATE_OPTIONS: { value: EarliestDateSource; label: string }[] = [
   { value: "earliest_goal", label: "Earliest goal" },
   { value: "first_session", label: "First session" },
 ];
+
+function exportFilename() {
+  return `prajna-export-${formatISO(new Date(), { representation: "date" })}.json`;
+}
 
 function SegmentedControl<T extends string>({
   options,
@@ -97,7 +102,7 @@ export default function SettingsScreen() {
   const handleShareData = async () => {
     try {
       const data = await prepareExportData();
-      const file = new File(Paths.cache, "meditation-data.json");
+      const file = new File(Paths.cache, exportFilename());
       file.write(data);
       await shareAsync(file.uri, {
         mimeType: "application/json",
@@ -113,10 +118,7 @@ export default function SettingsScreen() {
       const data = await prepareExportData();
       const directory = await Directory.pickDirectoryAsync();
       if (!directory) return;
-      const file = directory.createFile(
-        "meditation-data.json",
-        "application/json",
-      );
+      const file = directory.createFile(exportFilename(), "application/json");
       file.write(data);
       Alert.alert("Saved", "Data exported successfully.");
     } catch {
@@ -147,7 +149,7 @@ export default function SettingsScreen() {
       if (!Array.isArray(json.sessions) && !Array.isArray(json.goals)) {
         Alert.alert(
           "Invalid format",
-          "The JSON file must contain a \"sessions\" and/or \"goals\" array.",
+          'The JSON file must contain a "sessions" and/or "goals" array.',
         );
         return;
       }
@@ -163,14 +165,17 @@ export default function SettingsScreen() {
         `Imported ${result.sessions} session(s) and ${result.goals} goal(s).`,
       );
     } catch {
-      Alert.alert("Import failed", "Could not import data. Please make sure the file is a valid JSON export.");
+      Alert.alert(
+        "Import failed",
+        "Could not import data. Please make sure the file is a valid JSON export.",
+      );
     }
   };
 
   const handleDeleteAllData = () => {
     Alert.alert(
       "Delete all data?",
-      'This will permanently delete all sessions and goals. This cannot be undone.',
+      "This will permanently delete all sessions and goals. This cannot be undone.",
       [
         { text: "Cancel", style: "cancel" },
         {
@@ -182,8 +187,12 @@ export default function SettingsScreen() {
                 await db.execAsync("DELETE FROM sessions;");
                 await db.execAsync("DELETE FROM goals;");
               });
-              queryClient.invalidateQueries({ queryKey: queryKeys.sessions.all });
-              queryClient.invalidateQueries({ queryKey: queryKeys.sessions.stats });
+              queryClient.invalidateQueries({
+                queryKey: queryKeys.sessions.all,
+              });
+              queryClient.invalidateQueries({
+                queryKey: queryKeys.sessions.stats,
+              });
               queryClient.invalidateQueries({ queryKey: queryKeys.goals.all });
               Alert.alert("Done", "All data has been deleted.");
             } catch {
