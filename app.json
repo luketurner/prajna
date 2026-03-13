@@ -46,7 +46,6 @@
 
       "./plugins/withNotifeeResolution",
       "./plugins/withGradleTimeout",
-      "./plugins/withNotifee",
       "./plugins/withBellSound",
       "./plugins/withIncreasedGradleMemory",
       "expo-asset"

@@ -1,5 +1,4 @@
 import notifee, {
-  AndroidForegroundServiceType,
   AndroidImportance,
   AndroidVisibility,
 } from "@notifee/react-native";
@@ -213,9 +212,6 @@ export async function foregroundServiceNotification({
       chronometerDirection: chronometerDirection ?? "up",
       timestamp: timestamp ?? Date.now(),
       progress,
-      foregroundServiceTypes: [
-        AndroidForegroundServiceType.FOREGROUND_SERVICE_TYPE_MEDIA_PLAYBACK,
-      ],
       pressAction: { id: "default" },
     },
   });
