@@ -4,11 +4,8 @@ import notifee, {
   AndroidVisibility,
 } from "@notifee/react-native";
 
-/** Channel used for the foreground timer notification. */
-export const TIMER_CHANNEL_ID = "meditation-timer-fg";
-
-/** Channel used for chime notifications at stage/session end. */
-export const CHIME_CHANNEL_ID = "meditation-chime";
+/** Channel used for the foreground timer notification (with bell sound). */
+export const TIMER_CHANNEL_ID = "meditation-timer";
 
 /** Notification ID for the foreground service notification. */
 export const TIMER_NOTIFICATION_ID = "meditation-timer-fg-notification";
@@ -125,6 +122,8 @@ export async function registerForegroundService() {
         stages: data?.stages ? JSON.parse(data.stages) : null,
       };
 
+      let previousCompletedStageCount = 0;
+
       async function updateNotification() {
         const elapsedMs = Date.now() - timerData.startTime;
         const state = computeTimerState(
@@ -133,12 +132,18 @@ export async function registerForegroundService() {
           timerData.stages,
         );
 
+        // Detect stage transition — play bell by toggling onlyAlertOnce off
+        const stageJustCompleted =
+          state.completedStageCount > previousCompletedStageCount;
+        previousCompletedStageCount = state.completedStageCount;
+
         try {
           await foregroundServiceNotification({
             subtitle: state.subtitle,
             timestamp: state.timestamp,
             chronometerDirection: state.chronometerDirection,
             progress: state.progress,
+            onlyAlertOnce: !stageJustCompleted,
           });
         } catch {
           // Notification update failed — service may be stopping
@@ -156,21 +161,15 @@ export async function registerForegroundService() {
     });
   });
 
-  // Foreground service channel (silent, ongoing)
+  // Delete legacy channels for upgrading users
+  await notifee.deleteChannel("meditation-timer-fg");
+  await notifee.deleteChannel("meditation-chime");
+
+  // Single channel with bell sound — onlyAlertOnce controls when it plays
   await notifee.createChannel({
     id: TIMER_CHANNEL_ID,
     name: "Meditation Timer",
     importance: AndroidImportance.DEFAULT,
-    sound: undefined,
-    visibility: AndroidVisibility.PUBLIC,
-    vibration: false,
-  });
-
-  // Chime channel — plays bell.mp3 from res/raw
-  await notifee.createChannel({
-    id: CHIME_CHANNEL_ID,
-    name: "Meditation Chime",
-    importance: AndroidImportance.HIGH,
     sound: "bell",
     visibility: AndroidVisibility.PUBLIC,
     vibration: false,
@@ -183,6 +182,7 @@ export async function foregroundServiceNotification({
   chronometerDirection,
   progress,
   data,
+  onlyAlertOnce = true,
 }: {
   subtitle?: string | undefined;
   timestamp?: number | undefined;
@@ -196,6 +196,7 @@ export async function foregroundServiceNotification({
         [key: string]: string | number | object;
       }
     | undefined;
+  onlyAlertOnce?: boolean;
 }) {
   return notifee.displayNotification({
     id: TIMER_NOTIFICATION_ID,
@@ -207,7 +208,7 @@ export async function foregroundServiceNotification({
       visibility: AndroidVisibility.PUBLIC,
       ongoing: true,
       autoCancel: false,
-      onlyAlertOnce: true,
+      onlyAlertOnce,
       showChronometer: true,
       chronometerDirection: chronometerDirection ?? "up",
       timestamp: timestamp ?? Date.now(),

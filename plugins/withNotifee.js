@@ -51,7 +51,6 @@ module.exports = function withNotifee(config) {
 
     const requiredPermissions = [
       "android.permission.FOREGROUND_SERVICE_MEDIA_PLAYBACK",
-      "android.permission.SCHEDULE_EXACT_ALARM",
     ];
 
     for (const perm of requiredPermissions) {

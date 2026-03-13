@@ -2,10 +2,7 @@ import { StagesInput } from "@/components/StagesInput";
 import { TimerDisplay } from "@/components/TimerDisplay";
 import { Colors } from "@/constants/Colors";
 import { formatElapsedMs, useTimer } from "@/hooks/useTimer";
-import {
-  cancelChimeNotifications,
-  useTimerNotification,
-} from "@/hooks/useTimerNotification";
+import { useTimerNotification } from "@/hooks/useTimerNotification";
 import { MaterialIcons } from "@expo/vector-icons";
 import { useFocusEffect } from "@react-navigation/native";
 import { useRouter } from "expo-router";
@@ -127,7 +124,6 @@ export default function TimerScreen() {
   };
 
   const handleStop = () => {
-    cancelChimeNotifications();
     dismissTimerNotification();
     stop();
     navigatedToSaveRef.current = true;
@@ -147,7 +143,6 @@ export default function TimerScreen() {
           text: "Discard",
           style: "destructive",
           onPress: () => {
-            cancelChimeNotifications();
             dismissTimerNotification();
             discard();
           },
