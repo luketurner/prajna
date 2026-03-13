@@ -43,10 +43,11 @@
       ],
       "expo-sqlite",
       "@react-native-community/datetimepicker",
-      "expo-audio",
+
       "./plugins/withNotifeeResolution",
       "./plugins/withGradleTimeout",
       "./plugins/withNotifee",
+      "./plugins/withBellSound",
       "./plugins/withIncreasedGradleMemory",
       "expo-asset"
     ],

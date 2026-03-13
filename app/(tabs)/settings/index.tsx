@@ -3,10 +3,6 @@ import { Colors } from "@/constants/Colors";
 import { useRepositories } from "@/data/database-provider";
 import { queryKeys } from "@/data/query-keys";
 import {
-  useNotificationSettings,
-  type NotificationType,
-} from "@/hooks/useNotificationSettings";
-import {
   useStatsSettings,
   type EarliestDateSource,
 } from "@/hooks/useStatsSettings";
@@ -26,13 +22,6 @@ import {
   View,
 } from "react-native";
 
-const NOTIFICATION_OPTIONS: { value: NotificationType; label: string }[] = [
-  { value: "silent", label: "Silent" },
-  { value: "vibrate", label: "Vibrate" },
-  { value: "chime", label: "Chime" },
-  { value: "chime_twice", label: "Chime ×2" },
-];
-
 const EARLIEST_DATE_OPTIONS: { value: EarliestDateSource; label: string }[] = [
   { value: "earliest_goal", label: "Earliest goal" },
   { value: "first_session", label: "First session" },
@@ -48,8 +37,6 @@ export default function SettingsScreen() {
   const { sessionRepository, goalRepository } = useRepositories();
   const db = useSQLiteContext();
   const queryClient = useQueryClient();
-  const { stageEnd, sessionEnd, setStageEnd, setSessionEnd } =
-    useNotificationSettings();
   const { earliestDateSource, setEarliestDateSource } = useStatsSettings();
 
   const prepareExportData = async () => {
@@ -170,39 +157,6 @@ export default function SettingsScreen() {
       style={[styles.container, { backgroundColor: colors.background }]}
     >
       <Text style={[styles.sectionHeader, { color: colors.textSecondary }]}>
-        Notifications
-      </Text>
-
-      <View style={styles.settingRow}>
-        <Text style={[styles.settingLabel, { color: colors.text }]}>
-          Stage end
-        </Text>
-        <SegmentedControl
-          options={NOTIFICATION_OPTIONS}
-          value={stageEnd}
-          onChange={setStageEnd}
-          colors={colors}
-        />
-      </View>
-
-      <View style={styles.settingRow}>
-        <Text style={[styles.settingLabel, { color: colors.text }]}>
-          Session end
-        </Text>
-        <SegmentedControl
-          options={NOTIFICATION_OPTIONS}
-          value={sessionEnd}
-          onChange={setSessionEnd}
-          colors={colors}
-        />
-      </View>
-
-      <Text
-        style={[
-          styles.sectionHeader,
-          { color: colors.textSecondary, marginTop: 32 },
-        ]}
-      >
         Statistics
       </Text>
 

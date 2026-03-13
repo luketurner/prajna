@@ -43,20 +43,22 @@ module.exports = function withNotifee(config) {
       manifest.manifest.$["xmlns:tools"] = "http://schemas.android.com/tools";
     }
 
-    // Add FOREGROUND_SERVICE_SPECIAL_USE permission (Android 14+)
+    // Add required permissions
     if (!manifest.manifest["uses-permission"]) {
       manifest.manifest["uses-permission"] = [];
     }
     const permissions = manifest.manifest["uses-permission"];
-    const mediaPlaybackPermission =
-      "android.permission.FOREGROUND_SERVICE_MEDIA_PLAYBACK";
-    const hasPermission = permissions.some(
-      (p) => p.$?.["android:name"] === mediaPlaybackPermission,
-    );
-    if (!hasPermission) {
-      permissions.push({
-        $: { "android:name": mediaPlaybackPermission },
-      });
+
+    const requiredPermissions = [
+      "android.permission.FOREGROUND_SERVICE_MEDIA_PLAYBACK",
+      "android.permission.SCHEDULE_EXACT_ALARM",
+    ];
+
+    for (const perm of requiredPermissions) {
+      const has = permissions.some((p) => p.$?.["android:name"] === perm);
+      if (!has) {
+        permissions.push({ $: { "android:name": perm } });
+      }
     }
 
     return config;

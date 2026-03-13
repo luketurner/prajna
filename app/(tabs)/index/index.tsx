@@ -1,10 +1,11 @@
 import { StagesInput } from "@/components/StagesInput";
 import { TimerDisplay } from "@/components/TimerDisplay";
 import { Colors } from "@/constants/Colors";
-import { getNotificationSettings } from "@/hooks/useNotificationSettings";
 import { formatElapsedMs, useTimer } from "@/hooks/useTimer";
-import { useTimerNotification } from "@/hooks/useTimerNotification";
-import { notifyStageCompletions, stopBell } from "@/services/foreground-timer";
+import {
+  cancelChimeNotifications,
+  useTimerNotification,
+} from "@/hooks/useTimerNotification";
 import { MaterialIcons } from "@expo/vector-icons";
 import { useFocusEffect } from "@react-navigation/native";
 import { useRouter } from "expo-router";
@@ -12,7 +13,6 @@ import Storage from "expo-sqlite/kv-store";
 import { useCallback, useEffect, useRef, useState } from "react";
 import {
   Alert,
-  AppState,
   Pressable,
   ScrollView,
   StyleSheet,
@@ -34,7 +34,6 @@ export default function TimerScreen() {
     mode,
     currentStageIndex,
     totalStages,
-    completedStageCount,
     hasRecoveryData,
     recoveredElapsedMs,
     start,
@@ -62,24 +61,6 @@ export default function TimerScreen() {
   });
 
   const navigatedToSaveRef = useRef(false);
-  const prevCompletedCountRef = useRef(0);
-
-  // Play bell in the foreground when stages complete
-  useEffect(() => {
-    if (
-      completedStageCount > prevCompletedCountRef.current &&
-      totalStages > 0 &&
-      AppState.currentState === "active"
-    ) {
-      notifyStageCompletions(
-        prevCompletedCountRef.current,
-        completedStageCount,
-        totalStages,
-        getNotificationSettings(),
-      );
-    }
-    prevCompletedCountRef.current = completedStageCount;
-  }, [completedStageCount, totalStages]);
 
   // Persist stages whenever they change
   const handleStagesChange = useCallback((value: number[]) => {
@@ -133,7 +114,6 @@ export default function TimerScreen() {
   ]);
 
   const handleStart = async () => {
-    prevCompletedCountRef.current = 0;
     const stagesMs = stagesMinutes.map((m) => m * 60 * 1000);
 
     const permitted = await requestPermissions();
@@ -147,7 +127,7 @@ export default function TimerScreen() {
   };
 
   const handleStop = () => {
-    stopBell();
+    cancelChimeNotifications();
     dismissTimerNotification();
     stop();
     navigatedToSaveRef.current = true;
@@ -167,7 +147,7 @@ export default function TimerScreen() {
           text: "Discard",
           style: "destructive",
           onPress: () => {
-            stopBell();
+            cancelChimeNotifications();
             dismissTimerNotification();
             discard();
           },

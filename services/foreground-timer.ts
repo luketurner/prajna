@@ -3,11 +3,12 @@ import notifee, {
   AndroidImportance,
   AndroidVisibility,
 } from "@notifee/react-native";
-import { createAudioPlayer, setAudioModeAsync } from "expo-audio";
-import { AppState, Vibration } from "react-native";
 
 /** Channel used for the foreground timer notification. */
 export const TIMER_CHANNEL_ID = "meditation-timer-fg";
+
+/** Channel used for chime notifications at stage/session end. */
+export const CHIME_CHANNEL_ID = "meditation-chime";
 
 /** Notification ID for the foreground service notification. */
 export const TIMER_NOTIFICATION_ID = "meditation-timer-fg-notification";
@@ -15,8 +16,6 @@ export const TIMER_NOTIFICATION_ID = "meditation-timer-fg-notification";
 interface TimerData {
   startTime: number;
   stages: number[] | null;
-  notifyStageEnd: string;
-  notifySessionEnd: string;
 }
 
 interface TimerState {
@@ -96,101 +95,6 @@ function computeTimerState(
   };
 }
 
-const ALARM_AUTO_STOP_MS = 10000;
-export const BELL_GAP_MS = 500;
-const bellSource = require("@/assets/audio/bell.mp3");
-
-type AudioPlayer = ReturnType<typeof createAudioPlayer>;
-
-const activeTimeouts = new Set<ReturnType<typeof setTimeout>>();
-const activePlayers = new Set<AudioPlayer>();
-
-/**
- * Play the bell sound `times` times, with a gap between consecutive plays.
- * Uses the imperative expo-audio API so it works outside React components.
- */
-function playBell(times: number) {
-  setAudioModeAsync({
-    playsInSilentMode: true,
-    interruptionMode: "mixWithOthers",
-  });
-
-  let remaining = times;
-
-  function playOnce() {
-    if (remaining <= 0) return;
-    remaining--;
-    const player = createAudioPlayer(bellSource);
-    activePlayers.add(player);
-    player.play();
-
-    const timeout = setTimeout(() => {
-      activeTimeouts.delete(timeout);
-      player.pause();
-      player.remove();
-      activePlayers.delete(player);
-      if (remaining > 0) {
-        const gapTimeout = setTimeout(() => {
-          activeTimeouts.delete(gapTimeout);
-          playOnce();
-        }, BELL_GAP_MS);
-        activeTimeouts.add(gapTimeout);
-      }
-    }, ALARM_AUTO_STOP_MS);
-    activeTimeouts.add(timeout);
-  }
-
-  playOnce();
-}
-
-/** Cancel pending bell timeouts. Allow existing bells to continue to play. */
-export function stopBell() {
-  for (const t of activeTimeouts) {
-    clearTimeout(t);
-  }
-  activeTimeouts.clear();
-
-  // for (const p of activePlayers) {
-  //   p.pause();
-  //   p.remove();
-  // }
-  // activePlayers.clear();
-}
-
-/**
- * Perform a notification action based on the notification type setting.
- */
-/**
- * Fire notifications for a range of newly completed stages with staggered timing.
- */
-export function notifyStageCompletions(
-  from: number,
-  to: number,
-  totalStages: number,
-  settings: { stageEnd: string; sessionEnd: string },
-) {
-  for (let i = from; i < to; i++) {
-    const isFinal = i === totalStages - 1;
-    const notifyType = isFinal ? settings.sessionEnd : settings.stageEnd;
-    performNotification(notifyType);
-  }
-}
-
-export function performNotification(type: string) {
-  switch (type) {
-    case "vibrate":
-      Vibration.vibrate(500);
-      break;
-    case "chime":
-      playBell(1);
-      break;
-    case "chime_twice":
-      playBell(2);
-      break;
-    // "silent" — do nothing
-  }
-}
-
 let intervalId: ReturnType<typeof setInterval> | null = null;
 
 /** Clear the foreground service update interval. */
@@ -219,11 +123,7 @@ export async function registerForegroundService() {
       const timerData: TimerData = {
         startTime: Number(data?.startTime ?? Date.now()),
         stages: data?.stages ? JSON.parse(data.stages) : null,
-        notifyStageEnd: data?.notifyStageEnd ?? "chime",
-        notifySessionEnd: data?.notifySessionEnd ?? "chime_twice",
       };
-
-      let prevCompletedCount = 0;
 
       async function updateNotification() {
         const elapsedMs = Date.now() - timerData.startTime;
@@ -232,26 +132,6 @@ export async function registerForegroundService() {
           elapsedMs,
           timerData.stages,
         );
-
-        // Detect stage completions and notify (only when backgrounded;
-        // foreground bell is handled by the React component)
-        if (
-          state.completedStageCount > prevCompletedCount &&
-          state.totalStages > 0
-        ) {
-          if (AppState.currentState !== "active") {
-            notifyStageCompletions(
-              prevCompletedCount,
-              state.completedStageCount,
-              state.totalStages,
-              {
-                stageEnd: timerData.notifyStageEnd,
-                sessionEnd: timerData.notifySessionEnd,
-              },
-            );
-          }
-          prevCompletedCount = state.completedStageCount;
-        }
 
         try {
           await foregroundServiceNotification({
@@ -276,11 +156,22 @@ export async function registerForegroundService() {
     });
   });
 
+  // Foreground service channel (silent, ongoing)
   await notifee.createChannel({
     id: TIMER_CHANNEL_ID,
     name: "Meditation Timer",
     importance: AndroidImportance.DEFAULT,
     sound: undefined,
+    visibility: AndroidVisibility.PUBLIC,
+    vibration: false,
+  });
+
+  // Chime channel — plays bell.mp3 from res/raw
+  await notifee.createChannel({
+    id: CHIME_CHANNEL_ID,
+    name: "Meditation Chime",
+    importance: AndroidImportance.HIGH,
+    sound: "bell",
     visibility: AndroidVisibility.PUBLIC,
     vibration: false,
   });
