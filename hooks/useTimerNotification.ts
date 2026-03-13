@@ -1,6 +1,7 @@
 import {
-  clearForegroundInterval,
+  cancelScheduledBells,
   foregroundServiceNotification,
+  scheduleBellNotifications,
   TIMER_NOTIFICATION_ID,
 } from "@/services/foreground-timer";
 import notifee from "@notifee/react-native";
@@ -15,19 +16,20 @@ export function useTimerNotification() {
   const startTimerNotification = useCallback(
     async (startTime: number, stages: number[] | null): Promise<void> => {
       try {
+        const timed = stages && stages.length > 0;
+        const totalMs = timed
+          ? stages.reduce((sum, s) => sum + s, 0)
+          : 0;
+
         await foregroundServiceNotification({
           subtitle: "Meditating",
-          timestamp: startTime,
-          chronometerDirection: "up",
-          progress:
-            stages && stages.length > 0
-              ? { max: 100, current: 0 }
-              : { indeterminate: true },
-          data: {
-            startTime: String(startTime),
-            stages: stages ? JSON.stringify(stages) : "",
-          },
+          timestamp: timed ? startTime + totalMs : startTime,
+          chronometerDirection: timed ? "down" : "up",
         });
+
+        if (timed) {
+          await scheduleBellNotifications(startTime, stages);
+        }
       } catch {
         // Foreground service failed — app will still work in foreground
       }
@@ -36,7 +38,7 @@ export function useTimerNotification() {
   );
 
   const dismissTimerNotification = useCallback(async (): Promise<void> => {
-    clearForegroundInterval();
+    await cancelScheduledBells();
     try {
       await notifee.stopForegroundService();
     } catch {

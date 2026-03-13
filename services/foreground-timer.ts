@@ -1,6 +1,9 @@
 import notifee, {
+  AlarmType,
   AndroidImportance,
   AndroidVisibility,
+  TimestampTrigger,
+  TriggerType,
 } from "@notifee/react-native";
 
 /** Channel used for the foreground timer notification (with bell sound). */
@@ -9,19 +12,11 @@ export const TIMER_CHANNEL_ID = "meditation-timer";
 /** Notification ID for the foreground service notification. */
 export const TIMER_NOTIFICATION_ID = "meditation-timer-fg-notification";
 
-interface TimerData {
-  startTime: number;
-  stages: number[] | null;
-}
+/** Prefix for scheduled bell notification IDs. */
+const BELL_NOTIFICATION_PREFIX = "meditation-bell-";
 
-interface TimerState {
-  subtitle: string;
-  timestamp: number;
-  chronometerDirection: "up" | "down";
-  completedStageCount: number;
-  totalStages: number;
-  progress: { max: number; current: number } | { indeterminate: true };
-}
+/** IDs of currently scheduled bell trigger notifications. */
+let scheduledBellIds: string[] = [];
 
 function cumulativeThresholds(stages: number[]): number[] {
   const thresholds: number[] = [];
@@ -33,71 +28,58 @@ function cumulativeThresholds(stages: number[]): number[] {
   return thresholds;
 }
 
-function computeTimerState(
+/**
+ * Schedule bell notifications at each stage boundary.
+ * Uses trigger notifications so they fire even if the app process dies.
+ */
+export async function scheduleBellNotifications(
   startTime: number,
-  elapsedMs: number,
   stages: number[] | null,
-): TimerState {
-  if (!stages || stages.length === 0) {
-    return {
-      subtitle: "Meditating",
-      timestamp: startTime,
-      chronometerDirection: "up",
-      completedStageCount: 0,
-      totalStages: 0,
-      progress: { indeterminate: true },
-    };
-  }
+) {
+  if (!stages || stages.length === 0) return;
 
   const thresholds = cumulativeThresholds(stages);
-  const totalMs = thresholds[thresholds.length - 1];
 
-  if (elapsedMs >= totalMs) {
-    return {
-      subtitle: "Overtime",
-      timestamp: startTime + totalMs,
-      chronometerDirection: "up",
-      completedStageCount: stages.length,
-      totalStages: stages.length,
-      progress: { max: 100, current: 100 },
-    };
-  }
-
-  let stageIndex = 0;
   for (let i = 0; i < thresholds.length; i++) {
-    if (elapsedMs < thresholds[i]) {
-      stageIndex = i;
-      break;
-    }
+    const fireTime = startTime + thresholds[i];
+    // Don't schedule bells in the past
+    if (fireTime <= Date.now()) continue;
+
+    const id = `${BELL_NOTIFICATION_PREFIX}${i}`;
+    scheduledBellIds.push(id);
+
+    const trigger: TimestampTrigger = {
+      type: TriggerType.TIMESTAMP,
+      timestamp: fireTime,
+      alarmManager: {
+        type: AlarmType.SET_AND_ALLOW_WHILE_IDLE,
+      },
+    };
+
+    await notifee.createTriggerNotification(
+      {
+        id,
+        title: "Meditation",
+        subtitle: stages.length > 1 ? `Stage ${i + 1} complete` : "Complete",
+        android: {
+          channelId: TIMER_CHANNEL_ID,
+          autoCancel: true,
+          timeoutAfter: 3000,
+          importance: AndroidImportance.DEFAULT,
+          visibility: AndroidVisibility.PUBLIC,
+          pressAction: { id: "default" },
+        },
+      },
+      trigger,
+    );
   }
-
-  const subtitle =
-    stages.length > 1
-      ? `Stage ${stageIndex + 1} of ${stages.length}`
-      : "Meditating";
-
-  const progressPercent = Math.min(
-    100,
-    Math.round((elapsedMs / totalMs) * 100),
-  );
-
-  return {
-    subtitle,
-    timestamp: startTime + thresholds[stageIndex],
-    chronometerDirection: "down",
-    completedStageCount: stageIndex,
-    totalStages: stages.length,
-    progress: { max: 100, current: progressPercent },
-  };
 }
 
-let intervalId: ReturnType<typeof setInterval> | null = null;
-
-/** Clear the foreground service update interval. */
-export function clearForegroundInterval() {
-  if (intervalId !== null) {
-    clearInterval(intervalId);
-    intervalId = null;
+/** Cancel all scheduled bell trigger notifications. */
+export async function cancelScheduledBells() {
+  if (scheduledBellIds.length > 0) {
+    await notifee.cancelTriggerNotifications(scheduledBellIds);
+    scheduledBellIds = [];
   }
 }
 
@@ -111,53 +93,10 @@ export async function registerForegroundService() {
     // No-op: foreground service lifecycle is managed by stopForegroundService()
   });
 
-  notifee.registerForegroundService((notification) => {
-    return new Promise<void>(() => {
-      const data = notification.data as
-        | Record<string, string | undefined>
-        | undefined;
-      const timerData: TimerData = {
-        startTime: Number(data?.startTime ?? Date.now()),
-        stages: data?.stages ? JSON.parse(data.stages) : null,
-      };
-
-      let previousCompletedStageCount = 0;
-
-      async function updateNotification() {
-        const elapsedMs = Date.now() - timerData.startTime;
-        const state = computeTimerState(
-          timerData.startTime,
-          elapsedMs,
-          timerData.stages,
-        );
-
-        // Detect stage transition — play bell by toggling onlyAlertOnce off
-        const stageJustCompleted =
-          state.completedStageCount > previousCompletedStageCount;
-        previousCompletedStageCount = state.completedStageCount;
-
-        try {
-          await foregroundServiceNotification({
-            subtitle: state.subtitle,
-            timestamp: state.timestamp,
-            chronometerDirection: state.chronometerDirection,
-            progress: state.progress,
-            onlyAlertOnce: !stageJustCompleted,
-          });
-        } catch {
-          // Notification update failed — service may be stopping
-        }
-      }
-
-      // Update every second for progress bar
-      intervalId = setInterval(updateNotification, 1000);
-
-      // Fire immediately so the notification shows right away
-      updateNotification();
-
-      // The promise intentionally never resolves — the service runs until
-      // stopForegroundService() is called from the app (dismissTimerNotification).
-    });
+  notifee.registerForegroundService(() => {
+    // The promise intentionally never resolves — the service runs until
+    // stopForegroundService() is called from the app (dismissTimerNotification).
+    return new Promise<void>(() => {});
   });
 
   // Delete legacy channels for upgrading users
@@ -179,23 +118,16 @@ export async function foregroundServiceNotification({
   subtitle,
   timestamp,
   chronometerDirection,
-  progress,
   data,
-  onlyAlertOnce = true,
 }: {
   subtitle?: string | undefined;
   timestamp?: number | undefined;
   chronometerDirection?: "up" | "down" | undefined;
-  progress?:
-    | { max: number; current: number }
-    | { indeterminate: true }
-    | undefined;
   data?:
     | {
         [key: string]: string | number | object;
       }
     | undefined;
-  onlyAlertOnce?: boolean;
 }) {
   return notifee.displayNotification({
     id: TIMER_NOTIFICATION_ID,
@@ -207,11 +139,10 @@ export async function foregroundServiceNotification({
       visibility: AndroidVisibility.PUBLIC,
       ongoing: true,
       autoCancel: false,
-      onlyAlertOnce,
+      onlyAlertOnce: true,
       showChronometer: true,
       chronometerDirection: chronometerDirection ?? "up",
       timestamp: timestamp ?? Date.now(),
-      progress,
       pressAction: { id: "default" },
     },
   });
