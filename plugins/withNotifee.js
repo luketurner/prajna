@@ -49,9 +49,7 @@ module.exports = function withNotifee(config) {
     }
     const permissions = manifest.manifest["uses-permission"];
 
-    const requiredPermissions = [
-      "android.permission.FOREGROUND_SERVICE_MEDIA_PLAYBACK",
-    ];
+    const requiredPermissions = [];
 
     for (const perm of requiredPermissions) {
       const has = permissions.some((p) => p.$?.["android:name"] === perm);
