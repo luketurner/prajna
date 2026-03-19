@@ -2,9 +2,11 @@ import notifee, {
   AlarmType,
   AndroidImportance,
   AndroidVisibility,
+  EventType,
   TimestampTrigger,
   TriggerType,
 } from "@notifee/react-native";
+import Storage from "expo-sqlite/kv-store";
 
 /** Channel used for the foreground timer notification. */
 export const TIMER_CHANNEL_ID = "meditation-timer";
@@ -17,6 +19,9 @@ export const TIMER_NOTIFICATION_ID = "meditation-timer-fg-notification";
 
 /** Prefix for scheduled bell notification IDs. */
 const BELL_NOTIFICATION_PREFIX = "meditation-chime-";
+
+/** KV store key set when the timer is stopped from the notification action button. */
+export const STOPPED_EXTERNALLY_KEY = "timer_stopped_externally";
 
 /** IDs of currently scheduled bell trigger notifications. */
 let scheduledBellIds: string[] = [];
@@ -92,9 +97,21 @@ export async function cancelScheduledBells() {
  * Must be called at app startup, outside of any React component.
  */
 export async function registerForegroundService() {
-  // Required by Notifee — must be registered even if we don't use background events
-  notifee.onBackgroundEvent(async () => {
-    // No-op: foreground service lifecycle is managed by stopForegroundService()
+  notifee.onBackgroundEvent(async ({ type, detail }) => {
+    if (
+      type === EventType.ACTION_PRESS &&
+      detail.pressAction?.id === "stop"
+    ) {
+      // Write elapsed time so the app can reconcile when it returns to foreground
+      const data = detail.notification?.data;
+      const startTime = data?.startTime ? Number(data.startTime) : null;
+      const elapsed = startTime ? (Date.now() - startTime).toString() : "0";
+      Storage.setItemSync(STOPPED_EXTERNALLY_KEY, elapsed);
+
+      await cancelScheduledBells();
+      await notifee.stopForegroundService();
+      await notifee.cancelNotification(TIMER_NOTIFICATION_ID);
+    }
   });
 
   notifee.registerForegroundService(() => {
@@ -150,6 +167,7 @@ export async function foregroundServiceNotification({
       chronometerDirection: chronometerDirection ?? "up",
       timestamp: timestamp ?? Date.now(),
       pressAction: { id: "default" },
+      actions: [{ title: "Stop", pressAction: { id: "stop" } }],
     },
   });
 }

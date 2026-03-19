@@ -3,6 +3,8 @@ import { TimerDisplay } from "@/components/TimerDisplay";
 import { Colors } from "@/constants/Colors";
 import { formatElapsedMs, useTimer } from "@/hooks/useTimer";
 import { useTimerNotification } from "@/hooks/useTimerNotification";
+import { STOPPED_EXTERNALLY_KEY } from "@/services/foreground-timer";
+import notifee, { EventType } from "@notifee/react-native";
 import { MaterialIcons } from "@expo/vector-icons";
 import { useFocusEffect } from "@react-navigation/native";
 import { useRouter } from "expo-router";
@@ -10,6 +12,7 @@ import Storage from "expo-sqlite/kv-store";
 import { useCallback, useEffect, useRef, useState } from "react";
 import {
   Alert,
+  AppState,
   Pressable,
   ScrollView,
   StyleSheet,
@@ -110,6 +113,51 @@ export default function TimerScreen() {
     discardRecovery,
     router,
   ]);
+
+  // Handle "Stop" action press while app is in the foreground
+  useEffect(() => {
+    return notifee.onForegroundEvent(({ type, detail }) => {
+      if (
+        type === EventType.ACTION_PRESS &&
+        detail.pressAction?.id === "stop"
+      ) {
+        handleStopRef.current();
+      }
+    });
+  }, []);
+
+  // Ref to always have the latest handleStop without re-subscribing
+  const handleStopRef = useRef(() => {});
+  useEffect(() => {
+    handleStopRef.current = () => {
+      dismissTimerNotification();
+      stop();
+      navigatedToSaveRef.current = true;
+      router.push({
+        pathname: "/save-session" as never,
+        params: { durationMs: elapsedMs.toString() },
+      });
+    };
+  }, [dismissTimerNotification, stop, router, elapsedMs]);
+
+  // Reconcile when returning from background after external stop
+  useEffect(() => {
+    const subscription = AppState.addEventListener("change", (state) => {
+      if (state === "active") {
+        const stoppedElapsed = Storage.getItemSync(STOPPED_EXTERNALLY_KEY);
+        if (stoppedElapsed != null) {
+          Storage.removeItemSync(STOPPED_EXTERNALLY_KEY);
+          stop();
+          navigatedToSaveRef.current = true;
+          router.push({
+            pathname: "/save-session" as never,
+            params: { durationMs: stoppedElapsed },
+          });
+        }
+      }
+    });
+    return () => subscription.remove();
+  }, [stop, router]);
 
   const handleStart = async () => {
     const stagesMs = stagesMinutes.map((m) => m * 60 * 1000);

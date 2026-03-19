@@ -79,6 +79,7 @@ export function useTimerNotification() {
           title: "Meditating",
           timestamp: timed ? startTime + totalMs : startTime,
           chronometerDirection: timed ? "down" : "up",
+          data: { startTime: startTime.toString() },
         });
       } catch {
         // Foreground service failed — app will still work in foreground
