@@ -17,9 +17,7 @@ export function useTimerNotification() {
     async (startTime: number, stages: number[] | null): Promise<void> => {
       try {
         const timed = stages && stages.length > 0;
-        const totalMs = timed
-          ? stages.reduce((sum, s) => sum + s, 0)
-          : 0;
+        const totalMs = timed ? stages.reduce((sum, s) => sum + s, 0) : 0;
 
         await foregroundServiceNotification({
           subtitle: "Meditating",

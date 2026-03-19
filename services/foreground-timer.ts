@@ -6,14 +6,17 @@ import notifee, {
   TriggerType,
 } from "@notifee/react-native";
 
-/** Channel used for the foreground timer notification (with bell sound). */
+/** Channel used for the foreground timer notification. */
 export const TIMER_CHANNEL_ID = "meditation-timer";
+
+/** Channel used for the chime notifications after each stage/session */
+export const CHIME_CHANNEL_ID = "meditation-chime";
 
 /** Notification ID for the foreground service notification. */
 export const TIMER_NOTIFICATION_ID = "meditation-timer-fg-notification";
 
 /** Prefix for scheduled bell notification IDs. */
-const BELL_NOTIFICATION_PREFIX = "meditation-bell-";
+const BELL_NOTIFICATION_PREFIX = "meditation-chime-";
 
 /** IDs of currently scheduled bell trigger notifications. */
 let scheduledBellIds: string[] = [];
@@ -62,7 +65,7 @@ export async function scheduleBellNotifications(
         title: "Meditation",
         subtitle: stages.length > 1 ? `Stage ${i + 1} complete` : "Complete",
         android: {
-          channelId: TIMER_CHANNEL_ID,
+          channelId: CHIME_CHANNEL_ID,
           autoCancel: true,
           timeoutAfter: 3000,
           importance: AndroidImportance.DEFAULT,
@@ -99,16 +102,19 @@ export async function registerForegroundService() {
     return new Promise<void>(() => {});
   });
 
-  // Delete legacy channels for upgrading users
-  await notifee.deleteChannel("meditation-timer-fg");
-  await notifee.deleteChannel("meditation-chime");
+  await notifee.createChannel({
+    id: CHIME_CHANNEL_ID,
+    name: "Meditation Chime",
+    importance: AndroidImportance.DEFAULT,
+    sound: "bell",
+    visibility: AndroidVisibility.PUBLIC,
+    vibration: false,
+  });
 
-  // Single channel with bell sound — onlyAlertOnce controls when it plays
   await notifee.createChannel({
     id: TIMER_CHANNEL_ID,
     name: "Meditation Timer",
     importance: AndroidImportance.DEFAULT,
-    sound: "bell",
     visibility: AndroidVisibility.PUBLIC,
     vibration: false,
   });
@@ -139,7 +145,6 @@ export async function foregroundServiceNotification({
       visibility: AndroidVisibility.PUBLIC,
       ongoing: true,
       autoCancel: false,
-      onlyAlertOnce: true,
       showChronometer: true,
       chronometerDirection: chronometerDirection ?? "up",
       timestamp: timestamp ?? Date.now(),
