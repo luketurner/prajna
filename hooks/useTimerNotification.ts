@@ -4,8 +4,24 @@ import {
   scheduleBellNotifications,
   TIMER_NOTIFICATION_ID,
 } from "@/services/foreground-timer";
-import notifee from "@notifee/react-native";
+import notifee, {
+  AlarmType,
+  AndroidNotificationSetting,
+} from "@notifee/react-native";
 import { useCallback } from "react";
+import { Alert, AppState } from "react-native";
+
+/** Returns a promise that resolves the next time the app comes to the foreground. */
+function waitForForeground(): Promise<void> {
+  return new Promise((resolve) => {
+    const subscription = AppState.addEventListener("change", (state) => {
+      if (state === "active") {
+        subscription.remove();
+        resolve();
+      }
+    });
+  });
+}
 
 export function useTimerNotification() {
   const requestPermissions = useCallback(async (): Promise<boolean> => {
@@ -13,8 +29,48 @@ export function useTimerNotification() {
     return settings.authorizationStatus >= 1; // AUTHORIZED or PROVISIONAL
   }, []);
 
+  const ensureAlarmPermission = useCallback(async (): Promise<AlarmType> => {
+    const settings = await notifee.getNotificationSettings();
+    if (settings.android.alarm === AndroidNotificationSetting.ENABLED) {
+      return AlarmType.SET_EXACT_AND_ALLOW_WHILE_IDLE;
+    }
+
+    return new Promise<AlarmType>((resolve) => {
+      Alert.alert(
+        "Alarms & Reminders Permission",
+        'To play chimes at the right times during your session, this app needs the "Alarms & reminders" permission. Without it, chimes may be delayed by up to several minutes.',
+        [
+          {
+            text: "Skip",
+            style: "cancel",
+            onPress: () => resolve(AlarmType.SET_AND_ALLOW_WHILE_IDLE),
+          },
+          {
+            text: "Open Settings",
+            onPress: async () => {
+              await notifee.openAlarmPermissionSettings();
+              await waitForForeground();
+              const updated = await notifee.getNotificationSettings();
+              if (
+                updated.android.alarm === AndroidNotificationSetting.ENABLED
+              ) {
+                resolve(AlarmType.SET_EXACT_AND_ALLOW_WHILE_IDLE);
+              } else {
+                resolve(AlarmType.SET_AND_ALLOW_WHILE_IDLE);
+              }
+            },
+          },
+        ],
+      );
+    });
+  }, []);
+
   const startTimerNotification = useCallback(
-    async (startTime: number, stages: number[] | null): Promise<void> => {
+    async (
+      startTime: number,
+      stages: number[] | null,
+      alarmType: AlarmType = AlarmType.SET_EXACT_AND_ALLOW_WHILE_IDLE,
+    ): Promise<void> => {
       const timed = stages && stages.length > 0;
       const totalMs = timed ? stages.reduce((sum, s) => sum + s, 0) : 0;
 
@@ -30,7 +86,7 @@ export function useTimerNotification() {
 
       if (timed) {
         try {
-          await scheduleBellNotifications(startTime, stages);
+          await scheduleBellNotifications(startTime, stages, alarmType);
         } catch (e) {
           console.warn("Failed to schedule bell notifications:", e);
         }
@@ -55,6 +111,7 @@ export function useTimerNotification() {
 
   return {
     requestPermissions,
+    ensureAlarmPermission,
     startTimerNotification,
     dismissTimerNotification,
   };

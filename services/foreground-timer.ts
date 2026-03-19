@@ -1,7 +1,6 @@
 import notifee, {
   AlarmType,
   AndroidImportance,
-  AndroidNotificationSetting,
   AndroidVisibility,
   TimestampTrigger,
   TriggerType,
@@ -39,20 +38,9 @@ function cumulativeThresholds(stages: number[]): number[] {
 export async function scheduleBellNotifications(
   startTime: number,
   stages: number[] | null,
+  alarmType: AlarmType = AlarmType.SET_EXACT_AND_ALLOW_WHILE_IDLE,
 ) {
   if (!stages || stages.length === 0) return;
-
-  let alarmType = AlarmType.SET_EXACT_AND_ALLOW_WHILE_IDLE;
-
-  const settings = await notifee.getNotificationSettings();
-  if (settings.android.alarm !== AndroidNotificationSetting.ENABLED) {
-    await notifee.openAlarmPermissionSettings();
-    // Re-check after user returns from settings
-    const updated = await notifee.getNotificationSettings();
-    if (updated.android.alarm !== AndroidNotificationSetting.ENABLED) {
-      alarmType = AlarmType.SET_AND_ALLOW_WHILE_IDLE;
-    }
-  }
 
   const thresholds = cumulativeThresholds(stages);
 

@@ -42,6 +42,7 @@ export default function TimerScreen() {
   } = useTimer();
   const {
     requestPermissions,
+    ensureAlarmPermission,
     startTimerNotification,
     dismissTimerNotification,
   } = useTimerNotification();
@@ -114,12 +115,13 @@ export default function TimerScreen() {
     const stagesMs = stagesMinutes.map((m) => m * 60 * 1000);
 
     const permitted = await requestPermissions();
+    const alarmType = await ensureAlarmPermission();
 
     const startTime = Date.now();
     start(stagesMs);
 
     if (permitted) {
-      startTimerNotification(startTime, stagesMs);
+      startTimerNotification(startTime, stagesMs, alarmType);
     }
   };
 
