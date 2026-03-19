@@ -222,12 +222,6 @@ export default function TimerScreen() {
           </View>
         )}
       </View>
-
-      {isRunning && (
-        <Text style={[styles.hint, { color: colors.textSecondary }]}>
-          Tap stop when you finish meditating
-        </Text>
-      )}
     </ScrollView>
   );
 }
