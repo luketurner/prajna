@@ -1,6 +1,7 @@
 import notifee, {
   AlarmType,
   AndroidImportance,
+  AndroidNotificationSetting,
   AndroidVisibility,
   TimestampTrigger,
   TriggerType,
@@ -41,6 +42,18 @@ export async function scheduleBellNotifications(
 ) {
   if (!stages || stages.length === 0) return;
 
+  let alarmType = AlarmType.SET_EXACT_AND_ALLOW_WHILE_IDLE;
+
+  const settings = await notifee.getNotificationSettings();
+  if (settings.android.alarm !== AndroidNotificationSetting.ENABLED) {
+    await notifee.openAlarmPermissionSettings();
+    // Re-check after user returns from settings
+    const updated = await notifee.getNotificationSettings();
+    if (updated.android.alarm !== AndroidNotificationSetting.ENABLED) {
+      alarmType = AlarmType.SET_AND_ALLOW_WHILE_IDLE;
+    }
+  }
+
   const thresholds = cumulativeThresholds(stages);
 
   for (let i = 0; i < thresholds.length; i++) {
@@ -55,7 +68,7 @@ export async function scheduleBellNotifications(
       type: TriggerType.TIMESTAMP,
       timestamp: fireTime,
       alarmManager: {
-        type: AlarmType.SET_AND_ALLOW_WHILE_IDLE,
+        type: alarmType,
       },
     };
 
@@ -67,7 +80,7 @@ export async function scheduleBellNotifications(
         android: {
           channelId: CHIME_CHANNEL_ID,
           autoCancel: true,
-          timeoutAfter: 3000,
+          timeoutAfter: 10000,
           importance: AndroidImportance.DEFAULT,
           visibility: AndroidVisibility.PUBLIC,
           pressAction: { id: "default" },
@@ -121,12 +134,12 @@ export async function registerForegroundService() {
 }
 
 export async function foregroundServiceNotification({
-  subtitle,
+  title,
   timestamp,
   chronometerDirection,
   data,
 }: {
-  subtitle?: string | undefined;
+  title?: string | undefined;
   timestamp?: number | undefined;
   chronometerDirection?: "up" | "down" | undefined;
   data?:
@@ -137,7 +150,7 @@ export async function foregroundServiceNotification({
 }) {
   return notifee.displayNotification({
     id: TIMER_NOTIFICATION_ID,
-    subtitle,
+    title,
     data,
     android: {
       channelId: TIMER_CHANNEL_ID,

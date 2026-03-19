@@ -15,21 +15,25 @@ export function useTimerNotification() {
 
   const startTimerNotification = useCallback(
     async (startTime: number, stages: number[] | null): Promise<void> => {
-      try {
-        const timed = stages && stages.length > 0;
-        const totalMs = timed ? stages.reduce((sum, s) => sum + s, 0) : 0;
+      const timed = stages && stages.length > 0;
+      const totalMs = timed ? stages.reduce((sum, s) => sum + s, 0) : 0;
 
+      try {
         await foregroundServiceNotification({
-          subtitle: "Meditating",
+          title: "Meditating",
           timestamp: timed ? startTime + totalMs : startTime,
           chronometerDirection: timed ? "down" : "up",
         });
-
-        if (timed) {
-          await scheduleBellNotifications(startTime, stages);
-        }
       } catch {
         // Foreground service failed — app will still work in foreground
+      }
+
+      if (timed) {
+        try {
+          await scheduleBellNotifications(startTime, stages);
+        } catch (e) {
+          console.warn("Failed to schedule bell notifications:", e);
+        }
       }
     },
     [],
