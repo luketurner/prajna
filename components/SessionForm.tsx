@@ -172,16 +172,21 @@ export function SessionForm({
             Cancel
           </Text>
         </Pressable>
-        <GoldShimmer
-          mode="view"
-          style={[styles.button, styles.submitButton, { borderRadius: 8 }]}
+        <Pressable
+          onPress={handleSubmit}
+          disabled={isSubmitting}
+          style={[
+            styles.button,
+            styles.submitButton,
+            { borderRadius: 8, backgroundColor: colors.primaryButton },
+          ]}
         >
-          <Pressable onPress={handleSubmit} disabled={isSubmitting}>
-            <Text style={[styles.buttonText, { color: colors.background }]}>
+          <GoldShimmer mode="text">
+            <Text style={[styles.buttonText, { fontWeight: "bold" }]}>
               {isSubmitting ? "Saving..." : submitLabel}
             </Text>
-          </Pressable>
-        </GoldShimmer>
+          </GoldShimmer>
+        </Pressable>
       </View>
     </View>
   );

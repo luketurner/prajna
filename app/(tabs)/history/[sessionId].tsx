@@ -121,19 +121,22 @@ export default function SessionDetailScreen() {
 
         {/* Actions */}
         <View style={styles.actions}>
-          <GoldShimmer
-            mode="view"
-            style={[styles.actionButton, { borderRadius: 12 }]}
+          <Pressable
+            onPress={handleEdit}
+            style={[
+              styles.actionButton,
+              { borderRadius: 12, backgroundColor: colors.primaryButton },
+            ]}
           >
-            <Pressable onPress={handleEdit} style={styles.actionButtonInner}>
-              <MaterialIcons name="edit" size={20} color={colors.background} />
-              <Text
-                style={[styles.actionButtonText, { color: colors.background }]}
-              >
+            <GoldShimmer mode="icon">
+              <MaterialIcons name="edit" size={20} color="#C3BC9B" />
+            </GoldShimmer>
+            <GoldShimmer mode="text">
+              <Text style={[styles.actionButtonText, { fontWeight: "bold" }]}>
                 Edit
               </Text>
-            </Pressable>
-          </GoldShimmer>
+            </GoldShimmer>
+          </Pressable>
 
           <Pressable
             onPress={handleDelete}
@@ -198,12 +201,6 @@ const styles = StyleSheet.create({
     gap: 8,
     paddingVertical: 14,
     borderRadius: 12,
-  },
-  actionButtonInner: {
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "center",
-    gap: 8,
   },
   deleteButton: {
     backgroundColor: "transparent",

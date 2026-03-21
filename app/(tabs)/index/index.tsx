@@ -5,8 +5,8 @@ import { Colors } from "@/constants/Colors";
 import { formatElapsedMs, useTimer } from "@/hooks/useTimer";
 import { useTimerNotification } from "@/hooks/useTimerNotification";
 import { STOPPED_EXTERNALLY_KEY } from "@/services/foreground-timer";
-import notifee, { EventType } from "@notifee/react-native";
 import { MaterialIcons } from "@expo/vector-icons";
+import notifee, { EventType } from "@notifee/react-native";
 import { useFocusEffect } from "@react-navigation/native";
 import { useRouter } from "expo-router";
 import Storage from "expo-sqlite/kv-store";
@@ -249,7 +249,7 @@ export default function TimerScreen() {
               <MaterialIcons
                 name="play-arrow"
                 size={48}
-                color={colors.background}
+                color={colors.primaryButton}
               />
             </Pressable>
           </GoldShimmer>
@@ -274,7 +274,11 @@ export default function TimerScreen() {
                 accessibilityLabel="Stop and save session"
                 accessibilityRole="button"
               >
-                <MaterialIcons name="stop" size={48} color={colors.background} />
+                <MaterialIcons
+                  name="stop"
+                  size={48}
+                  color={colors.primaryButton}
+                />
               </Pressable>
             </GoldShimmer>
           </View>

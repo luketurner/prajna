@@ -1,4 +1,5 @@
 import { GoldShimmer } from "@/components/GoldShimmer";
+import { SegmentedControl } from "@/components/SegmentedControl";
 import { Colors } from "@/constants/Colors";
 import DateTimePicker from "@react-native-community/datetimepicker";
 import {
@@ -145,43 +146,16 @@ export function GoalForm({
       {/* Period Type Selector */}
       <View style={styles.field}>
         <Text style={[styles.label, { color: colors.text }]}>Period</Text>
-        <View style={styles.periodSelector}>
-          {(["year", "month", "custom"] as PeriodType[]).map((type) => {
-            const selected = periodType === type;
-            return (
-              <Pressable
-                key={type}
-                onPress={() => handlePeriodTypeChange(type)}
-                style={[
-                  styles.periodOption,
-                  {
-                    backgroundColor: selected
-                      ? undefined
-                      : colors.backgroundSecondary,
-                    borderColor: selected ? "transparent" : colors.border,
-                    overflow: "hidden",
-                  },
-                ]}
-              >
-                {selected && (
-                  <GoldShimmer mode="view" style={StyleSheet.absoluteFill}>
-                    <View />
-                  </GoldShimmer>
-                )}
-                <Text
-                  style={[
-                    styles.periodOptionText,
-                    {
-                      color: selected ? colors.background : colors.text,
-                    },
-                  ]}
-                >
-                  {type.charAt(0).toUpperCase() + type.slice(1)}
-                </Text>
-              </Pressable>
-            );
-          })}
-        </View>
+        <SegmentedControl
+          options={[
+            { value: "year" as PeriodType, label: "Year" },
+            { value: "month" as PeriodType, label: "Month" },
+            { value: "custom" as PeriodType, label: "Custom" },
+          ]}
+          value={periodType}
+          onChange={handlePeriodTypeChange}
+          colors={colors}
+        />
       </View>
 
       {/* Date Range (always shown, but only editable for 'custom') */}
@@ -258,16 +232,21 @@ export function GoalForm({
             Cancel
           </Text>
         </Pressable>
-        <GoldShimmer
-          mode="view"
-          style={[styles.button, styles.submitButton, { borderRadius: 8 }]}
+        <Pressable
+          onPress={handleSubmit}
+          disabled={isSubmitting}
+          style={[
+            styles.button,
+            styles.submitButton,
+            { borderRadius: 8, backgroundColor: colors.primaryButton },
+          ]}
         >
-          <Pressable onPress={handleSubmit} disabled={isSubmitting}>
-            <Text style={[styles.buttonText, { color: colors.background }]}>
+          <GoldShimmer mode="text">
+            <Text style={[styles.buttonText, { fontWeight: "bold" }]}>
               {isSubmitting ? "Saving..." : submitLabel}
             </Text>
-          </Pressable>
-        </GoldShimmer>
+          </GoldShimmer>
+        </Pressable>
       </View>
     </ScrollView>
   );
@@ -293,21 +272,6 @@ const styles = StyleSheet.create({
   },
   inputText: {
     fontSize: 16,
-  },
-  periodSelector: {
-    flexDirection: "row",
-    gap: 8,
-  },
-  periodOption: {
-    flex: 1,
-    paddingVertical: 12,
-    borderRadius: 8,
-    borderWidth: 1,
-    alignItems: "center",
-  },
-  periodOptionText: {
-    fontSize: 14,
-    fontWeight: "600",
   },
   dateRow: {
     flexDirection: "row",

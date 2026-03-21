@@ -19,6 +19,7 @@ const palette = {
   warning: "#f59e0b",
   error: "#d61737",
   card: "#600a18",
+  primaryButton: "#8e0e23",
   progressBar: "#C3BC9B",
   progressBarBackground: "#1D5269",
   fab: "#C3BC9B",

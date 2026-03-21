@@ -103,16 +103,21 @@ export default function SaveSessionScreen() {
             Discard
           </Text>
         </Pressable>
-        <GoldShimmer
-          mode="view"
-          style={[styles.button, styles.saveButton, { borderRadius: 12 }]}
+        <Pressable
+          onPress={handleSave}
+          disabled={createSession.isPending}
+          style={[
+            styles.button,
+            styles.saveButton,
+            { borderRadius: 12, backgroundColor: colors.primaryButton },
+          ]}
         >
-          <Pressable onPress={handleSave} disabled={createSession.isPending}>
-            <Text style={[styles.buttonText, { color: colors.background }]}>
+          <GoldShimmer mode="text">
+            <Text style={[styles.buttonText, { fontWeight: "bold" }]}>
               {createSession.isPending ? "Saving..." : "Save Session"}
             </Text>
-          </Pressable>
-        </GoldShimmer>
+          </GoldShimmer>
+        </Pressable>
       </View>
     </SafeAreaView>
   );

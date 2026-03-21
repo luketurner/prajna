@@ -20,29 +20,26 @@ export function SegmentedControl<T extends string>({
       {options.map((opt, i) => {
         const selected = opt.value === value;
         return (
-          <GoldShimmer
+          <Pressable
             key={opt.value}
-            mode="view"
-            disabled={!selected}
+            onPress={() => onChange(opt.value)}
             style={[
               styles.segment,
+              styles.segmentInner,
               i > 0 && { borderLeftWidth: 1, borderLeftColor: colors.border },
+              selected && { backgroundColor: colors.primaryButton },
             ]}
           >
-            <Pressable
-              onPress={() => onChange(opt.value)}
-              style={styles.segmentInner}
-            >
-              <Text
-                style={[
-                  styles.segmentText,
-                  { color: selected ? colors.background : colors.text },
-                ]}
-              >
+            {selected ? (
+              <GoldShimmer mode="text">
+                <Text style={styles.segmentText}>{opt.label}</Text>
+              </GoldShimmer>
+            ) : (
+              <Text style={[styles.segmentText, { color: colors.text }]}>
                 {opt.label}
               </Text>
-            </Pressable>
-          </GoldShimmer>
+            )}
+          </Pressable>
         );
       })}
     </View>
@@ -69,6 +66,6 @@ const styles = StyleSheet.create({
   },
   segmentText: {
     fontSize: 13,
-    fontWeight: "600",
+    fontWeight: "bold",
   },
 });
