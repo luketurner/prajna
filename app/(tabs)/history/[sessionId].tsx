@@ -87,9 +87,7 @@ export default function SessionDetailScreen() {
   const date = parseISO(session.date);
 
   return (
-    <ScrollView
-      style={[styles.container, {}]}
-    >
+    <ScrollView style={[styles.container, {}]}>
       <View style={styles.content}>
         {/* Duration */}
         <View style={styles.section}>
@@ -127,7 +125,7 @@ export default function SessionDetailScreen() {
             mode="view"
             style={[styles.actionButton, { borderRadius: 12 }]}
           >
-            <Pressable onPress={handleEdit}>
+            <Pressable onPress={handleEdit} style={styles.actionButtonInner}>
               <MaterialIcons name="edit" size={20} color={colors.background} />
               <Text
                 style={[styles.actionButtonText, { color: colors.background }]}
@@ -200,6 +198,12 @@ const styles = StyleSheet.create({
     gap: 8,
     paddingVertical: 14,
     borderRadius: 12,
+  },
+  actionButtonInner: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "center",
+    gap: 8,
   },
   deleteButton: {
     backgroundColor: "transparent",
