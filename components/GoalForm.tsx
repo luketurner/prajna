@@ -1,3 +1,4 @@
+import { GoldShimmer } from "@/components/GoldShimmer";
 import { Colors } from "@/constants/Colors";
 import DateTimePicker from "@react-native-community/datetimepicker";
 import {
@@ -145,35 +146,41 @@ export function GoalForm({
       <View style={styles.field}>
         <Text style={[styles.label, { color: colors.text }]}>Period</Text>
         <View style={styles.periodSelector}>
-          {(["year", "month", "custom"] as PeriodType[]).map((type) => (
-            <Pressable
-              key={type}
-              onPress={() => handlePeriodTypeChange(type)}
-              style={[
-                styles.periodOption,
-                {
-                  backgroundColor:
-                    periodType === type
-                      ? colors.tint
-                      : colors.backgroundSecondary,
-                  borderColor:
-                    periodType === type ? colors.tint : colors.border,
-                },
-              ]}
-            >
-              <Text
+          {(["year", "month", "custom"] as PeriodType[]).map((type) => {
+            const selected = periodType === type;
+            return (
+              <Pressable
+                key={type}
+                onPress={() => handlePeriodTypeChange(type)}
                 style={[
-                  styles.periodOptionText,
+                  styles.periodOption,
                   {
-                    color:
-                      periodType === type ? colors.background : colors.text,
+                    backgroundColor: selected
+                      ? undefined
+                      : colors.backgroundSecondary,
+                    borderColor: selected ? "transparent" : colors.border,
+                    overflow: "hidden",
                   },
                 ]}
               >
-                {type.charAt(0).toUpperCase() + type.slice(1)}
-              </Text>
-            </Pressable>
-          ))}
+                {selected && (
+                  <GoldShimmer mode="view" style={StyleSheet.absoluteFill}>
+                    <View />
+                  </GoldShimmer>
+                )}
+                <Text
+                  style={[
+                    styles.periodOptionText,
+                    {
+                      color: selected ? colors.background : colors.text,
+                    },
+                  ]}
+                >
+                  {type.charAt(0).toUpperCase() + type.slice(1)}
+                </Text>
+              </Pressable>
+            );
+          })}
         </View>
       </View>
 
@@ -251,19 +258,16 @@ export function GoalForm({
             Cancel
           </Text>
         </Pressable>
-        <Pressable
-          onPress={handleSubmit}
-          style={[
-            styles.button,
-            styles.submitButton,
-            { backgroundColor: colors.tint },
-          ]}
-          disabled={isSubmitting}
+        <GoldShimmer
+          mode="view"
+          style={[styles.button, styles.submitButton, { borderRadius: 8 }]}
         >
-          <Text style={[styles.buttonText, { color: colors.background }]}>
-            {isSubmitting ? "Saving..." : submitLabel}
-          </Text>
-        </Pressable>
+          <Pressable onPress={handleSubmit} disabled={isSubmitting}>
+            <Text style={[styles.buttonText, { color: colors.background }]}>
+              {isSubmitting ? "Saving..." : submitLabel}
+            </Text>
+          </Pressable>
+        </GoldShimmer>
       </View>
     </ScrollView>
   );

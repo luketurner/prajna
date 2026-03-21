@@ -1,3 +1,4 @@
+import { GoldShimmer } from "@/components/GoldShimmer";
 import { Colors } from "@/constants/Colors";
 import DateTimePicker from "@react-native-community/datetimepicker";
 import { format, isAfter, parseISO, startOfDay } from "date-fns";
@@ -171,19 +172,16 @@ export function SessionForm({
             Cancel
           </Text>
         </Pressable>
-        <Pressable
-          onPress={handleSubmit}
-          style={[
-            styles.button,
-            styles.submitButton,
-            { backgroundColor: colors.tint },
-          ]}
-          disabled={isSubmitting}
+        <GoldShimmer
+          mode="view"
+          style={[styles.button, styles.submitButton, { borderRadius: 8 }]}
         >
-          <Text style={[styles.buttonText, { color: colors.background }]}>
-            {isSubmitting ? "Saving..." : submitLabel}
-          </Text>
-        </Pressable>
+          <Pressable onPress={handleSubmit} disabled={isSubmitting}>
+            <Text style={[styles.buttonText, { color: colors.background }]}>
+              {isSubmitting ? "Saving..." : submitLabel}
+            </Text>
+          </Pressable>
+        </GoldShimmer>
       </View>
     </View>
   );

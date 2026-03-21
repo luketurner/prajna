@@ -1,3 +1,4 @@
+import { GoldShimmer } from "@/components/GoldShimmer";
 import { TimerDisplay } from "@/components/TimerDisplay";
 import { Colors } from "@/constants/Colors";
 import { useCreateSession } from "@/hooks/useSessions";
@@ -102,19 +103,16 @@ export default function SaveSessionScreen() {
             Discard
           </Text>
         </Pressable>
-        <Pressable
-          onPress={handleSave}
-          style={[
-            styles.button,
-            styles.saveButton,
-            { backgroundColor: colors.tint },
-          ]}
-          disabled={createSession.isPending}
+        <GoldShimmer
+          mode="view"
+          style={[styles.button, styles.saveButton, { borderRadius: 12 }]}
         >
-          <Text style={[styles.buttonText, { color: colors.background }]}>
-            {createSession.isPending ? "Saving..." : "Save Session"}
-          </Text>
-        </Pressable>
+          <Pressable onPress={handleSave} disabled={createSession.isPending}>
+            <Text style={[styles.buttonText, { color: colors.background }]}>
+              {createSession.isPending ? "Saving..." : "Save Session"}
+            </Text>
+          </Pressable>
+        </GoldShimmer>
       </View>
     </SafeAreaView>
   );

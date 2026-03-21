@@ -1,4 +1,5 @@
 import { GoalForm } from "@/components/GoalForm";
+import { GoldShimmer } from "@/components/GoldShimmer";
 import { Colors } from "@/constants/Colors";
 import { useDeleteGoal, useGoal, useUpdateGoal } from "@/hooks/useGoals";
 import { MaterialIcons } from "@expo/vector-icons";
@@ -259,17 +260,19 @@ export default function GoalDetailScreen() {
 
         {/* Actions */}
         <View style={styles.actions}>
-          <Pressable
-            onPress={() => setIsEditing(true)}
-            style={[styles.actionButton, { backgroundColor: colors.tint }]}
+          <GoldShimmer
+            mode="view"
+            style={[styles.actionButton, { borderRadius: 12 }]}
           >
-            <MaterialIcons name="edit" size={20} color={colors.background} />
-            <Text
-              style={[styles.actionButtonText, { color: colors.background }]}
-            >
-              Edit
-            </Text>
-          </Pressable>
+            <Pressable onPress={() => setIsEditing(true)}>
+              <MaterialIcons name="edit" size={20} color={colors.background} />
+              <Text
+                style={[styles.actionButtonText, { color: colors.background }]}
+              >
+                Edit
+              </Text>
+            </Pressable>
+          </GoldShimmer>
 
           <Pressable
             onPress={handleDelete}

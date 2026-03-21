@@ -264,17 +264,19 @@ export default function TimerScreen() {
               <MaterialIcons name="close" size={32} color={colors.error} />
             </Pressable>
 
-            <Pressable
-              onPress={handleStop}
-              style={[
-                styles.primaryButton,
-                { backgroundColor: colors.success },
-              ]}
-              accessibilityLabel="Stop and save session"
-              accessibilityRole="button"
+            <GoldShimmer
+              mode="view"
+              style={[styles.primaryButton, { borderRadius: 48 }]}
             >
-              <MaterialIcons name="stop" size={48} color={colors.background} />
-            </Pressable>
+              <Pressable
+                onPress={handleStop}
+                style={styles.primaryButtonInner}
+                accessibilityLabel="Stop and save session"
+                accessibilityRole="button"
+              >
+                <MaterialIcons name="stop" size={48} color={colors.background} />
+              </Pressable>
+            </GoldShimmer>
           </View>
         )}
       </View>

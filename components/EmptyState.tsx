@@ -1,3 +1,4 @@
+import { GoldShimmer } from "@/components/GoldShimmer";
 import { Colors } from "@/constants/Colors";
 import { MaterialIcons } from "@expo/vector-icons";
 import { StyleSheet, Text, useColorScheme, View } from "react-native";
@@ -14,12 +15,9 @@ export function EmptyState({ icon, title, message }: EmptyStateProps) {
 
   return (
     <View style={styles.container}>
-      <MaterialIcons
-        name={icon}
-        size={64}
-        color={colors.textSecondary}
-        style={styles.icon}
-      />
+      <GoldShimmer mode="icon">
+        <MaterialIcons name={icon} size={64} color="#000" />
+      </GoldShimmer>
       <Text style={[styles.title, { color: colors.text }]}>{title}</Text>
       <Text style={[styles.message, { color: colors.textSecondary }]}>
         {message}

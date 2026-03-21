@@ -1,3 +1,4 @@
+import { GoldShimmer } from "@/components/GoldShimmer";
 import { Colors } from "@/constants/Colors";
 import { Pressable, StyleSheet, Text, View } from "react-native";
 
@@ -19,24 +20,29 @@ export function SegmentedControl<T extends string>({
       {options.map((opt, i) => {
         const selected = opt.value === value;
         return (
-          <Pressable
+          <GoldShimmer
             key={opt.value}
-            onPress={() => onChange(opt.value)}
+            mode="view"
+            disabled={!selected}
             style={[
               styles.segment,
-              selected && { backgroundColor: colors.tint },
               i > 0 && { borderLeftWidth: 1, borderLeftColor: colors.border },
             ]}
           >
-            <Text
-              style={[
-                styles.segmentText,
-                { color: selected ? colors.background : colors.text },
-              ]}
+            <Pressable
+              onPress={() => onChange(opt.value)}
+              style={styles.segmentInner}
             >
-              {opt.label}
-            </Text>
-          </Pressable>
+              <Text
+                style={[
+                  styles.segmentText,
+                  { color: selected ? colors.background : colors.text },
+                ]}
+              >
+                {opt.label}
+              </Text>
+            </Pressable>
+          </GoldShimmer>
         );
       })}
     </View>
@@ -52,9 +58,14 @@ const styles = StyleSheet.create({
   },
   segment: {
     flex: 1,
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  segmentInner: {
     paddingVertical: 8,
     alignItems: "center",
     justifyContent: "center",
+    width: "100%",
   },
   segmentText: {
     fontSize: 13,
