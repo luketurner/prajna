@@ -93,8 +93,8 @@ function CustomTabBar({ state, descriptors, navigation }: BottomTabBarProps) {
       style={[
         styles.tabBar,
         {
-          backgroundColor: colors.background,
-          borderTopColor: colors.border,
+          backgroundColor: colors.headerBar,
+          borderTopColor: colors.headerBarBorder,
           paddingBottom: Math.max(insets.bottom, 8),
         },
       ]}
@@ -113,7 +113,7 @@ export default function TabLayout() {
     colors: {
       primary: colors.tint,
       background: "transparent",
-      card: colors.background,
+      card: colors.headerBar,
       text: colors.text,
       border: colors.border,
       notification: colors.tint,

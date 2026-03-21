@@ -23,6 +23,8 @@ const palette = {
   progressBarBackground: "#1D5269",
   fab: "#C3BC9B",
   fabIcon: "#246583",
+  headerBar: "#A70F28",
+  headerBarBorder: "#990e25",
 } as const;
 
 export const Colors = {
