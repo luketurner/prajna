@@ -1,3 +1,4 @@
+import { GoldShimmer } from "@/components/GoldShimmer";
 import { StagesInput } from "@/components/StagesInput";
 import { TimerDisplay } from "@/components/TimerDisplay";
 import { Colors } from "@/constants/Colors";
@@ -235,18 +236,23 @@ export default function TimerScreen() {
 
       <View style={styles.controls}>
         {!isRunning ? (
-          <Pressable
-            onPress={handleStart}
-            style={[styles.primaryButton, { backgroundColor: colors.tint }]}
-            accessibilityLabel="Start meditation timer"
-            accessibilityRole="button"
+          <GoldShimmer
+            mode="view"
+            style={[styles.primaryButton, { borderRadius: 48 }]}
           >
-            <MaterialIcons
-              name="play-arrow"
-              size={48}
-              color={colors.background}
-            />
-          </Pressable>
+            <Pressable
+              onPress={handleStart}
+              style={styles.primaryButtonInner}
+              accessibilityLabel="Start meditation timer"
+              accessibilityRole="button"
+            >
+              <MaterialIcons
+                name="play-arrow"
+                size={48}
+                color={colors.background}
+              />
+            </Pressable>
+          </GoldShimmer>
         ) : (
           <View style={styles.runningControls}>
             <Pressable
@@ -306,6 +312,12 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.25,
     shadowRadius: 4,
     elevation: 5,
+  },
+  primaryButtonInner: {
+    width: 96,
+    height: 96,
+    alignItems: "center",
+    justifyContent: "center",
   },
   secondaryButton: {
     width: 64,

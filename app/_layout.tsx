@@ -1,4 +1,5 @@
 import { Colors } from "@/constants/Colors";
+import { AccelerometerProvider } from "@/contexts/AccelerometerContext";
 import { RepositoryProvider } from "@/data/database-provider";
 import { migrateDbIfNeeded } from "@/data/migrations";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
@@ -44,6 +45,7 @@ export default function RootLayout() {
       <Suspense fallback={<LoadingFallback />}>
         <SQLiteProvider databaseName="prajna.db" onInit={migrateDbIfNeeded}>
           <RepositoryProvider>
+            <AccelerometerProvider>
             <StatusBar style="light" />
             <Stack
               screenOptions={{
@@ -86,6 +88,7 @@ export default function RootLayout() {
                 }}
               />
             </Stack>
+            </AccelerometerProvider>
           </RepositoryProvider>
         </SQLiteProvider>
       </Suspense>

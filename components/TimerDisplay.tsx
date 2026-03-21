@@ -1,5 +1,5 @@
-import { Colors } from "@/constants/Colors";
-import { StyleSheet, Text, useColorScheme } from "react-native";
+import { GoldShimmer } from "@/components/GoldShimmer";
+import { StyleSheet, Text } from "react-native";
 
 interface TimerDisplayProps {
   elapsedMs: number;
@@ -16,17 +16,16 @@ function formatTime(ms: number): string {
 }
 
 export function TimerDisplay({ elapsedMs }: TimerDisplayProps) {
-  const colorScheme = useColorScheme() ?? "light";
-  const colors = Colors[colorScheme];
-
   return (
-    <Text
-      style={[styles.timer, { color: colors.text }]}
-      accessibilityLabel={`Elapsed time: ${formatTime(elapsedMs)}`}
-      accessibilityRole="timer"
-    >
-      {formatTime(elapsedMs)}
-    </Text>
+    <GoldShimmer mode="text">
+      <Text
+        style={styles.timer}
+        accessibilityLabel={`Elapsed time: ${formatTime(elapsedMs)}`}
+        accessibilityRole="timer"
+      >
+        {formatTime(elapsedMs)}
+      </Text>
+    </GoldShimmer>
   );
 }
 
@@ -36,5 +35,6 @@ const styles = StyleSheet.create({
     fontWeight: "200",
     fontVariant: ["tabular-nums"],
     letterSpacing: 2,
+    color: "#000",
   },
 });
