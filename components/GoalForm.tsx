@@ -37,7 +37,6 @@ interface GoalFormProps {
     startDate: string;
     endDate: string;
   }) => void;
-  onCancel: () => void;
   submitLabel?: string;
   isSubmitting?: boolean;
 }
@@ -48,7 +47,6 @@ export function GoalForm({
   initialStartDate,
   initialEndDate,
   onSubmit,
-  onCancel,
   submitLabel = "Save",
   isSubmitting = false,
 }: GoalFormProps) {
@@ -220,19 +218,6 @@ export function GoalForm({
       {/* Buttons */}
       <View style={styles.buttons}>
         <Pressable
-          onPress={onCancel}
-          style={[
-            styles.button,
-            styles.cancelButton,
-            { borderColor: colors.border },
-          ]}
-          disabled={isSubmitting}
-        >
-          <Text style={[styles.buttonText, { color: colors.text }]}>
-            Cancel
-          </Text>
-        </Pressable>
-        <Pressable
           onPress={handleSubmit}
           disabled={isSubmitting}
           style={[
@@ -287,9 +272,6 @@ const styles = StyleSheet.create({
     paddingVertical: 14,
     borderRadius: 8,
     alignItems: "center",
-  },
-  cancelButton: {
-    borderWidth: 1,
   },
   submitButton: {},
   buttonText: {

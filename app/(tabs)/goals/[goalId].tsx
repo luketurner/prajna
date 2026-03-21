@@ -1,10 +1,11 @@
 import { GoalForm } from "@/components/GoalForm";
 import { GoldShimmer } from "@/components/GoldShimmer";
+import { OverflowMenu } from "@/components/OverflowMenu";
 import { Colors } from "@/constants/Colors";
 import { useDeleteGoal, useGoal, useUpdateGoal } from "@/hooks/useGoals";
 import { MaterialIcons } from "@expo/vector-icons";
 import { format, parseISO } from "date-fns";
-import { useLocalSearchParams, useRouter } from "expo-router";
+import { Stack, useLocalSearchParams, useRouter } from "expo-router";
 import { useState } from "react";
 import {
   ActivityIndicator,
@@ -36,6 +37,7 @@ export default function GoalDetailScreen() {
   const deleteGoal = useDeleteGoal();
 
   const [isEditing, setIsEditing] = useState(false);
+  const [menuVisible, setMenuVisible] = useState(false);
 
   const handleDelete = () => {
     Alert.alert(
@@ -95,13 +97,27 @@ export default function GoalDetailScreen() {
   if (isEditing) {
     return (
       <View style={[styles.container, {}]}>
+        <Stack.Screen
+          options={{
+            title: "Edit Goal",
+            headerRight: () => (
+              <Pressable
+                onPress={() => setIsEditing(false)}
+                style={styles.headerButton}
+              >
+                <Text style={{ color: colors.text, fontWeight: "600", fontSize: 16 }}>
+                  Cancel
+                </Text>
+              </Pressable>
+            ),
+          }}
+        />
         <GoalForm
           initialTargetHours={goal.targetHours}
           initialPeriodType={goal.periodType}
           initialStartDate={goal.startDate}
           initialEndDate={goal.endDate}
           onSubmit={handleUpdate}
-          onCancel={() => setIsEditing(false)}
           submitLabel="Update Goal"
           isSubmitting={updateGoal.isPending}
         />
@@ -141,6 +157,31 @@ export default function GoalDetailScreen() {
 
   return (
     <ScrollView style={[styles.container, {}]}>
+      <Stack.Screen
+        options={{
+          title: "Goal Details",
+          headerRight: () => (
+            <Pressable
+              onPress={() => setMenuVisible(true)}
+              style={styles.headerButton}
+            >
+              <MaterialIcons name="more-vert" size={24} color={colors.text} />
+            </Pressable>
+          ),
+        }}
+      />
+      <OverflowMenu
+        visible={menuVisible}
+        onClose={() => setMenuVisible(false)}
+        items={[
+          {
+            label: "Delete",
+            icon: "delete",
+            onPress: handleDelete,
+            destructive: true,
+          },
+        ]}
+      />
       <View style={styles.content}>
         {/* Status Badge */}
         <View
@@ -274,21 +315,6 @@ export default function GoalDetailScreen() {
               </Text>
             </GoldShimmer>
           </Pressable>
-
-          <Pressable
-            onPress={handleDelete}
-            style={[
-              styles.actionButton,
-              styles.deleteButton,
-              { borderColor: colors.error },
-            ]}
-            disabled={deleteGoal.isPending}
-          >
-            <MaterialIcons name="delete" size={20} color={colors.error} />
-            <Text style={[styles.actionButtonText, { color: colors.error }]}>
-              Delete
-            </Text>
-          </Pressable>
         </View>
       </View>
     </ScrollView>
@@ -381,9 +407,9 @@ const styles = StyleSheet.create({
     paddingVertical: 14,
     borderRadius: 12,
   },
-  deleteButton: {
-    backgroundColor: "transparent",
-    borderWidth: 2,
+  headerButton: {
+    paddingHorizontal: 16,
+    paddingVertical: 8,
   },
   actionButtonText: {
     fontSize: 16,

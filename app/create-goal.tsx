@@ -26,17 +26,12 @@ export default function CreateGoalScreen() {
     }
   };
 
-  const handleCancel = () => {
-    router.back();
-  };
-
   return (
     <SafeAreaView
       style={[styles.container, { backgroundColor: colors.background }]}
     >
       <GoalForm
         onSubmit={handleSubmit}
-        onCancel={handleCancel}
         submitLabel="Create Goal"
         isSubmitting={createGoal.isPending}
       />

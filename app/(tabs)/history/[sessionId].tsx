@@ -1,9 +1,11 @@
 import { GoldShimmer } from "@/components/GoldShimmer";
+import { OverflowMenu } from "@/components/OverflowMenu";
 import { Colors } from "@/constants/Colors";
 import { useDeleteSession, useSession } from "@/hooks/useSessions";
 import { MaterialIcons } from "@expo/vector-icons";
 import { format, parseISO } from "date-fns";
-import { useLocalSearchParams, useRouter } from "expo-router";
+import { Stack, useLocalSearchParams, useRouter } from "expo-router";
+import { useState } from "react";
 import {
   ActivityIndicator,
   Alert,
@@ -38,6 +40,7 @@ export default function SessionDetailScreen() {
   const id = parseInt(sessionId ?? "0", 10);
   const { data: session, isLoading } = useSession(id);
   const deleteSession = useDeleteSession();
+  const [menuVisible, setMenuVisible] = useState(false);
 
   const handleEdit = () => {
     router.push({
@@ -88,6 +91,31 @@ export default function SessionDetailScreen() {
 
   return (
     <ScrollView style={[styles.container, {}]}>
+      <Stack.Screen
+        options={{
+          title: "Session Details",
+          headerRight: () => (
+            <Pressable
+              onPress={() => setMenuVisible(true)}
+              style={styles.headerButton}
+            >
+              <MaterialIcons name="more-vert" size={24} color={colors.text} />
+            </Pressable>
+          ),
+        }}
+      />
+      <OverflowMenu
+        visible={menuVisible}
+        onClose={() => setMenuVisible(false)}
+        items={[
+          {
+            label: "Delete",
+            icon: "delete",
+            onPress: handleDelete,
+            destructive: true,
+          },
+        ]}
+      />
       <View style={styles.content}>
         {/* Duration */}
         <View style={styles.section}>
@@ -136,21 +164,6 @@ export default function SessionDetailScreen() {
                 Edit
               </Text>
             </GoldShimmer>
-          </Pressable>
-
-          <Pressable
-            onPress={handleDelete}
-            style={[
-              styles.actionButton,
-              styles.deleteButton,
-              { borderColor: colors.error },
-            ]}
-            disabled={deleteSession.isPending}
-          >
-            <MaterialIcons name="delete" size={20} color={colors.error} />
-            <Text style={[styles.actionButtonText, { color: colors.error }]}>
-              Delete
-            </Text>
           </Pressable>
         </View>
       </View>
@@ -202,9 +215,9 @@ const styles = StyleSheet.create({
     paddingVertical: 14,
     borderRadius: 12,
   },
-  deleteButton: {
-    backgroundColor: "transparent",
-    borderWidth: 2,
+  headerButton: {
+    paddingHorizontal: 16,
+    paddingVertical: 8,
   },
   actionButtonText: {
     fontSize: 16,

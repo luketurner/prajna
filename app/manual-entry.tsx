@@ -28,17 +28,12 @@ export default function ManualEntryScreen() {
     }
   };
 
-  const handleCancel = () => {
-    router.back();
-  };
-
   return (
     <SafeAreaView
       style={[styles.container, { backgroundColor: colors.background }]}
     >
       <SessionForm
         onSubmit={handleSubmit}
-        onCancel={handleCancel}
         submitLabel="Save Session"
         isSubmitting={createSession.isPending}
       />

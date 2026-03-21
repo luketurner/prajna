@@ -18,7 +18,6 @@ interface SessionFormProps {
   initialDate?: string; // ISO date YYYY-MM-DD
   initialDurationMinutes?: number;
   onSubmit: (data: { date: string; durationSeconds: number }) => void;
-  onCancel: () => void;
   submitLabel?: string;
   isSubmitting?: boolean;
 }
@@ -27,7 +26,6 @@ export function SessionForm({
   initialDate,
   initialDurationMinutes = 0,
   onSubmit,
-  onCancel,
   submitLabel = "Save",
   isSubmitting = false,
 }: SessionFormProps) {
@@ -160,19 +158,6 @@ export function SessionForm({
       {/* Buttons */}
       <View style={styles.buttons}>
         <Pressable
-          onPress={onCancel}
-          style={[
-            styles.button,
-            styles.cancelButton,
-            { borderColor: colors.border },
-          ]}
-          disabled={isSubmitting}
-        >
-          <Text style={[styles.buttonText, { color: colors.text }]}>
-            Cancel
-          </Text>
-        </Pressable>
-        <Pressable
           onPress={handleSubmit}
           disabled={isSubmitting}
           style={[
@@ -225,9 +210,6 @@ const styles = StyleSheet.create({
     paddingVertical: 14,
     borderRadius: 8,
     alignItems: "center",
-  },
-  cancelButton: {
-    borderWidth: 1,
   },
   submitButton: {},
   buttonText: {

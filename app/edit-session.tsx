@@ -37,10 +37,6 @@ export default function EditSessionScreen() {
     }
   };
 
-  const handleCancel = () => {
-    router.back();
-  };
-
   if (sessionLoading || !session) {
     return (
       <View style={[styles.centered, { backgroundColor: colors.background }]}>
@@ -55,7 +51,6 @@ export default function EditSessionScreen() {
         initialDate={session.date}
         initialDurationMinutes={Math.floor(session.durationSeconds / 60)}
         onSubmit={handleSubmit}
-        onCancel={handleCancel}
         submitLabel="Update Session"
         isSubmitting={updateSession.isPending}
       />
