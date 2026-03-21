@@ -1,12 +1,19 @@
 import { Colors } from "@/constants/Colors";
 import { MaterialIcons } from "@expo/vector-icons";
-import { Modal, Pressable, StyleSheet, Text, useColorScheme, View } from "react-native";
+import {
+  Modal,
+  Pressable,
+  StatusBar,
+  StyleSheet,
+  Text,
+  useColorScheme,
+  View,
+} from "react-native";
 
 interface OverflowMenuItem {
   label: string;
   icon?: keyof typeof MaterialIcons.glyphMap;
   onPress: () => void;
-  destructive?: boolean;
 }
 
 interface OverflowMenuProps {
@@ -18,6 +25,9 @@ interface OverflowMenuProps {
 export function OverflowMenu({ visible, onClose, items }: OverflowMenuProps) {
   const colorScheme = useColorScheme() ?? "light";
   const colors = Colors[colorScheme];
+  const statusBarHeight = StatusBar.currentHeight ?? 0;
+  const headerBarHeight = 56;
+  const menuTop = statusBarHeight + headerBarHeight;
 
   return (
     <Modal
@@ -31,7 +41,8 @@ export function OverflowMenu({ visible, onClose, items }: OverflowMenuProps) {
           style={[
             styles.menu,
             {
-              backgroundColor: colors.backgroundSecondary,
+              marginTop: menuTop,
+              backgroundColor: colors.background,
               borderColor: colors.border,
             },
           ]}
@@ -53,18 +64,9 @@ export function OverflowMenu({ visible, onClose, items }: OverflowMenuProps) {
               ]}
             >
               {item.icon && (
-                <MaterialIcons
-                  name={item.icon}
-                  size={20}
-                  color={item.destructive ? colors.error : colors.text}
-                />
+                <MaterialIcons name={item.icon} size={20} color={colors.text} />
               )}
-              <Text
-                style={[
-                  styles.menuItemText,
-                  { color: item.destructive ? colors.error : colors.text },
-                ]}
-              >
+              <Text style={[styles.menuItemText, { color: colors.text }]}>
                 {item.label}
               </Text>
             </Pressable>
@@ -81,16 +83,9 @@ const styles = StyleSheet.create({
     alignItems: "flex-end",
   },
   menu: {
-    marginTop: 56,
-    marginRight: 8,
-    borderRadius: 8,
+    marginRight: 2,
     borderWidth: 1,
     minWidth: 160,
-    elevation: 8,
-    shadowColor: "#000",
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.25,
-    shadowRadius: 4,
   },
   menuItem: {
     flexDirection: "row",
