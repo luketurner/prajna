@@ -21,7 +21,7 @@ export const GOLD_GRADIENT_LOCATIONS = [
 export const ACCELEROMETER_INTERVAL = 16;
 
 /** Exponential moving average smoothing factor (0–1, lower = smoother) */
-export const SMOOTHING_FACTOR = 0.5;
+export const SMOOTHING_FACTOR = 0.8;
 
 /**
  * Gradient oversize along each axis.
