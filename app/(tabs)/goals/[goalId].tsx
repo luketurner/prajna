@@ -140,9 +140,7 @@ export default function GoalDetailScreen() {
   }
 
   return (
-    <ScrollView
-      style={[styles.container, {}]}
-    >
+    <ScrollView style={[styles.container, {}]}>
       <View style={styles.content}>
         {/* Status Badge */}
         <View
@@ -264,7 +262,10 @@ export default function GoalDetailScreen() {
             mode="view"
             style={[styles.actionButton, { borderRadius: 12 }]}
           >
-            <Pressable onPress={() => setIsEditing(true)}>
+            <Pressable
+              onPress={() => setIsEditing(true)}
+              style={styles.actionButtonInner}
+            >
               <MaterialIcons name="edit" size={20} color={colors.background} />
               <Text
                 style={[styles.actionButtonText, { color: colors.background }]}
@@ -379,6 +380,12 @@ const styles = StyleSheet.create({
     gap: 8,
     paddingVertical: 14,
     borderRadius: 12,
+  },
+  actionButtonInner: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "center",
+    gap: 8,
   },
   deleteButton: {
     backgroundColor: "transparent",
