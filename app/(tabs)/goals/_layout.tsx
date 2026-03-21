@@ -13,6 +13,7 @@ export default function GoalsLayout() {
       screenOptions={{
         headerStyle: { backgroundColor: colors.headerBar },
         headerTintColor: colors.text,
+        headerTitleStyle: { fontWeight: 700 },
       }}
     >
       <Stack.Screen

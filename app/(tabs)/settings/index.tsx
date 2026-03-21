@@ -153,15 +153,13 @@ export default function SettingsScreen() {
   };
 
   return (
-    <ScrollView
-      style={[styles.container, {}]}
-    >
-      <Text style={[styles.sectionHeader, { color: colors.textSecondary }]}>
+    <ScrollView style={[styles.container, {}]}>
+      <Text style={[styles.sectionHeader, { color: colors.text }]}>
         Statistics
       </Text>
 
       <View style={styles.settingRow}>
-        <Text style={[styles.settingLabel, { color: colors.text }]}>
+        <Text style={[styles.settingLabel, { color: colors.textSecondary }]}>
           Starting date for stats calculations
         </Text>
         <SegmentedControl
@@ -173,10 +171,7 @@ export default function SettingsScreen() {
       </View>
 
       <Text
-        style={[
-          styles.sectionHeader,
-          { color: colors.textSecondary, marginTop: 32 },
-        ]}
+        style={[styles.sectionHeader, { color: colors.text, marginTop: 32 }]}
       >
         Data
       </Text>
