@@ -1,4 +1,5 @@
 import { EmptyState } from "@/components/EmptyState";
+import { GoldShimmer } from "@/components/GoldShimmer";
 import { Colors } from "@/constants/Colors";
 import { useSessionStats } from "@/hooks/useSessionStats";
 import { MaterialIcons } from "@expo/vector-icons";
@@ -61,7 +62,9 @@ export default function StatsScreen() {
               { backgroundColor: colors.card, borderColor: colors.border },
             ]}
           >
-            <MaterialIcons name="all-inclusive" size={24} color={colors.tint} />
+            <GoldShimmer mode="icon">
+              <MaterialIcons name="all-inclusive" size={24} color={colors.tint} />
+            </GoldShimmer>
             <Text style={[styles.statValue, { color: colors.text }]}>
               {formatDuration(stats.totalSecondsAllTime)}
             </Text>
@@ -75,11 +78,13 @@ export default function StatsScreen() {
               { backgroundColor: colors.card, borderColor: colors.border },
             ]}
           >
-            <MaterialIcons
-              name="calendar-today"
-              size={24}
-              color={colors.tint}
-            />
+            <GoldShimmer mode="icon">
+              <MaterialIcons
+                name="calendar-today"
+                size={24}
+                color={colors.tint}
+              />
+            </GoldShimmer>
             <Text style={[styles.statValue, { color: colors.text }]}>
               {formatDuration(stats.totalSecondsThisMonth)}
             </Text>
@@ -93,7 +98,9 @@ export default function StatsScreen() {
               { backgroundColor: colors.card, borderColor: colors.border },
             ]}
           >
-            <MaterialIcons name="date-range" size={24} color={colors.tint} />
+            <GoldShimmer mode="icon">
+              <MaterialIcons name="date-range" size={24} color={colors.tint} />
+            </GoldShimmer>
             <Text style={[styles.statValue, { color: colors.text }]}>
               {formatDuration(stats.totalSecondsThisWeek)}
             </Text>
@@ -114,7 +121,9 @@ export default function StatsScreen() {
             ]}
           >
             <View style={styles.statRowContent}>
-              <MaterialIcons name="event" size={28} color={colors.tint} />
+              <GoldShimmer mode="icon">
+                <MaterialIcons name="event" size={28} color={colors.tint} />
+              </GoldShimmer>
               <View style={styles.statRowText}>
                 <Text style={[styles.statRowValue, { color: colors.text }]}>
                   {stats.totalSessions}
@@ -134,7 +143,9 @@ export default function StatsScreen() {
             ]}
           >
             <View style={styles.statRowContent}>
-              <MaterialIcons name="timer" size={28} color={colors.tint} />
+              <GoldShimmer mode="icon">
+                <MaterialIcons name="timer" size={28} color={colors.tint} />
+              </GoldShimmer>
               <View style={styles.statRowText}>
                 <Text style={[styles.statRowValue, { color: colors.text }]}>
                   {formatDuration(stats.averageSessionSeconds)}
@@ -154,7 +165,9 @@ export default function StatsScreen() {
             ]}
           >
             <View style={styles.statRowContent}>
-              <MaterialIcons name="speed" size={28} color={colors.tint} />
+              <GoldShimmer mode="icon">
+                <MaterialIcons name="speed" size={28} color={colors.tint} />
+              </GoldShimmer>
               <View style={styles.statRowText}>
                 <Text style={[styles.statRowValue, { color: colors.text }]}>
                   {stats.averageSessionsPerDay.toFixed(2)}
@@ -179,11 +192,13 @@ export default function StatsScreen() {
               { backgroundColor: colors.card, borderColor: colors.border },
             ]}
           >
-            <MaterialIcons
-              name="local-fire-department"
-              size={32}
-              color={colors.warning}
-            />
+            <GoldShimmer mode="icon">
+              <MaterialIcons
+                name="local-fire-department"
+                size={32}
+                color={colors.warning}
+              />
+            </GoldShimmer>
             <Text style={[styles.streakValue, { color: colors.text }]}>
               {stats.currentStreak}
             </Text>
@@ -200,11 +215,13 @@ export default function StatsScreen() {
               { backgroundColor: colors.card, borderColor: colors.border },
             ]}
           >
-            <MaterialIcons
-              name="emoji-events"
-              size={32}
-              color={colors.success}
-            />
+            <GoldShimmer mode="icon">
+              <MaterialIcons
+                name="emoji-events"
+                size={32}
+                color={colors.success}
+              />
+            </GoldShimmer>
             <Text style={[styles.streakValue, { color: colors.text }]}>
               {stats.longestStreak}
             </Text>

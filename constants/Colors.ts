@@ -17,14 +17,14 @@ const palette = {
   border: "#3A7A9A",
   success: "#22c55e",
   warning: "#f59e0b",
-  error: "#ef4444",
-  card: "#1D5269",
+  error: "#d61737",
+  card: "#600a18",
   progressBar: "#C3BC9B",
   progressBarBackground: "#1D5269",
   fab: "#C3BC9B",
   fabIcon: "#246583",
-  headerBar: "#A70F28",
-  headerBarBorder: "#990e25",
+  headerBar: "#8e0e23",
+  headerBarBorder: "#700b1c",
 } as const;
 
 export const Colors = {

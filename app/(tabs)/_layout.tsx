@@ -78,7 +78,7 @@ function CustomTabBar({ state, descriptors, navigation }: BottomTabBarProps) {
               accessibilityRole="button"
               accessibilityLabel="Timer"
             >
-              <MaterialIcons name="timer" size={28} color={colors.fabIcon} />
+              <MaterialIcons name="timer" size={28} color={colors.headerBar} />
             </Pressable>
           </GoldShimmer>,
         );
@@ -130,43 +130,43 @@ export default function TabLayout() {
     <View style={{ flex: 1, backgroundColor: colors.background }}>
       <FabricBackground />
       <ThemeProvider value={transparentTheme}>
-      <Tabs
-        tabBar={(props) => <CustomTabBar {...props} />}
-        screenOptions={{
-          headerShown: false,
-        }}
-      >
-      <Tabs.Screen
-        name="index"
-        options={{
-          title: "Meditation Timer",
-        }}
-      />
-      <Tabs.Screen
-        name="stats"
-        options={{
-          title: "Stats",
-        }}
-      />
-      <Tabs.Screen
-        name="history"
-        options={{
-          title: "Past Sessions",
-        }}
-      />
-      <Tabs.Screen
-        name="goals"
-        options={{
-          title: "Goals",
-        }}
-      />
-      <Tabs.Screen
-        name="settings"
-        options={{
-          title: "Settings",
-        }}
-      />
-    </Tabs>
+        <Tabs
+          tabBar={(props) => <CustomTabBar {...props} />}
+          screenOptions={{
+            headerShown: false,
+          }}
+        >
+          <Tabs.Screen
+            name="index"
+            options={{
+              title: "Meditation Timer",
+            }}
+          />
+          <Tabs.Screen
+            name="stats"
+            options={{
+              title: "Stats",
+            }}
+          />
+          <Tabs.Screen
+            name="history"
+            options={{
+              title: "Past Sessions",
+            }}
+          />
+          <Tabs.Screen
+            name="goals"
+            options={{
+              title: "Goals",
+            }}
+          />
+          <Tabs.Screen
+            name="settings"
+            options={{
+              title: "Settings",
+            }}
+          />
+        </Tabs>
       </ThemeProvider>
     </View>
   );
