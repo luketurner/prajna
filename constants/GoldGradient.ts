@@ -4,13 +4,13 @@
  */
 
 export const GOLD_GRADIENT_COLORS = [
-  "#7A7456", // Deep shadow
-  "#9A9578", // Secondary gold
-  "#C3BC9B", // Primary gold
-  "#E8E0C0", // Bright specular highlight
-  "#C3BC9B", // Primary gold
-  "#9A9578", // Secondary gold
-  "#7A7456", // Deep shadow
+  "#7A7248", // Deep shadow
+  "#A1965C", // Secondary gold
+  "#CBB872", // Primary gold
+  "#ECD898", // Bright specular highlight
+  "#CBB872", // Primary gold
+  "#A1965C", // Secondary gold
+  "#7A7248", // Deep shadow
 ] as const;
 
 export const GOLD_GRADIENT_LOCATIONS = [
