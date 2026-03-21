@@ -24,7 +24,7 @@ export default function GoalsScreen() {
 
   if (isLoading) {
     return (
-      <View style={[styles.centered, { backgroundColor: colors.background }]}>
+      <View style={[styles.centered, {}]}>
         <ActivityIndicator size="large" color={colors.tint} />
       </View>
     );
@@ -32,7 +32,7 @@ export default function GoalsScreen() {
 
   if (goals.length === 0) {
     return (
-      <View style={[styles.container, { backgroundColor: colors.background }]}>
+      <View style={[styles.container, {}]}>
         <EmptyState
           icon="flag"
           title="No Goals Yet"
@@ -43,7 +43,7 @@ export default function GoalsScreen() {
   }
 
   return (
-    <View style={[styles.container, { backgroundColor: colors.background }]}>
+    <View style={[styles.container, {}]}>
       <FlatList
         data={goals}
         keyExtractor={(item) => item.id.toString()}

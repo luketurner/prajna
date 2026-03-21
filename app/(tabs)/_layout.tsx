@@ -1,7 +1,9 @@
+import { FabricBackground } from "@/components/FabricBackground";
 import { GoldShimmer } from "@/components/GoldShimmer";
 import { Colors } from "@/constants/Colors";
 import { MaterialIcons } from "@expo/vector-icons";
 import type { BottomTabBarProps } from "@react-navigation/bottom-tabs";
+import { type Theme, ThemeProvider } from "@react-navigation/native";
 import { Tabs } from "expo-router";
 import { Pressable, StyleSheet, useColorScheme, View } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
@@ -103,13 +105,37 @@ function CustomTabBar({ state, descriptors, navigation }: BottomTabBarProps) {
 }
 
 export default function TabLayout() {
+  const colorScheme = useColorScheme() ?? "light";
+  const colors = Colors[colorScheme];
+
+  const transparentTheme: Theme = {
+    dark: true,
+    colors: {
+      primary: colors.tint,
+      background: "transparent",
+      card: colors.background,
+      text: colors.text,
+      border: colors.border,
+      notification: colors.tint,
+    },
+    fonts: {
+      regular: { fontFamily: "System", fontWeight: "400" },
+      medium: { fontFamily: "System", fontWeight: "500" },
+      bold: { fontFamily: "System", fontWeight: "700" },
+      heavy: { fontFamily: "System", fontWeight: "900" },
+    },
+  };
+
   return (
-    <Tabs
-      tabBar={(props) => <CustomTabBar {...props} />}
-      screenOptions={{
-        headerShown: false,
-      }}
-    >
+    <View style={{ flex: 1, backgroundColor: colors.background }}>
+      <FabricBackground />
+      <ThemeProvider value={transparentTheme}>
+      <Tabs
+        tabBar={(props) => <CustomTabBar {...props} />}
+        screenOptions={{
+          headerShown: false,
+        }}
+      >
       <Tabs.Screen
         name="index"
         options={{
@@ -141,6 +167,8 @@ export default function TabLayout() {
         }}
       />
     </Tabs>
+      </ThemeProvider>
+    </View>
   );
 }
 

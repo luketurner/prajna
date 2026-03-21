@@ -78,7 +78,7 @@ export default function GoalDetailScreen() {
 
   if (isLoading) {
     return (
-      <View style={[styles.centered, { backgroundColor: colors.background }]}>
+      <View style={[styles.centered, {}]}>
         <ActivityIndicator size="large" color={colors.tint} />
       </View>
     );
@@ -86,7 +86,7 @@ export default function GoalDetailScreen() {
 
   if (!goal) {
     return (
-      <View style={[styles.centered, { backgroundColor: colors.background }]}>
+      <View style={[styles.centered, {}]}>
         <Text style={{ color: colors.text }}>Goal not found</Text>
       </View>
     );
@@ -94,7 +94,7 @@ export default function GoalDetailScreen() {
 
   if (isEditing) {
     return (
-      <View style={[styles.container, { backgroundColor: colors.background }]}>
+      <View style={[styles.container, {}]}>
         <GoalForm
           initialTargetHours={goal.targetHours}
           initialPeriodType={goal.periodType}
@@ -141,7 +141,7 @@ export default function GoalDetailScreen() {
 
   return (
     <ScrollView
-      style={[styles.container, { backgroundColor: colors.background }]}
+      style={[styles.container, {}]}
     >
       <View style={styles.content}>
         {/* Status Badge */}

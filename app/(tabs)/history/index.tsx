@@ -65,7 +65,7 @@ export default function HistoryScreen() {
 
   if (isLoading) {
     return (
-      <View style={[styles.centered, { backgroundColor: colors.background }]}>
+      <View style={[styles.centered, {}]}>
         <ActivityIndicator size="large" color={colors.tint} />
       </View>
     );
@@ -73,7 +73,7 @@ export default function HistoryScreen() {
 
   if (sessions.length === 0) {
     return (
-      <View style={[styles.container, { backgroundColor: colors.background }]}>
+      <View style={[styles.container, {}]}>
         <EmptyState
           icon="self-improvement"
           title="No Sessions Yet"
@@ -100,7 +100,7 @@ export default function HistoryScreen() {
 
   if (viewMode === "list") {
     return (
-      <View style={[styles.container, { backgroundColor: colors.background }]}>
+      <View style={[styles.container, {}]}>
         <FlatList
           data={sessions}
           keyExtractor={(item) => item.id.toString()}
@@ -137,7 +137,7 @@ export default function HistoryScreen() {
   );
 
   return (
-    <View style={[styles.container, { backgroundColor: colors.background }]}>
+    <View style={[styles.container, {}]}>
       <FlatList
         data={selectedDate ? filteredSessions : []}
         keyExtractor={(item) => item.id.toString()}

@@ -154,7 +154,7 @@ export default function SettingsScreen() {
 
   return (
     <ScrollView
-      style={[styles.container, { backgroundColor: colors.background }]}
+      style={[styles.container, {}]}
     >
       <Text style={[styles.sectionHeader, { color: colors.textSecondary }]}>
         Statistics

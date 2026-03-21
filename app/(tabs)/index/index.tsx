@@ -214,7 +214,7 @@ export default function TimerScreen() {
 
   return (
     <ScrollView
-      style={{ flex: 1, backgroundColor: colors.background }}
+      style={{ flex: 1 }}
       contentContainerStyle={styles.scrollContent}
     >
       {!isRunning && (

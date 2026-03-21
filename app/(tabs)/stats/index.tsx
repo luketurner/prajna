@@ -29,7 +29,7 @@ export default function StatsScreen() {
 
   if (isLoading) {
     return (
-      <View style={[styles.centered, { backgroundColor: colors.background }]}>
+      <View style={[styles.centered, {}]}>
         <ActivityIndicator size="large" color={colors.tint} />
       </View>
     );
@@ -37,7 +37,7 @@ export default function StatsScreen() {
 
   if (!stats || stats.totalSessions === 0) {
     return (
-      <View style={[styles.container, { backgroundColor: colors.background }]}>
+      <View style={[styles.container, {}]}>
         <EmptyState
           icon="insights"
           title="No Statistics Yet"
@@ -49,7 +49,7 @@ export default function StatsScreen() {
 
   return (
     <ScrollView
-      style={[styles.container, { backgroundColor: colors.background }]}
+      style={[styles.container, {}]}
       contentContainerStyle={styles.content}
     >
       {/* Time Totals */}

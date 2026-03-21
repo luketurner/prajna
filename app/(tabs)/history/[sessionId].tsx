@@ -70,7 +70,7 @@ export default function SessionDetailScreen() {
 
   if (isLoading) {
     return (
-      <View style={[styles.centered, { backgroundColor: colors.background }]}>
+      <View style={[styles.centered, {}]}>
         <ActivityIndicator size="large" color={colors.tint} />
       </View>
     );
@@ -78,7 +78,7 @@ export default function SessionDetailScreen() {
 
   if (!session) {
     return (
-      <View style={[styles.centered, { backgroundColor: colors.background }]}>
+      <View style={[styles.centered, {}]}>
         <Text style={{ color: colors.text }}>Session not found</Text>
       </View>
     );
@@ -88,7 +88,7 @@ export default function SessionDetailScreen() {
 
   return (
     <ScrollView
-      style={[styles.container, { backgroundColor: colors.background }]}
+      style={[styles.container, {}]}
     >
       <View style={styles.content}>
         {/* Duration */}
